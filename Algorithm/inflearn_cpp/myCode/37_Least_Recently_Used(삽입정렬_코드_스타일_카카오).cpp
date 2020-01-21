@@ -20,7 +20,7 @@ void hit(int a[], int tmp, int pos)
 
 int main()
 {
-    int a[11] = {0,};
+    int a[18] = {0,};
     int s, n , tmp, pos;
     scanf("%d %d", &s, &n);
 
