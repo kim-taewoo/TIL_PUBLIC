@@ -1,26 +1,26 @@
 T = int(input())
 
 '''
-1 2 3
-4 5 6
-7 8 9
+90도 회전하면
+0번째 행은 n-1번째 열이 되고,
+1번째 행은 n-2번째 열이 되고,
+n-1번째 행은 0번째 열이 된다.
+같은 행 내에서 순서가 바뀌지는 않는다.
+즉 본래 '열'번호가 순서대로 바뀐 곳의 '행'번호가 된다.
+[0][0] -> [0][n-1]
+[0][1] -> [1][n-1]
+[n-1][0] -> [0][0]
 
-7 4 1
-8 5 2
-9 6 3
-
-90 도 회전하면 
-[0][0] 은 [0][n-1]
-[0][1] 은 [1][n-1]
-[0][2] 은 [2][n-1]
-
-[1][0] 은 [0][1]
-[1][1] 은 [1][1]
-[1][2] 은 [2][1]
+코드상으로는 변환 결과 좌표에 대입하는 식으로 구현되므로
+거꾸로 생각할 필요가 있다.
 '''
 
-def rotate(r,c):
-    pass
+def rotate90(a):
+    b = [[0]*n for _ in range(n)]
+    for r in range(n):
+        for c in range(n):
+            b[c][n-1-r] = a[r][c]
+    return b
 
 
 for t in range(1,T+1):
@@ -28,7 +28,11 @@ for t in range(1,T+1):
     n = int(input())
     a = [list(map(int, input().split())) for _ in range(n)]
 
+    r_90 = rotate90(a)
+    r_180 = rotate90(r_90)
+    r_270 = rotate90(r_180)
 
     for r in range(n):
-        for c in range(n):
-            print(, end=" ")
+        print("".join(map(str, r_90[r])), end=" ")
+        print("".join(map(str, r_180[r])), end=" ")
+        print("".join(map(str, r_270[r])))
