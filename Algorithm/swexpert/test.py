@@ -1,3 +1,2 @@
-n = int(input())
-
-print(((1 + n) * n) // 2)
+s = input().split()
+print(len(s))
