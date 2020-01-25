@@ -1,19 +1,21 @@
 T = 10
+def chk_ver(x, y):
+    for j in reversed(range(x+max_length+1, 101)):
+        l = [a[i][y] for i in range(x, j)]
+        for i in range(len(l)//2):
+            if l[i] != l[-1-i]:
+                return 0
+        return len(l)
 
-def chk_hor(r,c):
-    l = a[r][c:]
-    for i in range(len(l)//2):
-        if l[i] != l[-1-i]:
-            return 0
-    return len(l)
 
+def chk_hor(x,y):
+    for j in reversed(range(y+max_length+1, 101)):
+        l = a[x][y:j]
+        for i in range(len(l)//2):
+            if l[i] != l[-1-i]:
+                return 0
+        return len(l)
 
-def chk_ver(r, c):
-    l = [a[i][c] for i in range(r, 100)]
-    for i in range(len(l)//2):
-        if l[i] != l[-1-i]:
-            return 0
-    return len(l)
 
 for _ in range(1, T+1):
     t = int(input())
