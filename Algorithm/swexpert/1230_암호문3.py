@@ -1,35 +1,34 @@
-T = 1
+T = 10
 
 for t in range(1,T+1):
     n_a = int(input())
-    a = list(input().split())
+    a = input().split()
     n_c = int(input())
-    c = list(input().split())
+    c = input().split()
 
-    cnt = 0
     i = 0
     while i < len(c):
         if c[i] == 'I':
-            idx = int(c[i+1])
-            n = int(c[i+2])
-            for j in range(n):
-                a.insert(idx+j, c[i+2+j])
-            i+= 2 + n + 1
+            x = int(c[i+1])
+            y = int(c[i+2])
+            ii = []
+            for s in range(y):
+                ii.append(c[i+2+s])
+            a = a[:x] + ii + a[x:]
+            i += 2 + y + 1
 
-            cnt += 1
         elif c[i] == 'D':
-            idx = int(c[i+1])
-            n = int(c[i+2])
-            for j in range(n):
-                a.pop(idx)
+            x = int(c[i+1])
+            y = int(c[i+2])
+            a = a[:x] + a[x+y-1 : ]
             i += 3
-            cnt += 1
         elif c[i] == 'A':
-            n = int(c[i+1])
-            for j in range(n):
-                a.append(c[i+2+j])
-            i += 1 + n + 1
-            cnt += 1
+            y = int(c[i+1])
+            aa = []
+            for s in range(y):
+                aa.append(c[i+2+s])
+            a = a + aa
+            i += 1 + y + 1
+
     result = " ".join(a[:10])
     print("#{} {}".format(t, result))
-    print(cnt)
