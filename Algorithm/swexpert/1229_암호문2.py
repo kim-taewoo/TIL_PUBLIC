@@ -11,16 +11,14 @@ for t in range(1, T+1):
         if c[i] == 'I':
             x = int(c[i+1])
             y = int(c[i+2])
-            ii = []
-            for s in range(y):
-                ii.append(c[i+2+s])
+            ii = c[i+3:i+3+y]
             a = a[:x] + ii + a[x:]
             i += 2 + y + 1
 
         elif c[i] == 'D':
             x = int(c[i+1])
             y = int(c[i+2])
-            a = a[:x] + a[x-y+1:]
+            a = a[:x] + a[x+y:]
             i += 3
 
     result = " ".join(a[:10])
