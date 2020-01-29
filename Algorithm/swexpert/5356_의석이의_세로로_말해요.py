@@ -14,4 +14,4 @@ for t in range(1, T+1):
         for j in range(5):
             if len(a[j]) - 1 >= i:
                 print(a[j][i], end="")
-        
+    print()
