@@ -13,6 +13,6 @@ for t in range(1, T+1):
             if cnt > max_cnt:
                 max_cnt = cnt
             cnt = 1
-    if cnt > 1:
+    if cnt > max_cnt:
         max_cnt = cnt
     print("#{} {}".format(t, max_cnt))

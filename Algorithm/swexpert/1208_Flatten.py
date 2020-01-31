@@ -1,8 +1,6 @@
 T = 10
-
 for t in range(1, T+1):
     n = int(input())
-
     a = list(map(int, input().split()))
 
     for i in range(n):
@@ -13,8 +11,3 @@ for t in range(1, T+1):
 
     a = sorted(a)
     print("#{} {}".format(t, a[99] - a[0]))
-
-
-
-    
-
