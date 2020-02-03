@@ -1,23 +1,29 @@
 #include <stdio.h>
+int n;
+int ch[11];
 
-using namespace std;
-void dfs(int n)
+void dfs(int el)
 {
-  for (size_t i = 1; i <= n; i++)
+  if (el == n + 1)
   {
-    
+    for (size_t i = 1; i <= n; i++)
+    {
+      if (ch[i])
+        printf("%zu ", i);
+    }
+    printf("\n");
+    return;
   }
-  
+  ch[el] = 1;
+  dfs(el + 1);
+  ch[el] = 0;
+  dfs(el + 1);
 }
-
-int a[10];
 
 int main()
 {
-  int n;
   scanf("%d", &n);
 
-  dfs(n);
-
+  dfs(1);
   return 0;
 }
