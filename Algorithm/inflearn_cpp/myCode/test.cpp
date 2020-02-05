@@ -1,19 +1,40 @@
 #include <stdio.h>
-#include <vector>
-using namespace std;
-vector<int> a(3);
-vector<int> b[5];
+
+int n, total;
+int a[11];
+int chk[11];
+bool flag = false;
+
+void dfs(int l, int sum)
+{
+    if (sum > (total / 2))
+        return;
+    if (flag)
+        return;
+    if (l == n + 1)
+    {
+        if (sum == (total - sum))
+        {
+            flag = true;
+        }
+        return;
+    }
+    dfs(l + 1, sum + a[l]);
+    dfs(l + 1, sum);
+}
+
 int main()
 {
-    for (size_t i = 0; i<3; i++)
+    scanf("%d", &n);
+    for (size_t i = 1; i <= n; i++)
     {
-        printf("%d ", a[i]);
+        scanf("%d", &a[i]);
+        total += a[i];
     }
-    for (size_t j = 0; j < 5; j++)
-    {
-        printf("%d", b[j]);
-    }
-    
-    
+    dfs(1, 0);
+    if (flag)
+        printf("YES\n");
+    else
+        printf("NO\n");
     return 0;
 }
