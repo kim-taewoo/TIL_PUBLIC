@@ -1,24 +1,18 @@
 #include <stdio.h>
-
-int n, total;
+int n, total = 0, flag = 0;
 int a[11];
-int chk[11];
-bool flag = false;
 
-void dfs(int l, int sum)
+void dfs(int level, int sum)
 {
-  if (sum > (total / 2)) return;
   if (flag) return;
-  if (l == n + 1)
+  if (sum == total / 2)
   {
-    if (sum == (total-sum))
-    {
-      flag = true;
-    }
+    flag = 1;
     return;
   }
-  dfs(l+1, sum + a[l]);
-  dfs(l+1, sum);
+  if (level == n+1) return;
+  dfs(level+1, sum+a[level]);
+  dfs(level+1, sum);
 }
 
 int main()
@@ -27,10 +21,16 @@ int main()
   for (size_t i = 1; i <= n; i++)
   {
     scanf("%d", &a[i]);
-    total+=a[i];
+    total += a[i];
   }
-  dfs(1, 0);  
-  if (flag) printf("YES\n");
-  else printf("NO\n");
+  if (total % 2) printf("%s", "NO\n");
+  else
+  {
+    dfs(1, 0);
+    if (flag) printf("%s", "YES\n");
+    else if (!flag) printf("%s", "NO\n");
+  }
+  
+  
   return 0;
 }

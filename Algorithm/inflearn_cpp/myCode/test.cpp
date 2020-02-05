@@ -1,19 +1,31 @@
 #include <stdio.h>
-#include <vector>
-using namespace std;
-vector<int> a(3);
-vector<int> b[5];
+int n, m, cnt=0;
+int a[11];
+
+void dfs(int level, int val)
+{
+  if (level == n+1)
+  {
+    if (val == m) cnt++;
+  }
+  else
+  {
+    dfs(level + 1, val + a[level]);
+    dfs(level + 1, val - a[level]);
+    dfs(level + 1, val);
+  }
+}
+
 int main()
 {
-    for (size_t i = 0; i<3; i++)
-    {
-        printf("%d ", a[i]);
-    }
-    for (size_t j = 0; j < 5; j++)
-    {
-        printf("%d", b[j]);
-    }
-    
-    
-    return 0;
+  scanf("%d %d", &n, &m);
+  for (size_t i = 1; i <= n; i++)
+  {
+    scanf("%d", &a[i]);
+  }
+  dfs(1, 0);
+  if (cnt ==0) printf("-1\n");
+  else printf("%d\n", cnt);
+  
+  return 0;
 }
