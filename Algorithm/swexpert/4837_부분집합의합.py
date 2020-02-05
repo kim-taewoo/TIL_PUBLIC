@@ -1,17 +1,16 @@
-def dfs(level, el_cnt, total):
-    # 종료, 분할, 해결
+def dfs(level, selected, total):
     global cnt
-    if el_cnt == n:
+    if selected == n:
         if total == k:
-            cnt += 1 #해결
+            cnt += 1
         return
-    # if total > n: # 음수 원소가 있으면 쓸 수 없는 조건
+    # if total > n: # 음수 원소가 있어 쓸 수 없는 종료 조건
     #     return
-    if 12 - level + 1 < n - el_cnt: 
+    if 12 - level + 1 < n - selected: 
         return
     
-    dfs(level+1, el_cnt+1, total + level) #분할
-    dfs(level+1, el_cnt, total) #분할
+    dfs(level+1, selected+1, total + level) # 선택o
+    dfs(level+1, selected, total) # 선택x
 
 
 T = int(input())

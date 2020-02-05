@@ -2,4 +2,15 @@ T = int(input())
 
 for t in range(T):
     s = input()
-    width = len(s) * 5 - (len(s) - 1)
+    length = len(s)
+    pattern1 = "." + ".#.." * length
+    pattern2 = "." + "#." * length * 2
+    pattern3 = "#"
+    for i in s:
+        pattern3 += ".{}.#".format(i)
+    
+    print(pattern1)
+    print(pattern2)
+    print(pattern3)
+    print(pattern2)
+    print(pattern1)

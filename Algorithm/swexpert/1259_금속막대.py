@@ -1,6 +1,5 @@
 def dfs(now):
     global max_result
-    global result
     flag = False
     for i in range(n):
         if chk[i]: continue
@@ -13,7 +12,7 @@ def dfs(now):
             result.pop()
     if not flag:
         if len(result) > len(max_result):
-            max_result = result
+            max_result = result[:]
 
 T = int(input())
 for t in range(1, T+1):
@@ -34,3 +33,4 @@ for t in range(1, T+1):
     for i in max_result:
         print(*bolts[i], end=" ")
     print()
+    print(chk)
