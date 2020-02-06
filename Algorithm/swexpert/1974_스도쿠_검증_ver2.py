@@ -1,8 +1,8 @@
 T = int(input())
-from pprint import pprint
+
 for t in range(1, T+1):
     a = [list(map(int, input().split())) for _ in range(9)]
-    pprint(a)
+
     def chk_sudoku():
         for i in range(3):
             for r in range(9): 
@@ -16,9 +16,8 @@ for t in range(1, T+1):
                     elif i == 1: # 세로 체크
                         cur = a[c][r]
                     else: # 사각형 체크
-                        # 9개의 작은 정사각형 0~8 인덱스(왼쪽위부터 오른쪽 아래방향 [세로로!]), 해당 사각형 내에서 0~8 인덱스.
+                        # 9개의 작은 정사각형 0~8 인덱스(왼쪽위부터 오른쪽 아래방향), 해당 사각형 내에서 0~8 인덱스.
                         cur = a[(r // 3 * 3) + (c // 3)][(r % 3 * 3) + (c % 3)]
-                        print(r,c,(r // 3 * 3) + (c // 3),(r % 3 * 3) + (c % 3),cur)
                     if cur == 0: continue
                     if sudoku[cur - 1]: return False
                     sudoku[cur - 1] = True
