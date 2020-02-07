@@ -3,12 +3,10 @@ for t in range(1, T+1):
     print("#{}".format(t))
     n, d = input().split()
     n = int(n)
-    a = [list(map(int, input().split())) for _ in range(n)]
+    ll = [list(map(int, input().split())) for _ in range(n)]
+    if d == 'up' or d == 'down':
+        ll = zip(*ll)
     results = []
-    if d == 'right' or d == 'left':
-        ll = a
-    else:
-        ll = list(zip(*a))
     for j in ll:
         result = []
         c1 = 0
@@ -29,11 +27,12 @@ for t in range(1, T+1):
                         c1 = i
         if c1: 
             result.append(c1)
-        if len(result) < n:
+        shorter = n - len(result)
+        if shorter:
             if d == 'left' or d == 'up':
-                result += [0] * (n - len(result))
+                result += [0] * shorter
             else:
-                result = [0] * (n - len(result)) + list(reversed(result))
+                result = [0] * shorter + list(reversed(result))
         results.append(result)
     if d == 'up' or d == 'down':
         results = zip(*results)
