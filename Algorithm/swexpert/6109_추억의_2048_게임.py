@@ -8,7 +8,7 @@ for t in range(1, T+1):
     if d == 'right' or d == 'left':
         ll = a
     else:
-        ll = zip(*a)
+        ll = list(zip(*a))
     for j in ll:
         result = []
         c1 = 0
