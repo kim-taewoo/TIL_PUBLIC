@@ -6,16 +6,16 @@ vector<pair<int, int> > map[20];
 
 void dfs(int day, int money)
 {
-    if (day + map[day][0].first-1 <= n)
-    {
-        dfs(day + map[day][0].first, money + map[day][0].second);
-        dfs(day+1, money);
-    }
-    else
+    if (day == n+1)
     {
         if (money > max_money) max_money = money;
         return;
     }
+    if (day + map[day][0].first <= n+1)
+    {
+        dfs(day + map[day][0].first, money + map[day][0].second);
+    }
+    dfs(day+1, money);
 }
 
 int main()
