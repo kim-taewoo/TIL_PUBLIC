@@ -40,7 +40,8 @@ int main()
   {
     for (size_t j = 1; j <= n; j++)
     {
-      scanf("%d", &map[i][j]);
+      scanf("%d", &map[i][j]); 
+      // 사실 이렇게 map에 저장할 필요 없음. 그냥 바로 house 와 pizza 만 담아서 이용할 것이기 때문.
       if (map[i][j] == 1)
         house[h++].push_back(make_pair(i, j));
       else if (map[i][j] == 2) 
