@@ -1,18 +1,5 @@
 k = int(input())
 
-<<<<<<< HEAD
-h, v = 0, 0
-for i in range(6):
-    d, dist = map(int, input().split())
-    if d == 4:
-        v += dist
-    elif d == 3:
-        v -= dist
-    elif d == 2:
-        h -= dist
-    else:
-        h += dist
-=======
 a = [list(map(int, input().split())) for _ in range(6)] * 2
 
 for i in range(12):
@@ -21,4 +8,3 @@ for i in range(12):
         result = (a[i][1] + a[i+2][1]) * (a[i+1][1] + a[i+3][1]) - square
         break
 print(result * k)
->>>>>>> b6c0c49175aeb531b526b21859e043275b36bbc5

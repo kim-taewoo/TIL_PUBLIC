@@ -24,7 +24,7 @@ for i in range(5):
 
 cnt = 0
 for i in b:
-    if cnt >= 13:
+    if cnt >= 12:
         result = chk_bingo()
         if result: 
             print(cnt)
