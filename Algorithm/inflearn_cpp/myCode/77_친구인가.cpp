@@ -11,20 +11,16 @@ int Find(int x)
     }
     else
     {
-        return Find(a[x]);
+        return a[x] = Find(a[x]);
     }
 }
 
-int Union(int d, int e)
+void Union(int d, int e)
 {
-    if (Find(d) == Find(e))
+    if (Find(d) != Find(e))
     {
-        return 1;
+        a[d] = e;
     }
-    else
-    {
-        return 0;
-    }    
 }
 
 int main()
@@ -40,21 +36,13 @@ int main()
     for (size_t i = 0; i < m; i++)
     {
         scanf("%d %d", &b, &c);
-        a[b] = c;
+        Union(b,c);
     }
 
     int d, e;
     scanf("%d %d", &d, &e);
-
-    if (Union(d,e))
-    {
-        printf("%s", "YES");
-    }
-    else
-    {
-        printf("%s", "NO");
-    }
-    
+    if (Find(d) == Find(e)) printf("%s", "YES");
+    else printf("%s", "NO");
     
     return 0;
 }
