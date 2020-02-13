@@ -1,5 +1,4 @@
 k = int(input())
-
 a = [list(map(int, input().split())) for _ in range(6)] * 2
 
 for i in range(12):

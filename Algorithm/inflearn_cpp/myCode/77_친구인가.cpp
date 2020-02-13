@@ -15,13 +15,6 @@ int Find(int x)
     }
 }
 
-<<<<<<< HEAD
-void Union(int d, int e)
-{
-    if (Find(d) != Find(e))
-    {
-        a[d] = e;
-=======
 void Union(int b, int c)
 {
     b = Find(b);
@@ -29,7 +22,6 @@ void Union(int b, int c)
     if (b != c)
     {
         a[b] = c;
->>>>>>> 83f46a6a0c052d345b7ab0857b822bff07ce73e3
     }
 }
 
