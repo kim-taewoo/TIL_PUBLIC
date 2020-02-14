@@ -1,3 +1,3 @@
-l = '1'
-x = l.split()
-print(x)
+a = '12321'
+
+print(a == a[::-1])

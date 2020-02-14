@@ -1,6 +1,4 @@
-T = 1
-
-
+T = 10
 def chk_palindrome(list_to_chk, length):
     for i in range(length//2):
         if list_to_chk[i] != list_to_chk[-1-i]:
@@ -10,9 +8,7 @@ def chk_palindrome(list_to_chk, length):
 
 for _ in range(1, T+1):
     t = int(input())
-
     a = [list(input()) for _ in range(100)]
-
     found = False
     for l in range(100, 0, -1): # 가장 긴 100부터 1칸씩 내려가며 검사
         for r in range(100): 

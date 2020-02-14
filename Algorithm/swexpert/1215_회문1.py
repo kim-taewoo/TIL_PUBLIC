@@ -1,7 +1,5 @@
 T = 10
-
 def chk_hor(r,c):
-
     for i in range(n//2):
         if a[r][c+i] != a[r][c+n-1-i]:
             return False
@@ -9,7 +7,6 @@ def chk_hor(r,c):
 
 
 def chk_ver(r, c):
-
     for i in range(n//2):
         if a[r+i][c] != a[r+n-1-i][c]:
             return False
@@ -17,9 +14,7 @@ def chk_ver(r, c):
 
 for t in range(1, T+1):
     n = int(input())
-
     a = [list(input()) for _ in range(8)]
-
     cnt = 0
     for r in range(8):
         for c in range(8):
