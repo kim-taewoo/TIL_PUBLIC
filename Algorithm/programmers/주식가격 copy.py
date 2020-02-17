@@ -9,3 +9,4 @@ def solution(prices):
         answer.append(cnt)
     answer.append(0)
     return answer
+    

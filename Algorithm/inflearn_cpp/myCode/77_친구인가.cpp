@@ -37,30 +37,13 @@ int main()
     for (size_t i = 0; i < m; i++)
     {
         scanf("%d %d", &b, &c);
-<<<<<<< HEAD
-        Union(b,c);
-=======
         Union(b, c);
->>>>>>> 83f46a6a0c052d345b7ab0857b822bff07ce73e3
     }
 
     int d, e;
     scanf("%d %d", &d, &e);
-<<<<<<< HEAD
     if (Find(d) == Find(e)) printf("%s", "YES");
     else printf("%s", "NO");
     
-=======
-
-    if (Find(d) == Find(e))
-    {
-        printf("%s", "YES\n");
-    }
-    else
-    {
-        printf("%s", "NO\n");
-    }
-
->>>>>>> 83f46a6a0c052d345b7ab0857b822bff07ce73e3
     return 0;
 }
