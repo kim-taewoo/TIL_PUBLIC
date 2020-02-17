@@ -1,6 +1,6 @@
 dr = (-1,0,1,0)
 dc = (0,1,0,-1)
-from pprint import pprint
+
 def dfs(level, selected, total_cnt):
     global max_core
     global min_cnt
@@ -19,8 +19,8 @@ def dfs(level, selected, total_cnt):
     nr,nc = r,c
     for d in range(4):
         nr, nc = nr + dr[d], nc + dc[d]
-        cnt = 1
-        while not (nr < 0 or nc < 0 or nr >= n or nc >= n or chk[nr][nc] or a[nr][nc]):
+        cnt = 0
+        while nr >= 0 and nc >= 0 and nr < n and nc < n and not chk[nr][nc] and not a[nr][nc]:
             chk[nr][nc] = True
             nr, nc = nr + dr[d], nc + dc[d]
             cnt += 1
@@ -30,7 +30,6 @@ def dfs(level, selected, total_cnt):
         while nr != r or nc != c:
             chk[nr][nc] = False
             nr, nc = nr - dr[d], nc - dc[d]
-            cnt -= 1
 
 T = int(input())
 for t in range(1, T+1):
@@ -48,7 +47,6 @@ for t in range(1, T+1):
     max_core = 0
     min_cnt = 2147000000
     dfs(0, 0, 0) # 코어 level, 선택된 코어 개수, 전선 길이
-    print(max_core)
-    print(min_cnt)
+    print("#{} {}".format(t, min_cnt))
             
     
