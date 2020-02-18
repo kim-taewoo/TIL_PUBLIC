@@ -2,25 +2,16 @@ def oob(a, b):
     return a < 0 or b < 0 or a >= n or b >= m or room[a][b] == 6
 
 
-def watch(a, b, level, directions):
-    tmp = 0
+def watch(a, b, directions):
+    tmp = list()
     for d in directions:
         na, nb = a + dr[d], b + dc[d]
         while not oob(na, nb):
             if not (room[na][nb] or chk[na][nb]):
-                tmp += 1
-                chk[na][nb] = level
+                chk[na][nb] = True
+                tmp.append((na, nb))
             na, nb = na + dr[d], nb + dc[d]
     return tmp
-
-
-def unwatch(a, b, level, directions):
-    for d in directions:
-        na, nb = a + dr[d], b + dc[d]
-        while not oob(na, nb):
-            if chk[na][nb] == level:
-                chk[na][nb] = 0
-            na, nb = na + dr[d], nb + dc[d]
 
 
 def dfs(level, cnt):
@@ -34,42 +25,52 @@ def dfs(level, cnt):
     r, c, t = cctvs[level]
     if t == 5:
         new_watch = 0
-        new_watch += watch(r,c,level+1,[0,1,2,3])
+        result = watch(r, c, [0, 1, 2, 3])
+        new_watch += len(result)
         dfs(level+1, cnt + new_watch)
-        unwatch(r,c,level+1, [0,1,2,3])
+        for x, y in result:
+            chk[x][y] = 0
     elif t == 1:
         for i in range(4):
-            new_watch = watch(r,c,level+1,[i])
+            result = watch(r, c, [i])
+            new_watch = len(result)
             dfs(level+1, cnt+new_watch)
-            unwatch(r,c,level+1,[i])
+            for x, y in result:
+                chk[x][y] = 0
     elif t == 2:
         for i in range(2):
             new_watch = 0
-            new_watch += watch(r,c,level+1, [i,i+2])
+            result = watch(r, c, [i, i+2])
+            new_watch += len(result)
             dfs(level+1, cnt+new_watch)
-            unwatch(r,c,level+1, [i,i+2])
+            for x, y in result:
+                chk[x][y] = 0
     elif t == 3:
         for i in range(4):
             new_watch = 0
-            new_watch += watch(r,c,level+1, [i,(i+1)%4])
+            result = watch(r, c, [i, (i+1) % 4])
+            new_watch += len(result)
             dfs(level+1, cnt+new_watch)
-            unwatch(r,c,level+1, [i,(i+1)%4])
+            for x, y in result:
+                chk[x][y] = 0
     elif t == 4:
         for i in range(4):
             new_watch = 0
-            new_watch += watch(r,c,level+1, [i,(i+1)%4,(i+2)%4])
+            result = watch(r, c, [i, (i+1) % 4, (i+2) % 4])
+            new_watch += len(result)
             dfs(level+1, cnt+new_watch)
-            unwatch(r,c,level+1, [i,(i+1)%4,(i+2)%4])
+            for x, y in result:
+                chk[x][y] = 0
 
 
 # main()
-n, m = map(int,input().split())
+n, m = map(int, input().split())
 room = [list(map(int, input().split())) for _ in range(n)]
 
-dr = [-1, 0, 1, 0] # 위, 오른쪽, 아래쪽, 왼쪽
+dr = [-1, 0, 1, 0]  # 위, 오른쪽, 아래쪽, 왼쪽
 dc = [0, 1, 0, -1]
 
-chk = [[0 for _ in range(m)] for __ in range(n)]
+chk = [[False for _ in range(m)] for __ in range(n)]
 cctvs = []
 remains = 0
 for r in range(n):

@@ -13,6 +13,7 @@ def watch(a, b, level, directions):
             na, nb = na + dr[d], nb + dc[d]
     return tmp
 
+
 def unwatch(a, b, level, directions):
     for d in directions:
         na, nb = a + dr[d], b + dc[d]
@@ -20,6 +21,7 @@ def unwatch(a, b, level, directions):
             if chk[na][nb] == level:
                 chk[na][nb] = 0
             na, nb = na + dr[d], nb + dc[d]
+
 
 def dfs(level, cnt):
     global max_cnt
@@ -41,48 +43,23 @@ def dfs(level, cnt):
             dfs(level+1, cnt+new_watch)
             unwatch(r,c,level+1,[i])
     elif t == 2:
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [0,2])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [0,2])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [1,3])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [1,3])
+        for i in range(2):
+            new_watch = 0
+            new_watch += watch(r,c,level+1, [i,i+2])
+            dfs(level+1, cnt+new_watch)
+            unwatch(r,c,level+1, [i,i+2])
     elif t == 3:
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [0,1])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [0,1])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [1,2])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [1,2])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [2,3])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [2,3])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [3,0])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [3,0])
+        for i in range(4):
+            new_watch = 0
+            new_watch += watch(r,c,level+1, [i,(i+1)%4])
+            dfs(level+1, cnt+new_watch)
+            unwatch(r,c,level+1, [i,(i+1)%4])
     elif t == 4:
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [0,1,2])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [0,1,2])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [1,2,3])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [1,2,3])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [2,3,0])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [2,3,0])
-        new_watch = 0
-        new_watch += watch(r,c,level+1, [3,0,1])
-        dfs(level+1, cnt+new_watch)
-        unwatch(r,c,level+1, [3,0,1])
+        for i in range(4):
+            new_watch = 0
+            new_watch += watch(r,c,level+1, [i,(i+1)%4,(i+2)%4])
+            dfs(level+1, cnt+new_watch)
+            unwatch(r,c,level+1, [i,(i+1)%4,(i+2)%4])
 
 
 # main()
