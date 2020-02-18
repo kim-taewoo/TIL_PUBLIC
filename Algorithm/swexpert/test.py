@@ -1,3 +1,7 @@
-a = [[1,2],[3,4],[5,6],[7,8]]
+def test(n):
+    for i in range(3):
+        n+=1
 
-print([[0 for _ in range(2)]] + a)
+    print(n)
+
+test(3)
