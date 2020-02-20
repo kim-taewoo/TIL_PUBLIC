@@ -1,3 +1,6 @@
 *.obj
 *.exe
 .ide/
+.idea/
+*.xml
+*.iml
