@@ -4,28 +4,19 @@ direction = [(1, -1), (1, 1), (-1, 1), (-1, -1)]
 def dfs(a, b, d, cnt):
     global max_result
 
-    na, nb = a + direction[d][0], b + direction[d][1]
-    if 0 <= na < n and 0 <= nb < n:
-        if desserts[board[na][nb]]:
-            if d == 3 and na == sa and nb == sb:
-                if cnt > max_result:
-                    max_result = cnt
-        else:
-            desserts[board[na][nb]] = True
-            dfs(na, nb, d, cnt + 1)
-            desserts[board[na][nb]] = False
-
-    if d < 3:
-        na, nb = a + direction[d+1][0], b + direction[d+1][1]
+    for i in range(2):
+        if d == 3 and i == 1: continue
+        na, nb = a + direction[d+i][0], b + direction[d+i][1]
         if 0 <= na < n and 0 <= nb < n:
-            if desserts[board[na][nb]]:
-                if d == 3 and na == sa and nb == sb:
-                    if cnt > max_result:
-                        max_result = cnt
+            if d + i == 3 and desserts[board[na][nb]]:
+                if na == sa and nb == sb:
+                    max_result = max(max_result, cnt)
+                    return
             else:
-                desserts[board[na][nb]] = True
-                dfs(na, nb, d+1, cnt + 1)
-                desserts[board[na][nb]] = False
+                if not desserts[board[na][nb]]:
+                    desserts[board[na][nb]] = True
+                    dfs(na, nb, d+i, cnt + 1)
+                    desserts[board[na][nb]] = False
 
 
 T = int(input())
