@@ -1,9 +1,6 @@
-# 크루스칼 알고리즘 사용시도. (실패)
-# 실패이유: 크루스칼 같이 간선의 비용을 기준으로 오름차순 정렬한 뒤 사용할 간선을 고르는 것은, 
-# 간선의 비용이 unique 하지 않고 같은 비용의 간선이 여러 개일 경우 어떤 것을 먼저 사용하냐에 따라 최소신장트리가 달라질 수 있다.
-# 따라서 이 문제같은 경우 간선 기준인 크루스칼이 아닌 프림 알고리즘을 써야한다.
-
+# 프림 알고리즘 사용시도.
 from pprint import pprint
+import heapq
 
 
 def bfs(a, b, numbering):  # 섬 넘버링
@@ -21,22 +18,6 @@ def bfs(a, b, numbering):  # 섬 넘버링
                 q.append((nx, ny))
 
 
-def find_group(x):
-    if x == group_belong[x]:
-        return x
-    else:
-        group = find_group(group_belong[x])
-        group_belong[x] = group
-        return group
-
-
-def union_group(x, y):
-    x = find_group(x)
-    y = find_group(y)
-    if x != y:
-        group_belong[x] = y
-
-
 # main()
 n, m = map(int, input().split())
 
@@ -52,8 +33,8 @@ for r in range(n):
 
 num_island = numbering - 1  # 섬의 개수. 아래쪽에서 사용됨.
 
-# 성립 가능한 모든 다리 구하기
-bridges = []
+# 성립 가능한 모든 다리 구하기 및 인접리스트에 저장.
+connections = [list() for _ in range(num_island + 1)]  # 인덱스 맞춰주기 위해 + 1
 for r in range(n):
     for c in range(m):
         if numbered_board[r][c]:
@@ -72,13 +53,11 @@ for r in range(n):
                         arrived_num = numbered_board[r][nc]
                         if arrived_num == started_num:
                             break
-                        else:
-                            if started_num <= arrived_num:
-                                bridges.append(
-                                    (length, started_num, arrived_num))
-                            else:
-                                bridges.append(
-                                    (length, arrived_num, started_num))
+                        else:  # 무방향 인접리스트
+                            connections[started_num].append(
+                                (length, arrived_num))
+                            connections[arrived_num].append(
+                                (length, started_num))
                         break
                     elif numbered_board[r][nc] == 0:
                         length += 1
@@ -97,36 +76,30 @@ for r in range(n):
                         if arrived_num == started_num:
                             break
                         else:
-                            if started_num <= arrived_num:
-                                bridges.append(
-                                    (length, started_num, arrived_num))
-                            else:
-                                bridges.append(
-                                    (length, arrived_num, started_num))
-
+                            connections[started_num].append(
+                                (length, arrived_num))
+                            connections[arrived_num].append(
+                                (length, started_num))
                         break
                     elif numbered_board[nr][c] == 0:
                         length += 1
-
-# 인덱스: 섬의 넘버링, 원소: 해당 섬의 속한 그룹
-group_belong = [i for i in range(num_island+1)]
-bridges = sorted(bridges, key=lambda x: x[0])  # 최소거리순으로 정렬
+# pprint(connections)
 total_dist = 0
-print(bridges)
-for i in bridges:
-    dist, a, b = i
-    fa = find_group(a)
-    fb = find_group(b)
-    if fa != fb:
+island_chk = [False for _ in range(num_island+1)]
+# 우선순위 큐를 heapq 로 구현. 최소 비용부터 나오는 최소힙. 튜플 원소의 앞에 오는 것이 거리(비용), 뒤의 것이 섬 번호(노드번호)
+pq = [(0, 1)]
+while pq:
+    dist, island_num = heapq.heappop(pq)
+    if not island_chk[island_num]:
+        island_chk[island_num] = True
+        # bfs 와 같은 데서 큐를 사용할 때는 큐에 들어가는 하나하나가 모두 필요한 유니크한 위치기 때문에
+        # 큐에 넣으면서 체크해줘도 되지만, 여기서는 같은 섬들끼리 연결해주는 다리가 여러개 있을 수 있기 때문에
+        # 큐에서 빼서 쓸 때 아직도 쓸 수 있는 다리인지 확인해야 한다.
         total_dist += dist
-        union_group(a, b)
-    print(group_belong)
+        for i in connections[island_num]:
+            heapq.heappush(pq, i)
 
-
-pprint(numbered_board)
-print(group_belong)
-
-if len(set(group_belong[1:])) == 1:
+if all(island_chk[1:]):
     print(total_dist)
 else:
     print(-1)
