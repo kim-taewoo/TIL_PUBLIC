@@ -1,5 +1,5 @@
-# 프림 알고리즘 사용시도.
-from pprint import pprint
+# 프림 알고리즘 (성공)
+# from pprint import pprint
 import heapq
 
 

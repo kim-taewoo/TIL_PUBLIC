@@ -1,20 +1,3 @@
-import sys
-sys.stdin = open('input.txt')
-'''
-N x M : 1~10
-땅 / 바다
-다리 2이상, 직선
----------------
-섬을 인식한다.
-4방향서치 > 끝까지 > 섬의 x,y > 저장한다.<check_island + DFS_island> (lands에 index 2부터 각각 저장, 1은 true랑 혼돈되서..)
------------------------------------------------
-섬의 한 점과 다른 섬의 한 점이 직선으로 이어질수 있는지 검사 <check_bridge>
-이어질수 있으면 : 다리 생성 tuple형식 (노드1, 노드2, 다리길이)
--------------------------------------------------------
-가능한 경우의 수 구하기 : <getSubset> >>> 이어지면 : <DFS2> >>> 최소거리 비교 후 결과 저장
-'''
-
-
 def check_island(x, y, n):  # 2번부터 섬 네이밍 + 좌표저장
     if not field[x][y]:
         DFS_island(x, y, n)
@@ -44,6 +27,9 @@ def check_bridge(n1, n2):
             temp = []
             i = 1
             while 0 <= x+dx[k]*i <= N-1 and 0 <= y+dy[k]*i <= M-1:  # 경계끝까지
+                # 태우: 중간에 다른 섬이 껴있는 경우에 뛰어넘어 갈 수 없으므로 종료해주어야 함. 
+                if field[x+dx[k]*i][y+dy[k]*i] >= 2 and field[x+dx[k]*i][y+dy[k]*i] != n2:
+                    break
                 if field[x+dx[k]*i][y+dy[k]*i] == n1:  # 내 땅을 또 만나면 다음 방향 서치
                     break
                 if field[x+dx[k]*i][y+dy[k]*i] == n2:  # 섬과 섬 이어지면, 다리 길이와 함께 저장
@@ -91,7 +77,7 @@ def DFS2(v):  # poten의 다리들로 모든 섬을 연결 할 수 있는 지 >>
 
 T = 1  # 제출시 1로, 테스트 케이스 여러개 넣을때 편리하도록 구성
 for tc in range(1, T+1):
-    dx = [0, 0, 1, -1]  ## 태우: 변하지 않는 리스트를 테스트 케이스마다 새로 생성할 필요 없음
+    dx = [0, 0, 1, -1]
     dy = [1, -1, 0, 0]
     N, M = map(int, input().split())
     field = [list(False if x == '1' else True for x in input().split())

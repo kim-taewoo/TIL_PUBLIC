@@ -1,3 +1,6 @@
-d = {}
-for i in d.get('0', []):
-    print(i)
+def test(a):
+    return a[-1]
+
+
+a = []
+print(test(a))
