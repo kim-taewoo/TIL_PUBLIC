@@ -3,6 +3,7 @@
 # 그럴싸해 보였지만 계속 4 개 테스트 케이스에서 실패하길래 곰곰히 생각해보니 문제가 있었음.
 # 가장 큰 값을 고르는 것까지는 성공하겠지만 그 옆에 그보다는 작지만
 # 2명을 조합했을 때는 가장 클 수 있는 가능성이 있는 선택지를 선택할 수 없게 됨.
+# 즉 그리디하게 가장 큰 값을 순서대로 저장한다고 최적의 조합을 보장받을 수 없다.
 
 # 아래는 그냥 바이너리 연산을 쓴 잘 짠 사람의 코드
 # calc 의 계산이 간지남.
@@ -10,7 +11,7 @@
 
 def cal(temp):
     ret = 0
-    # 각 원소를 고를지 말지의 조합이므로 2 ** M 개의 조합이 가능하다. 아예 안 고르는 건 말이 안되므로 1부터 시작.
+    # 각 원소를 고를지 말지의 조합이므로 2 ** M 개의 조합이 가능하다. 아무것도 안 고르는 건 말이 안되므로 1부터 시작.
     for i in range(1, (1 << M)):
         tsum = 0
         ttsum = 0
@@ -38,10 +39,10 @@ for tc in range(1, int(input()) + 1):
     mattt = []
     for i in range(N):
         for j in range(N):
-            mattt.append(matt[i][j]) # 일차원 리스트에 모두 더하기. 왜? 아래서 조합할거니까.
+            mattt.append(matt[i][j])  # 일차원 리스트에 모두 더하기. 왜? 아래서 조합할거니까.
 
     ans = 0
-    for i in range(len(mattt) - M): # 꼴랑 2개 조합하는 것이므로 dfs 대신 2중 for 문으로 해결
+    for i in range(len(mattt) - M):  # 꼴랑 2개 조합하는 것이므로 dfs 대신 2중 for 문으로 해결
         for j in range(i + M, len(mattt)):
             if ans < mattt[i] + mattt[j]:
                 ans = mattt[i] + mattt[j]
