@@ -5,7 +5,8 @@ def dfs(month, cost):
         if cost < min_cost:
             min_cost = cost
         return
-    
+    if cost > min_cost:
+        return
     if plan[month]:
         dfs(month+1, cost + plan[month] * d)
         dfs(month+1, cost + m)
@@ -19,5 +20,4 @@ for tc in range(1, T+1):
     plan = [0] + list(map(int, input().split()))
     min_cost = y
     dfs(1, 0)
-
     print("#{} {}".format(tc, min_cost))
