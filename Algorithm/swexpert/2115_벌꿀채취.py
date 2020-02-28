@@ -51,9 +51,6 @@ for t in range(1, T+1):
             worker1 = calc_max_price(r, c)
             worker2 = pick_another(r, c+M)
             if worker1 + worker2 > maxi_result:
-                # print(worker1, worker2)
                 maxi_result = worker1 + worker2
 
-    # from pprint import pprint
-    # pprint(max_table)
     print("#{} {}".format(t, maxi_result))
