@@ -40,7 +40,6 @@ for t in range(1, T+1):
         comb2_time = calc_time(comb2, 1)
         time_consumed = max(comb1_time, comb2_time)
 
-        if time_consumed < min_time_consumed:
-            min_time_consumed = time_consumed
+        min_time_consumed = min(min_time_consumed, time_consumed)
 
     print("#{} {}".format(t, min_time_consumed))
