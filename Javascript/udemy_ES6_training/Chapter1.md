@@ -1,3 +1,5 @@
+# CHAPTER1. Syntax Changes & Additions
+
 ## Let vs Var
 1. Block Scope 의 개념없이 모든 게 전역변수로 만들어졌던 Var 과 달리, Let 은 Block Scope 가 적용된다. 즉, 선언된 스코프를 벗어난 곳에서 Let 변수를 호출하려하면 에러가 발생한다.
 1. Let 변수는 Hoisting 되지 않는다. 
@@ -187,4 +189,13 @@ let {name, greet} = obj;
 // let {name, greet: hello} = obj // alias hello
 greet();
 ```
+
+# CHAPTER2. Modules & Classes
+
+## 작업환경 세팅
+이 강의에서는 편의를 위해 아래 웹앱 사용. 그러나 한글 지원도 잘 안 되고 사용도 뭔가 불편해서 vscode 에서 쓸 방법을 찾아보았다.  
+[Plunker](https://plnkr.co)  
+로컬 vscode 에서 node.js 와 express 에서 ES6 를 쓰기 위한 가이드는 아래 참고  
+[가이드](https://www.freecodecamp.org/news/how-to-enable-es6-and-beyond-syntax-with-node-and-express-68d3e11fe1ab)  
+
 
