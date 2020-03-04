@@ -193,9 +193,134 @@ greet();
 # CHAPTER2. Modules & Classes
 
 ## 작업환경 세팅
-이 강의에서는 편의를 위해 아래 웹앱 사용. 그러나 한글 지원도 잘 안 되고 사용도 뭔가 불편해서 vscode 에서 쓸 방법을 찾아보았다.  
+이 강의에서는 편의를 위해 Plunker 라는 웹 에디터 사용. 그러나 한글 지원도 잘 안 되고 사용도 뭔가 불편해서 vscode 에서 쓸 방법을 찾아보았다.  
 [Plunker](https://plnkr.co)  
-로컬 vscode 에서 node.js 와 express 에서 ES6 를 쓰기 위한 가이드는 아래 참고  
+로컬 vscode 에서 node.js 와 express 에서 ES6 를 쓰기 위한 가이드는 아래 내용을 참고했다.
 [가이드](https://www.freecodecamp.org/news/how-to-enable-es6-and-beyond-syntax-with-node-and-express-68d3e11fe1ab)  
+위 가이드를 따라 로컬 서버환경을 구성하고, udemy 코드를 불러다 쓸 수 있게 추가적인 세팅을 하면 된다. 다만 위 글을 쓴 사람의 작업환경은 리눅스로, 윈도우 머신에서는 정상 작동하지 않는 부분이 있다. 추가적으로 `npm install cross-env` 를 하고, `package.json` 파일의 `scripts` 의 dev, prod 명령어 앞에 **cross-env** 를 붙여주어야 한다.
 
+## Modules 기본개념
+1. 변수나 함수 값을 '복사' 해서 가져오는 것이 아니라 참조만 하는 것이기 때문에, `import` 된 파일 내의 변수 값이 동적으로 바뀌면, 그 변수를 가지고 온 파일에서도 해당 변수가 가진 값은 바뀌어 있다.
+1. ES6에서 모든 모듈은 무조건 **Strinct Mode** 이다. 따라서 별개로 `"use strict"` 같은 정의를 해주지 않아도 된다. 
+1. 모듈은 shared 나 global 스코프를 가지지 않고 각각 별개의 스코프를 가진다. 
 
+## import & export 문법
+1. 한 파일 내에 여러 개의 `export` 를 쓸 수 있다. 다만 `export default` 는 단 한 개만 쓸 수 있다.
+1. `import` 할 때 `as` 키워드를 이용해 원본 변수 or 함수명과 다른 이름으로 쓸 수 있다. 
+    ```javascript
+    import {keyValue as key} from 'externalFile';
+    ```
+1. `*` 을 이용해 모든 `export` 를 한 번에 가져올 수 있다. 이렇게 한 번에 가져올 때는 반드시 `as` 키워드로 이름을 붙여주어야 한다. 이 이름은 가져온 모든 것을 담고 있는 **object** 가 된다. 
+
+## Class Basics
+- ES5 에서도 Prototype 과 같은 Class 와 유사한 문법이 존재했지만(내부적으로 거의 동일하게 동작한다.), ES6 의 Class 문법을 통해 Class 문법이 보다 명확해지고 활용도가 좋아졌다. 
+
+- 다른 프로그래밍 언어의 클래스처럼, 자바스크립트의 클래스도, `class` 로 정의된 블루프린트를 이용해 새로운 object 를 `new` 키워드로 찍어낼 수 있게 한다. 클래스의 메서드는 따로 `function` 키워드 없이 곧바로 정의하면 된다. (일반 object 에서도 가능했다.) Constructor 를 따로 명시해 클래스 property 를 초기화할 수 있다.
+
+- 클래스 인스턴스의 prototype 은 해당 클래스의 프로토타입과 같다. [링크::프로토타입공부](https://medium.com/@bluesh55/javascript-prototype-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0-f8e67c286b67)
+
+```javascript
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+
+  greet() {
+    console.log("Hello, my name is " + this.name);
+  }
+}
+
+let person = new Person();
+person.greet();
+
+console.log(person.__proto__); // [object Object]
+console.log(person.__proto__ == Object.prototype); // false
+console.log(person.__proto__ == Object); // false
+console.log(person.__proto__ == Person.prototype); // true
+console.log(person.__proto__ === Person.prototype); // true
+```
+
+## Inheritance
+- 다른 언어처럼 상속이 가능하다.
+- 부모와 프로토타입이 동일하지는 않다. 
+
+```javascript
+class Max extends Person {
+  constructor(age) {
+    super('Max'); // 부모 클래스의 constructor 를 호출
+    this.age = age;
+  },
+  greetTwice() {
+    this.greet();
+    this.greet();
+    // super.greet() 으로도 가능. 물론 자식 클래스에 같은 이름의 함수가 새로 정의되어 덮어 씌워진다면 this 와 super 은 다른 함수를 가리킨다.
+  }
+}
+let max = new Max(27);
+max.greetTwice();
+console.log(max.__proto__ === Person.prototype); // false
+console.log(person.__proto__ === Person); // false
+```
+
+## static method
+클래스의 method 정의 때 앞에 `static` 키워드를 붙여 static method 를 만들 수 있다. static method 는 클래스의 instantiation 없이 쓸 수 있어, 함수의 번들을 만들기 좋다.
+
+```javascript
+class Helper {
+  static logTwice(message) {
+    console.log(message);
+    console.log(message);
+  }
+}
+Helper.logTwice('Logged!');
+```
+
+## Classes & Modules
+- 클래스도 당연히 `export` 가능하다.
+
+## Getters & Setters
+앞에 `_` 언더스코어를 써서 property 를 private property 로 만들어 getters 와 setters 를 통해서만 조회 및 수정 가능하도록 할 수 있다. 물론 `person._name` 같이 아예 언더스코어까지 쳐서 접근하면 접근되기 때문에 진정한 캡슐화라고는 할 수 없지만, 어느정도의 틀을 제공한다.
+
+```javascript
+class Person {
+  constructor(name) {
+    this._name = name;
+  }
+
+  get name() {
+    return this._name.toUpperCase();
+  }
+
+  set name(value) {
+    if (value.length > 2) {
+      this._name = value;
+    }
+    else {
+      console.log("Rejected");
+    }
+  }
+}
+let person = new Person("Max");
+console.log(person)
+```
+
+## Extending Built-in Objects
+
+- Subclassing 이란, 자바스크립트 built-in 클래스를 본인의 입맛에 맞게 수정해서 쓰는 것이다.
+
+```javascript
+class ConvertableArray extends Array {
+  convert() {
+    let returnArray = [];
+    this.forEach(value => returnArray.push('Converted!' + value));
+    return returnArray;
+  }
+}
+
+let numberArray = new ConvertableArray();
+numberArray.push(1);
+numberArray.push(2);
+numberArray.push(3);
+
+console.log(numberArray.convert());
+```

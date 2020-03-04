@@ -4,10 +4,12 @@
  * Module dependencies.
  */
 import app from '../app';
+// 원하는 챕터코드 실행
+import udemyCode from '../udemy-codes/module_basics/script'
 import http from 'http';
 import debugLib from 'debug';
 const debug = debugLib('module-setting:server');
-
+udemyCode()
 /**
  * Get port from environment and store in Express.
  */
