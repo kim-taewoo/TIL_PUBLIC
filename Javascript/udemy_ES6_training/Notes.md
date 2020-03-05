@@ -403,3 +403,127 @@ console.log(numbers + 1); // 원래라면 "1,2,31" 같은 거야 하는데 1000.
 ```
 더 많은 Well known symbols 에 관해서는 아래 가이드를 참고하자.  
 [MDN Well known Symbols 문서](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol)
+
+# CHAPTER 4. Iterators & Generators
+
+## Iterator Basics
+- Javascript 에서 Iterateable 한 객체는(Array 등등), built-in well-known symbol 이 있다. `console.log(typeof array[Symbol.iterator])` 같은 방식으로 그 심볼의 존재유무를 확인할 수 있다.
+- Array 의 `Symbol.iterator` 을 출력해보면 'function' 이라고 뜨는데, 함수임을 짐작하고 호출해보면 `[object Array iterator]` 이라고 출력된다. 이 객체는 오직 `next()` 메서드만을 가진 객체다. 이 `next()` 메서드를 호출할 때마다 Array 의 원소가 하나씩 value 값으로 사용되고, 본래 가진 개수보다 많이 `next()` 가 호출되면 `undefined` 를 마지막 value 로 종료된다. ("done" property 가 true 가 되어 종료를 알린다.)
+
+```js
+let array = [1,2,3];
+let it = array[Symbol.iterator]();
+console.log(it.next()); // done:false, value: 1
+console.log(it.next());
+console.log(it.next());
+console.log(it.next()); // done:true, value: undefined
+```
+
+## Iterators in Action
+- 위에서 살펴보았던 iterator 심볼 내용을 덮어씌워 내가 원하는 방식으로 객체를 순회하도록 할 수 있다. 
+
+- 아래 예시는 기존 Array 와는 아예 관계없이 iterator를 덮어씌운 대로 for 반복문이 실행되는 모습을 보여준다. 
+
+```javascript
+let array = [1,2,3];
+array[Symbol.iterator] = function() {
+  let nextValue = 10;
+  return {
+    next: function() {
+      nextValue++;
+      return {
+        done: nextValue > 15 ? true : false,
+        value: nextValue
+      }
+    }
+  }
+}
+
+for (let element of array) {
+  console.log(element);
+} // 11, 12, 13, 14, 15 출력
+
+console.log(array); // [1,2,3]. 즉 원본이 수정된 것은 아님!
+```
+
+> 정리: iterateable 한 객체는 iterator 심볼(함수)을 가지고 있고, 그 함수는 next 라는 메서드를 가진 객체를 반환한다. 잘 덮어 씌우면 원하는대로 객체 순회 규칙을 짤 수 있다.
+
+## Creating a custom, iterateable Object
+- 위에서는 원래 iterateable 한 Array 의 iterator 를 조작했다면, 이제 평범한 객체를 iterateable 하게 만들어보자. `done` property 를 조건에 맞게 true 로 변화시켜 주어야 무한 루프에 빠지지 않는다.
+
+```javascript
+let person = {
+  name: 'Josh',
+  hobbies: ['Sports', 'Cooking'],
+  [Symbol.iterator]: () => {
+    let i = 0;
+    let hobbies = this.hobbies;
+    return {
+      next: function() {
+        let value = hobbies[i];
+        i++;
+        return {
+          done: i > hobbies.length ? true : false;
+          value: value
+        };
+      }
+    };
+  }
+};
+
+for (let hobby of person) {
+  console.log(hobby);
+}
+```
+
+## Generators Basics
+- Generator 는 마치 위에서 배운 iterator 심볼을 따로 떼낸 것처럼 동작한다. 문법적으로는 `*` 이 붙은 함수처럼 생겼는데, `return` 대신 `yield` 를 여러 개 가지고 있고, `next()` 가 호출될 때마다 자신이 가지고 있는 `yield` 를 반환한다.
+
+```javascript
+function *select() {
+  yield 'House';
+  yield 'Garage';
+}
+
+let it = select();
+console.log(it.next()); // done: false, value: 'House'
+console.log(it.next());
+console.log(it.next()); // done: true, value:undefined
+```
+
+## Generators in Action
+- 앞서 말한대로, generator 는 마치 iterator 를 아웃소싱 한 것처럼 사용한다. 
+- 이 방법이 좋은 이유는, yield 를 쓰는 것이 무엇을 반환할 지 관리하기 편하기 때문이다. (각 단계마다 api 호출을 하거나 db 를 쿼리하거나 등등 다양한 행동을 편하게 지정해놓을 수 있다.)
+
+```javascript
+let obj = {
+  [Symbol.iterator]: gen // out-sourcing iterator
+}
+function *gen() {
+  yield 1;
+  yield 2;
+}
+
+for (let element of obj) {
+  console.log(element)
+}
+```
+
+- 아예 generator 만의 순회방식을 지정할 수도 있다.
+
+```javascript
+function *gen(end) {
+  for (let i = 0; i < end; i++) {
+    yield i;
+  }
+}
+let it = gen(2);
+console.log(it.next());
+console.log(it.next());
+console.log(it.next()); // undefined
+console.log(it.next());
+```
+
+## throw, return
+- `next` 대신 `throw` 를 써서 강제로 에러를 발생시킬 수 있다.
+- `next` 대신 `return` 을 써서 강제로 값을(해당 순서의 값) 덮어씌울 수 있다.
