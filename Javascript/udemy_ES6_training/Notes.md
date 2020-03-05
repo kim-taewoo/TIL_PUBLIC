@@ -324,3 +324,82 @@ numberArray.push(3);
 
 console.log(numberArray.convert());
 ```
+
+# CAHPTER3. Symbols
+
+## Basics
+- 심볼이란 Number, String 과 같은 자료형(Primitive)의 일종이다.
+- 심볼은 유니크하고, Not iterable 한 특징을 가지고 있다.
+- 위 특징 덕분에 무언가를 실수로 덮어쓰거나 수정하는 일을 방지할 수 있다.
+- 직접 접근하는 방법 외의 iterator 를 통해 출력이 안되기 때문에, meta 정보를 기입해 놓는 데 많이 쓰인다.
+
+```javascript
+// 생성시 new 가 필요 없음에 주의
+let symbol = Symbol('debug'); // debug 는 그냥 이름 붙인 것일 뿐 unique id 는 따로 가진다.
+console.log(symbol) // [object Symbol] {...}
+console.log(symbol.toString()) // "Symbol(debug)"
+console.log(typeof symbol); // "symbol"
+
+let anotherSymbol = Symbol('debug');
+
+console.log(symbol == anotherSymbol); // false
+
+// 활용
+let obj = {
+  name: 'Max',
+  [symbol]: 22 // 이전에 배운 '변수가 담고 있는 값' 으로 객체 property 를 만들 수 있는 문법
+}
+console.log(obj[symbol]); // 직접 접근으로는 출력가능.
+```
+
+## Shared Symbols 
+- `Symbol.for()` 문법으로 유니크한 id 를 공유하는 두 개 이상의 Symbol 을 만들 수 있다. 
+
+```javascript
+let symbol1 = Symbol.for('age');
+let symbol2 = Symbol.for('age');
+console.log(symbol1 == symbol2); // true
+
+let person = {
+  name: 'Max',
+  age: 30
+};
+
+function makeAge(person) {
+  let ageSymbol = Symbol.for('age');
+  person[ageSymbol] = 27;
+}
+
+makeAge(person);
+
+console.log(person[symbol1]); // 27
+// 원래라면 함수 내 변수 + 심볼(ageSymbol)이어서 접근 불가능했겠지만, 
+// 바깥 스코프에 만들어 놓은 심볼 변수(symbol1 or symbol2)가 같은 심볼을 공유하고 있기 때문에 접근 가능.
+
+console.log(person["age"]); // 30  , 이건 심볼 아님.
+// object 에 "age" 라는 이름의 property 가 있어도, 심볼은 별개로 접근 가능함을 확인.
+```
+
+## Well-known Symbols
+이미 정의되어 있는 심볼들이 있다.
+
+아래 예시는 클래스 인스턴스를 출력할 때, [Object object] 대신 그 클래스명이 나오도록 심볼을 바꾸는 과정을 보여준다. 
+```javascript
+class Person {
+
+}
+Person.prototype[Symbol.toStringTag] = 'Person';
+let person = new Person();
+console.log(person); // [obejct Person] { ... }
+```
+
+어떤 default behaviour 을 덮어씌우는 함수를 작성할 수도 있다.
+```javascript
+let numbers = [1,2,3];
+numbers[Symbol.toPrimitive] = function() {
+  return 999;
+}
+console.log(numbers + 1); // 원래라면 "1,2,31" 같은 거야 하는데 1000.
+```
+더 많은 Well known symbols 에 관해서는 아래 가이드를 참고하자.  
+[MDN Well known Symbols 문서](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol)
