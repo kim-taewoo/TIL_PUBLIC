@@ -6,6 +6,9 @@
 
 > Hoisting : 모든 변수 선언이 파일 맨 앞쪽에서 선언된 것처럼 끌어올리는 자바스크립트 특유의 작동방식. `var age = 13` 와 같은 변수 선언이 해당 변수의 호출보다 아래에 있어도 이상없이 작동한다.
 
+## const
+- 한 번 정의된 변수가 가리키는 메모리 주소가 바뀌는 일이 없도록 막는다. 값 이 아닌 메모리 주소 라고 굳이 말한 이유는, const 를 쓴다고 해서 Array 나 Object 의 값을 수정하지 못하는 게 아니기 때문이다. 물론 단순 정수, 문자 같은 애초에 고정된 메모리만을 차지하는 변수면 값도 수정하지 못한다.
+
 ## Arrow Functions
 ```javascript
 // 기존 함수 정의 방식
@@ -219,6 +222,8 @@ greet();
 
 - 클래스 인스턴스의 prototype 은 해당 클래스의 프로토타입과 같다. [링크::프로토타입공부](https://medium.com/@bluesh55/javascript-prototype-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0-f8e67c286b67)
 
+- 클래스 인스턴스의 prototype 은 자바스크립트 기본 객체의 prototype과 같지 않다. 즉 클래스마다 구분되는 prototype을 가진다.
+
 ```javascript
 class Person {
   constructor(name) {
@@ -325,7 +330,7 @@ numberArray.push(3);
 console.log(numberArray.convert());
 ```
 
-# CAHPTER3. Symbols
+# CHAPTER3. Symbols
 
 ## Basics
 - 심볼이란 Number, String 과 같은 자료형(Primitive)의 일종이다.
@@ -527,3 +532,289 @@ console.log(it.next());
 ## throw, return
 - `next` 대신 `throw` 를 써서 강제로 에러를 발생시킬 수 있다.
 - `next` 대신 `return` 을 써서 강제로 값을(해당 순서의 값) 덮어씌울 수 있다.
+
+# CHAPTER5. Promises
+
+Promise 는 자바스크립트가 욕을 먹게 하던 주범 중 하나인 **callback 지옥** 을 벗어날 수 있게 해준다. Promise 를 쓰기 전에는 비동기(asynchronous) 작업을 처리하기 위해 *callback 함수 안에 callback 함수 안에 callback 함수 안에 callback 함수...* 같이 끊없이 파고드는 callback 함수를 작성해야 했다. 하지만 Promise 의 등장으로, 보다 간편하게 비동기 작업을 chaining 해서 쓸 수 있게 되었다. 
+
+## Promise Basics
+promise 객체가 resolve 로 넘겨준 값을 `then()` 함수의 첫번째 함수 인자에 받아다 쓴다. `then()` 함수의 두 번째 함수 인자는 reject 로 넘겨준 값을 받는다.
+
+```javascript
+let promise = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    resolve('Done!');
+    // reject('Failed!');
+  } ,1500)
+});
+
+promise.then(function(value) {
+  console.log(value);
+}, function(value) {
+  console.log(value); // reject 용
+});
+```
+
+## Chaining Promises
+
+여러 Promise 를 체이닝할 수 있고, `.catch()` 로 에러(reject) 관리도 가능하다. 
+
+```javascript
+function waitASecond(seconds) {
+  return new Promise(function(resolve, reject) {
+    if (seconds > 2) {
+      reject("Rejected!");
+    } else {
+      setTimeout(function() {
+        seconds++;
+        resolve(seconds);
+      }, 1000);
+    }
+  });
+}
+
+waitASecond(1)
+  .then(waitASecond) // 곧바로 다른 Promise 실행토록 할 수 있음. (호출을 해놓는 게 아니라 함수를 가리키기만 하는 것임에 주의!)
+  .then(function(seconds) {
+    console.log(seconds);
+  })
+  .catch(function(error) {
+    console.log(error)
+  });
+```
+
+## Built-in Methods - All 과 Race
+Promise 에는 유용하게 쓸 수 있는 built-in 메서드들이 있다.
+
+1. Promise.all([promise1, promise2])
+    - 배열로 받은 모든 promise 가 resolve 되면 각각의 결과값을 배열에 담아 반환하고, 하나라도 reject 되면 reject 값을 반환한다.
+2. Promise.race([promise1, promise2])
+    - `.all()` 과 달리, 가장 빨리 resolve 혹은 reject 된 것을 반환한다. 그 외 다른 것들이 resolve 되든 reject 되든 신경쓰지 않는다. 
+
+```javascript
+let promise1 = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    resolve('Resolved!');
+  }, 1000);
+});
+
+let promise2 = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    reject('Rejected!');
+  }, 2000);
+});
+
+// Promise.race([promise1, promise2])
+Promise.all([promise1, promise2])
+  .then(function(success) {
+    console.log(success);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+```
+
+# CHAPTER6. Extensions of Built-in Objects
+ES6 는 객체를 다루는 데 유용한 몇가지 방식들이 추가됐다.
+
+## Object 관련
+
+### Object.assign()
+
+1. `Object.assign()` 은 여러 개의 객체를 받아 하나의 객체로 만들어준다. 
+1. 만약 각 객체의 프로토타입이 다르다면(서로 다른 클래스의 인스턴스인 경우 등등), **첫번째 인자의 프로토타입**이 새로 만들어진 객체의 프로토타입이 된다. 즉, 마치 첫번째 객체에, 그 뒤 객체들을 하나씩 추가하거나 덮어씌우는 것처럼 동작한다.
+1. 따라서 아예 새로운 객체에 여러 객체들을 합치고 싶은 것이면 첫번째 인자로 빈 객체를 넣어야 한다.  
+`Object.assign({}, obj1, obj2);`
+
+```javascript
+// 일반 객체끼리의 통합(merge)
+var obj1 = {
+  a:1
+}
+var obj2 = {
+  b:2
+}
+var obj = Object.assign(obj1, obj2);
+console.log(obj)
+// [object Object] {
+  a: 1,
+  b: 2
+}
+```
+
+```javascript
+class Obj1 {
+  constructor() {
+    this.a = 1;
+  }
+}
+class Obj2 {
+  constructor() {
+    this.b = 2;
+  }
+}
+
+var obj1 = new Obj1();
+var obj2 = new Obj2();
+
+var obj = Object.assign(obj1, obj2); // 첫번째 인자인 obj1 의 프로토타입 계승
+console.log(obj.__proto__ === Obj1.prototype) // true
+```
+
+### Object.setPrototypeOf()
+
+어떤 객체가 이미 생성된 이후에 그 객체의 prototype 을 바꿀 수 있다. `Object.create()` 라는 메서드도 있지만, `create()` 는 객체가 생성되는 시점에 설정하는 것이었다면, `setPrototypeOf()` 는 언제든 가능하다.
+
+이걸 어디다 쓰냐 싶겠지만, 아래 예시처럼, 어떤 객체 자기자신에게 특정 property 가 없다면 그 객체의 prototype 까지 가서 더 찾아보게 되는데, 그 추가적인 검색 범위를 지정할 수 있다는 데서 유용하다.
+
+```javascript
+let person = {
+};
+
+let boss = {
+  name: 'Anne'
+};
+
+console.log(person.__proto__ === Object.prototype); // true
+Object.setPrototypeOf(person, boss); // person 객체의 prototype 을 boss 로 바꿈.
+console.log(person.__proto__ === Object.prototype); // false
+console.log(person.__proto__ === boss); // true
+console.log(person.name); // 'Anne' , prototype 인 boss 까지 가서 찾아냄.
+```
+
+## Strings 관련
+1. startsWith() : 시작 문자열 체크 (대소문자 구분)
+    ```javascript
+    let name = 'Joshua';
+    console.log(name.startsWith('Jos')); // true
+    ```
+1. endsWith() : 끝부분 문자열 체크
+1. includes() : 문자열 포함 체크 (대소문자 구분)
+    ```javascript
+    let name = 'Joshua';
+    console.log(name.includes('sh')); // true
+    ```
+## Numbers 관련
+1. isNan
+1. isFinite
+1. isInteger
+
+## Arrays 관련
+1. Array.of : 그냥 Array(5) 라고 하면, **길이**가 5이고, 원소는 undefined 로 채워진 배열을 반환한다. Array.of 를 쓰면, 괄호 안에 인자로 넣은 값들로 채워진 배열을 반환한다. (물론 그냥 [5,10,11] 같이 직접 써서 만들어도 된다.)
+
+    ```javascript
+    let array = Array.of(5,10,11);
+    console.log(array); // [5,10,11]
+    ```
+
+1. Array.from : 이미 존재하는 배열을 베이스로 새로운 배열을 만들 수 있다. 어떻게 변형할지 두번째 인자에 함수를 넣는다.
+    ```javascript
+    let array = [10,11,12];
+    let newArray = Array.from(array, val => val*2);
+    console.log(newArray); // [20,22,24]
+    ```
+
+1. array.fill(value, start_index, end_index) : 이미 존재하는 배열의 원소 값을 바꾼다. 시작과 끝 인덱스를 지정하는 인자는 생략가능하고, 끝 인덱스 -1 까지 바뀐다.
+
+1. array.find(conditional function) : 조건에 맞는 **첫번째** 원소만을 반환한다. 함수 가리키는 포인터만 넣으면 알아서 배열의 각 원소를 함수 인자로 대입하며 조건을 체크하기 때문에, 복잡한 조건 매칭 함수도 사용할 수 있다.
+    ```javascript
+    // 기본 사례
+    let array = [10,12,15];
+    console.log(array.find(val => val >= 12)); // 12
+
+    // 유용한 활용
+    var inventory = {
+      {name: 'apples', quantity: 2},
+      {name: 'pineapples', quantity: 5},
+      {name: 'watermelons', quantity: 9},
+    };
+    function findWatermelon(fruit) {
+      return fruit.name === 'watermelons';
+    }
+    console.log(inventory.find(findWatermelon)); // watermelons 객체반환
+    ```
+
+1. array.copyWithin() : 배열 안의 특정 값을 복사해 다른 인덱스에도 적용할 수 있다. 첫번째 인자는 바꾸고 싶은 인덱스, 두 번째 인자는 복사해올 원소의 인덱스를 넣는다. 옵션으로 세 번째 인자도 있으나, 사용하기 헷갈린다...
+
+1. array.entries() : 배열의 각 원소의 인덱스와 값을 배열로 묶어서 반환하는 Iterator 를 반환한다 python 의 enumerate 와 비슷하다고 생각하면 된다.
+    ```javascript
+    let array = [1,2,3];
+    let it = array.entries();
+    for (let element of it) {
+      console.log(element);
+    }
+    // [0, 1]
+    // [1, 2]
+    // [2, 3]
+    ```
+
+# CHAPTER7. Maps & Sets 
+ES6 에서 새로 도입된 대표적인 객체유형들
+
+## Maps
+다른 프로그래밍 언어에서도 자주 쓰이는 key-value 쌍의 자료형으로 Map 객체를 쓸 수 있다. 
+
+### Map 객체 생성
+`set()` 을 이용하거나, 인자로 이중 배열형태로 key-value 를 넣어 Map 객체를 생성할 수 있다. 같은 key 로 또다시 Map 에 객체를 넣으면 에러가 뜨지 않고 덮어씌워진다.
+
+```javascript
+let cardAce = {
+  name: 'Ace of Spades'
+};
+let cardKing = {
+  name: 'King of Clubs'
+};
+// 초기화 방법 1
+let deck = new Map();
+deck.set('as', cardAce);
+deck.set('kc', cardKing);
+
+// 초기화 방법 2
+let deck = new Map([['as', cardAce],['kc', cardKing]]);
+```
+
+### Map 객체 사용법
+1. map.size: 가지고 있는 원소 개수 반환
+1. map.get(key): 해당 키의 값 반환. 없다면 undefined 반환
+1. map.delete(key): 해당 키를 가진 쌍 삭제.
+1. map.keys() 활용해 키 순회하기
+    ```javascript
+    for (key of map.keys()) {
+      console.log(key);
+    }
+    ```
+1. map.values() 활용해 값 순회하기
+    ```javascript
+    for (value of map.values()) {
+      console.log(value);
+    }
+    ```
+1. map.entries() 활용해 배열 행태의 [키, 값] 순회하기 (사실 `.entries()` 없이 그냥 Map 자체를 돌려도 같은 결과가 나온다.)
+    ```javascript
+    for (entry of map.entries()) {
+      console.log(entry);
+    }
+    ```
+
+## WeakMap
+WeakMap 은 key 로 오직 reference type 만이 허용되는 특별한 형태의 Map 이다. 이런 객체를 만들어 쓰는 이유는 Garbage Collector 와 관련이 있다. key 가 reference type 이면, 자바스크립트 코드를 실행할 때 사용되지 않는 key-value 는 garbage collector 가 알아서 삭제해서 효율성을 높일 수 있다. reference type 의 키의 메모리 길이를 확정지을 수 없기 때문에 일반 Map 객체처럼 loop 을 도는 것은 불가능하다.
+
+## Sets
+유니크한 값만을 가지고 있는 collection 객체다.  
+아래와 같은 메서드를 가지고 있다.
+1. add(val) : val 추가하기
+1. delete(val) : val 삭제. 없어도 에러가 발생하진 않는다.
+1. clear() : 모두 비우기
+1. has(val) : val 이 있는지 확인.
+1. 이외에도 Map 객체처럼 keys, values, entries() 도 있지만 Set 을 위한 것이라기 보단 비슷한 구현구조를 가진 흔적으로 보인다.
+
+```javascript
+let set = new Set([1,1,1]);
+set.add(2);
+for (element for set){
+  console.log(element); // 1, 2
+}
+```
+
+## WeakSet
+WeakMap 과 마찬가지로 오직 reference type 만이 허용되는 객체 유형이다. 사용되지 않는 객체를 Garbage Collector 가 제거할 수 있도록 한다. 다만 reference type 이기에 `let obj1 = {a:1}` 같이 따로 객체를 변수에 저장해서 key 로 쓰지 않으면 `{a:1} !== {a:1}` 임에 유의하자.
