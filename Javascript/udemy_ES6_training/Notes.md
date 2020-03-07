@@ -818,3 +818,85 @@ for (element for set){
 
 ## WeakSet
 WeakMap 과 마찬가지로 오직 reference type 만이 허용되는 객체 유형이다. 사용되지 않는 객체를 Garbage Collector 가 제거할 수 있도록 한다. 다만 reference type 이기에 `let obj1 = {a:1}` 같이 따로 객체를 변수에 저장해서 key 로 쓰지 않으면 `{a:1} !== {a:1}` 임에 유의하자.
+
+# CHAPTER8. Reflect API
+meta-programming (run-time 에 코드를 감정하기 위한 프로그래밍.) 을 돕는 도구를 모아둔 것. 객체를 만들거나, 객체 내 property 를 만들고 구성하는 것과 관련된 메서드들을 다수 가지고 있다. 사실 굳이 Reflect API 를 쓰지 않아도 Javascript 자체적으로 객체 내부 메서드나 전역 함수 등등으로 이미 가지고 있는 기능이다. 그런데도 굳이 Refelct API 를 쓰는 이유는,   
+1. 여기저기 퍼져 있는 객체와 관련된 메서드들을 한 곳에 모아 사용하기 편하게 만들어준다. (bundle)
+1. 새로운 기능들이 있다.
+1. Proxy API 와 함께 썼을 때 편의성이 극대화된다.
+
+## Reflect.construct() 로 객체 생성하기
+`new` 키워드나 `Object.create()` 처럼 객체를 생성할 수 있다.   
+첫번째 인자로 클래스, 두번째 인자로 해당 클래스의 생성자에 들어갈 인자의 배열을 넣고, 세번째 인자를 옵션으로, 원하는 프로토타입 객체를 넣을 수 있다. (세번째 인자로 들어가는 객체의 프로토타입으로 새로 생기는 객체의 프로토타입을 바꾼다. `Object.create()` 나 `Object.setPrototypeOf` 와 유사한 역할) 
+```javascript
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+let person = new Person(); // 기존 방식
+let person = Reflect.construct(Person, ['Josh']);
+console.log(person instanceof Person); // true
+``` 
+
+## Reflect.apply()
+`this` 와 연관된 대표적인 메서드 `call()`, `bind()`, `apply()` 중 apply 도 Reflect API에 있다. 첫번째 인자는 호출할 메서드, 두번째 인자에는 그 메서드를 호출할 때 `this` 가 될 객체, 세번째 인자에는 그 메서드의 인자를 배열로 넣는다.
+```javascript
+class Person {
+  constructor(name,age) {
+    this.name = name;
+    this.age = age;
+  }
+  greet(prefix) {
+    console.log(prefix + 'Hello, I am ' + this.name);
+  }
+}
+let person = Reflect.construct(Person, ['Josh', 27]);
+Reflect.apply(person.greet, {name:'Daniel'}, ['pre ']);
+// pre Hello, I am Daniel
+```
+
+## Reflect and Prototypes
+Reflect API 에는 Prototype 를 알아내거나 수정하는 메서드들이 있다.  
+어떤 인스턴스의 프로토타입을 알아낼 때 `__proto__` 라는 메서드를 많이 쓰곤 헀는데, 사실 이건 ES5 에서도 표준메서드가 아니었고, ES6 에서도 호환성을 위해 놔두기는 했지만 권장되지 않는다. 그래서 `Reflect.getPrototypeOf(instance)` 를 쓰도록 한다.  
+
+프로토타입의 property 를 추가하거나 수정하고 싶을 때도, 이전처럼 직접 접근해서 수정할 수도 있지만, `Reflect.setPrototypeOf(instance, proto)` 같이 Reflect API 를 통해 수정할 수 있다. 
+
+위에서 배운 `Reflect.apply()` 와 사용하는 것도 당연히 가능하다. 클래스의 메서드에는 존재하지 않더라도, 클래스의 프로토타입에 `setPrototypeOf` 로 메서드를 만들고, `apply()` 로 사용할 수 있다.
+
+```javascript
+class Person {
+  constructor() {
+    this.name = 'Josh';
+  }
+}
+let person = new Person(); // Reflect.construct() 도 당연히 가능
+
+Person.prototype.age = 26; // 직접 접근해서 바꾸는 방법
+
+let proto = {
+  age: 40,
+  greet() {
+    console.log('Hello'); // 프로토타입에 새로운 메서드 설정
+  }
+};
+Reflect.setPrototypeOf(person, proto); // Reflect API 를 이용하는 방법.
+Reflect.apply(person.greet, null, []); // prototype 의 메서드 호출됨. // "Hello"
+
+console.log(Reflect.getPrototypeOf(person) == Person.prototype); // true
+```
+
+## Accessing Properties with Reflect
+당연히 property 도 Reflect API 로 접근 및 수정이 가능하다.  
+1. Reflect.get(obj, property name, refer)
+    - 세 번째 인자는 옵션으로, `apply()` 처럼 지금 이 get 을 어디서 가져올 것인지 설정할 수 있다. (this 가리키는 걸로 생각하면 됨)
+1. Reflect.set(obj, property name, value, refer) 
+    - 옵션은 네 번째 인자는 get 의 세 번째 인자와 유사하게 어느 객체를 가리킬지 설정한다. 4번째 인자의 경우 왜 이런 게 필요하냐 궁금할 수 있는데, 그냥 '확실히' 이 객체를 가리킬거다 라는 느낌으로 생각하는 게 좋다. 자바스크립트는 중간에 context가 꼬이는 경우가 종종 있으니까..
+1. Reflect.has(obj, property name)
+    - 이 property 를 가지고 있는지 boolean 값으로 반환
+1. Reflect.ownKeys(obj)
+    - 가지고 있는 모든 property 를 배열에 담아 반환한다. getters 가 설정되어 있어 앞에 언더스코어("_") 붙어있는 것도 붙어있는 채로 반환한다.
+
+- 위 모든 메서드는 getter 와 setter 이 따로 설정되어 있더라도 문제 없이 작동한다.
+
