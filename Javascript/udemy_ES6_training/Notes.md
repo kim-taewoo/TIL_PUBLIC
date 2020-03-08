@@ -5,9 +5,9 @@
 1. Let 변수는 Hoisting 되지 않는다. 
 
 > Hoisting : 모든 변수 선언이 파일 맨 앞쪽에서 선언된 것처럼 끌어올리는 자바스크립트 특유의 작동방식. `var age = 13` 와 같은 변수 선언이 해당 변수의 호출보다 아래에 있어도 이상없이 작동한다.
-
+ 
 ## const
-- 한 번 정의된 변수가 가리키는 메모리 주소가 바뀌는 일이 없도록 막는다. 값 이 아닌 메모리 주소 라고 굳이 말한 이유는, const 를 쓴다고 해서 Array 나 Object 의 값을 수정하지 못하는 게 아니기 때문이다. 물론 단순 정수, 문자 같은 애초에 고정된 메모리만을 차지하는 변수면 값도 수정하지 못한다.
+- 한 번 정의된 변수가 가리키는 메모리 주소가 바뀌는 일이 없도록 막는다. 값 이 아닌 메모리 주소 라고 굳이 말한 이유는, const 를 쓴다고 해서 Array 나 Object 의 값을 수정하지 못하는 게 아니기 때문이다. (즉, value 가 const 한 게 아니라 binding 이 const 한 것이다.) 물론 단순 정수, 문자 같은 애초에 고정된 메모리만을 차지하는 변수면 값도 수정하지 못한다.
 
 ## Arrow Functions
 ```javascript
@@ -162,7 +162,7 @@ let b = 10;
 console.log(b, a);
 ```
 
-원하는 값만을 빼오기 위해 공백으로 생략도 가능하다.
+원하는 값만을 빼오기 위해 공백으로 생략도 가능하다. 참고로 분배받기 위한 왼쪽 변수의 개수가 부족한 경우, Rest Operator 로 받은 게 아니라면 그 개수까지만 받아오고 **뒤 부분은 무시된다**.
 ```javascript
 let numbers = [1,2,3];
 let [a,,c] = numbers;
@@ -820,7 +820,8 @@ for (element for set){
 WeakMap 과 마찬가지로 오직 reference type 만이 허용되는 객체 유형이다. 사용되지 않는 객체를 Garbage Collector 가 제거할 수 있도록 한다. 다만 reference type 이기에 `let obj1 = {a:1}` 같이 따로 객체를 변수에 저장해서 key 로 쓰지 않으면 `{a:1} !== {a:1}` 임에 유의하자.
 
 # CHAPTER8. Reflect API
-meta-programming (run-time 에 코드를 감정하기 위한 프로그래밍.) 을 돕는 도구를 모아둔 것. 객체를 만들거나, 객체 내 property 를 만들고 구성하는 것과 관련된 메서드들을 다수 가지고 있다. 사실 굳이 Reflect API 를 쓰지 않아도 Javascript 자체적으로 객체 내부 메서드나 전역 함수 등등으로 이미 가지고 있는 기능이다. 그런데도 굳이 Refelct API 를 쓰는 이유는,   
+**Reflect** 란 단어의 사전적 의미 중에 **반영하다**, 즉 apply 와 유사한 뜻이 있다. 그 뜻대로 Reflect API 는 객체에 어떤 조작을 반영하는 메서드들을 모아둔 API 다.  
+meta-programming (run-time 에 코드의 status 를 인지하고 그에 맞춰 작동하도록 하는 프로그래밍.) 을 돕는 도구를 모아뒀다고 표현하기도 한다. 객체의 상태를 확인하거나, 객체를 만들거나, 객체 내 property 를 만들고 구성하는 것과 관련된 메서드들을 다수 가지고 있다. 사실 굳이 Reflect API 를 쓰지 않아도 Javascript 자체적으로 객체 내부 메서드나 전역 함수 등등으로 이미 가지고 있는 기능이다. 그런데도 굳이 Refelct API 를 쓰는 데는 몇가지 이유가 있다.
 1. 여기저기 퍼져 있는 객체와 관련된 메서드들을 한 곳에 모아 사용하기 편하게 만들어준다. (bundle)
 1. 새로운 기능들이 있다.
 1. Proxy API 와 함께 썼을 때 편의성이 극대화된다.
@@ -900,3 +901,138 @@ console.log(Reflect.getPrototypeOf(person) == Person.prototype); // true
 
 - 위 모든 메서드는 getter 와 setter 이 따로 설정되어 있더라도 문제 없이 작동한다.
 
+## Creating and Deleting properties with Reflect API
+
+### Createing with Reflect.defineProperty()
+`Object.defineProperty(obj, prop, descriptor)` 라는 기존의 문법이 Reflect 에도 존재한다. obj 는 속성을 정의할 객체, prop 은 새로 정의하거나 수정하려는 속성의 이름 또는 *Symbol*, descriptor 는 새로 정의하거나 수정하려는 속성을 기술하는 객체다. _MDN 문서 참고_
+
+세번째 descriptor 에는 이렇게 만들어진 객체 property 에 대한 여러가지 설정을 할 수 있다.  
+1. writable : 수정할 수 있는 property 여부를 설정한다. default 값은 false 로 읽기전용이다. 읽기전용인 경우, 수정을 시도할 때 에러가 발생하지는 않지만 그냥 바뀌지 않는다. 
+1. configurable: 한 번 이 설정을 한 후 나중에 설정을 바꿀 수 있는지 여부로, default 값은 false 로 설정을 바꿀 수 없다. 
+
+```javascript
+class Person {
+  constructor(name, age) {
+    this._name =name;
+    this.age = age;
+  }
+  get name() {
+    return this._name;
+  }
+  set name(value) {
+    this._name = value;
+  }
+}
+
+let mum = {
+  _namne: 'Mum'
+};
+let person = new Person('Josh', 27);
+Reflect.defineProperty(person, 'hobbies', {
+  writable: true,
+  value: ['Sports', 'Cooking'],
+  configurable: true
+});
+console.log(person.hobbies); // ['Sports', 'Cooking']
+person.hobbies = ['Nothing']; // writable 옵션이 true 이면 수정되고, false 라면 에러를 일으키지는 않고 그냥 바뀌지 않는다. 
+```
+
+### Deleting with Reflect.deleteProperty(obj, prop)
+기존에도 그냥 `delete obj.age` 같이 `delte` 키워드로 property 삭제가 가능했다. Reflect API 에서는 `.deleteProperty(obj, prop)` 으로 삭제할 수 있다.
+
+## Preventing Object extensions & Wrap up
+Reflect API 메서드로 어떤 객체의 property 추가, 수정, 삭제 등을 막는(Lock) 설정을 하거나, 그 막는 설정이 되어있는지 확인할 수 있다.  
+1. Reflect.preventExtensions(obj) : 객체에 Lock 을 건다.
+1. console.log(Reflect.isExtensible(obj)) : 객체에 Lock 이 걸려있는지 확인하고 결과를 출력한다.
+
+# CHAPTER9. Proxy API
+Proxy API 는 어떤 객체에 접근할 때, 기존 자바스크립트처럼 직접 접근하지 않고 하나의 추가적인 Layer 를 거치도록 한다. 즉, 객체에 접근하고 조작할 때의 룰을 정한다. 앞서 배운 Reflect API 는 객체에 어떻게 접근하고 수정하는가에 관련되었다면, Proxy API 는 그 접근과 수정 때 객체가 어떻게 반응할 지 규칙을 정하는(제한을 거는) 것이다. 
+
+Reflect API 와 함께 쓰기 좋도록 같은 이름의 메서드들이 많다. 즉, Proxy 로 어떤 객체를 감싸고, 그 wrapper 인스턴스를 조작하면서 조건에 부합하면 그냥 Reflect API 로 실행하고, 아니면 다른 결과가 나오도록 조정하는 식으로 코드를 짠다. 
+
+## get & set
+```javascript
+let person = {
+  age: 27,
+  hobby: "Soccer"
+};
+// '규칙'을 주로 handler 라고 말한다.
+let handler = {
+  // target obj, property name
+  get: function(target, name) {
+    return name in target ? target[name] : "Nonexistent";
+  },
+  set: function(target, property, value) {
+    if (value.length >= 2) {
+      Reflect.set(target, property, value);
+    }
+  }
+};
+// target obj, handler(rules)
+let proxy = new Proxy(person, handler);
+console.log(proxy.age); // 27
+console.log(proxy.name); // "Nonexistent"
+
+proxy.name = "M";
+console.log(proxy.hobby); // "Soccer"
+```
+
+## Using Proxies as Prototypes
+빈 객체를 target obj 인자로 넣어 proxy 객체를 만들면 `Reflect.setPrototypeOf()` 를 이용해 그 proxy 객체를 프로토타입으로 사용할 수 있다. 어떤 객체에 현재 존재하는 property 를 다루는 데는 적합하지 않겠지만, backup behavior 의 설정을 위한 prototype 세팅이 가능한 것이다. 
+
+```javascript
+let person = {
+  age: 27,
+  hobby: "Soccer"
+};
+
+let handler = {
+  // target obj, property name
+  get: function(target, name) {
+    return name in target ? target[name] : "Nonexistent";
+  }
+};
+
+let proxy = new Proxy({}, handler);
+Reflect.setPrototypeOf(person, proxy);
+console.log(person.hobbies); //"Nonexistent"
+```
+
+## Proxies as Proxies
+proxy 객체를 또다른 proxy 객체로 감쌀 수 있다.
+
+## Wrapping Functions
+일반 객체의 property 접근 규칙을 정하는 것 외에, 함수도 proxy 로 감쌀 수 있다. `apply` 에 관한 handler 를 작성해서 이용한다.
+
+```javascript
+function log(message) {
+  console.log(`Logged a message: ${message}`);
+}
+let handler = {
+  apply: function(target, thisArg, argumentList) {
+    if (argumentList.length == 1) {
+      return Reflect.apply(target, thisArg, argumentList);
+    }
+  }
+};
+let proxy = new Proxy(log, handler);
+proxy('Hello');
+```
+
+## Revocable Proxies
+원하는 시점에 무효화 할 수 있는 proxy 도 있다. 
+
+```javascript
+let person = {
+  name: 'Josh';
+};
+let handler = {
+  get: function(target, property) {
+    return Reflect.get(target, property);
+  }
+}
+let {proxy, revoke} = Proxy.revocable(person, handler);
+console.log(proxy.name); // 'Josh'  
+revoke();
+console.log(proxy.name); // error 발생
+```
