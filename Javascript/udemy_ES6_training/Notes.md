@@ -611,6 +611,10 @@ waitASecond(1)
   });
 ```
 
+### async / await
+Promise 와 Generator 를 엮어 asynchronous 한 코드를 마치 synchronous 한 것처럼 쓸 수 있는 async / await 이 있다. async / await 도 결국 Promise고, 따라서 Promise 를 return 한다는 점을 기억하고 있자.  
+> [참고영상](https://youtu.be/NsQ2QIrQShU)
+
 ## Built-in Methods - All 과 Race
 Promise 에는 유용하게 쓸 수 있는 built-in 메서드들이 있다.
 
