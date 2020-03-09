@@ -167,6 +167,9 @@ console.log(b, a);
 let numbers = [1,2,3];
 let [a,,c] = numbers;
 console.log(a,c)
+
+const head = ([x]) => x;
+head([1,2,3]) === 1; // true, 뒷부분 무시됨.
 ```
 
 이미 생성된 Array 가 아니어도 곧바로 destructuring 을 쓸 수 있다.
@@ -216,7 +219,32 @@ greet();
 1. `*` 을 이용해 모든 `export` 를 한 번에 가져올 수 있다. 이렇게 한 번에 가져올 때는 반드시 `as` 키워드로 이름을 붙여주어야 한다. 이 이름은 가져온 모든 것을 담고 있는 **object** 가 된다. 
 
 ## Class Basics
-- ES5 에서도 Prototype 과 같은 Class 와 유사한 문법이 존재했지만(내부적으로 거의 동일하게 동작한다.), ES6 의 Class 문법을 통해 Class 문법이 보다 명확해지고 활용도가 좋아졌다. 
+- ES5 에서도 Prototype 을 활용한 Class 와 유사한 문법을 썼지만(내부적으로 class 문법과 거의 동일하게 동작한다.), ES6 의 Class 문법을 통해 Class 문법이 보다 명확해지고 활용도가 좋아졌다. 
+
+1. ES5 방식
+```javascript
+function Point(x, y) {
+  this.x = x;
+  this.y = y;
+}
+Point.prototype.moveBy = function(dx,dy) {
+  this.x += dx;
+  this.y += dy;
+};
+```
+2. ES6 방식
+```javascript
+class Point {
+  constructor(x,y) {
+    this.x = x;
+    this.y = y;
+  }
+  moveBy(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+  }
+}
+```
 
 - 다른 프로그래밍 언어의 클래스처럼, 자바스크립트의 클래스도, `class` 로 정의된 블루프린트를 이용해 새로운 object 를 `new` 키워드로 찍어낼 수 있게 한다. 클래스의 메서드는 따로 `function` 키워드 없이 곧바로 정의하면 된다. (일반 object 에서도 가능했다.) Constructor 를 따로 명시해 클래스 property 를 초기화할 수 있다.
 
@@ -941,8 +969,8 @@ person.hobbies = ['Nothing']; // writable 옵션이 true 이면 수정되고, fa
 기존에도 그냥 `delete obj.age` 같이 `delte` 키워드로 property 삭제가 가능했다. Reflect API 에서는 `.deleteProperty(obj, prop)` 으로 삭제할 수 있다.
 
 ## Preventing Object extensions & Wrap up
-Reflect API 메서드로 어떤 객체의 property 추가, 수정, 삭제 등을 막는(Lock) 설정을 하거나, 그 막는 설정이 되어있는지 확인할 수 있다.  
-1. Reflect.preventExtensions(obj) : 객체에 Lock 을 건다.
+Reflect API 메서드로 어떤 객체의 property 추가를 막는(Lock) 설정을 하거나, 그 막는 설정이 되어있는지 확인할 수 있다.  
+1. Reflect.preventExtensions(obj) : 객체에 Lock 을 건다. 이후 `.defineProperty(obj, prop_name, key-value)` 해도 추가되지 않는다.
 1. console.log(Reflect.isExtensible(obj)) : 객체에 Lock 이 걸려있는지 확인하고 결과를 출력한다.
 
 # CHAPTER9. Proxy API
