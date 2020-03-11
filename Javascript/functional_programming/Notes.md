@@ -243,3 +243,15 @@ const factorial = (n, accum = 1) => {
   return factorial(n-1, n * accum);
 };
 ```
+
+# Practical Functional Promgramming in Jaascript
+
+> [참고영상](https://youtu.be/zeZOPB9uxdE)
+
+```javascript
+function add(a,b) {return a + b;}
+var mAdd = memoize(add);
+mAdd(2,3) === 5 // add() called
+mAdd(1,3) === 4 // add() called
+mAdd(2,3) === 5 // add() **Not** called
+```
