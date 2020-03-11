@@ -24,7 +24,7 @@ var fn = () => console.log('Hello!');
 ```
 
 ### Arrow Function 의 특이사항
-1. Oneliner 로 쓸 수 있는 경우, `return` 키워드를 생략할 수 있다.
+1. 한 줄 (Oneliner) 로 쓸 수 있는 경우, `return` 키워드를 생략할 수 있다. 또한 Function body(중괄호)도 생략할 수 있다. 다만 반환하고자 하는 게 object 라면, Function body 와의 구분을 위해 일반 소괄호는 씌워줘야 한다.
 1. 매개변수가 한 개인 경우, 괄호를 생략할 수 있다. (매개변수가 0 개일 때는 빈 괄호를 써주어야 한다.)
 1. 익명함수처럼 사용 가능하다.
     ```javascript

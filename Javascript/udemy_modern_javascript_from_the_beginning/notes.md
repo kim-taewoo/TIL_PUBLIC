@@ -81,3 +81,32 @@ Date 의 타입은 object (const 로 선언해도 변경가능.)
 
 ### `mouseenter`, `mouseleave` 와 `mouseover`, `mouseout` 의 차이점
 `mouseenter`, `mouseleave` 는 해당 이벤트가 걸린 element 에 들어갈 때와 나갈 때 한 번씩만 발생하지만, `mouseover` 과 `mouseout` 은, 해당 element 의 자식 element 에 마우스가 진입하면, 전체적으로 봤을 때는 여전히 원래 element 안이라도 out 되고 자식 element 에서 나올 때 또다시 over 된다. 
+
+## AJAX
+Asynchronous Javascript XML 의 약자지만, 사실 요즘은 XML 을 거의 안 쓰고 JSON 을 쓴다..
+
+## Fetch API
+- Fetch 는 Axios 같은 외부 라이브러리와 달리, http error 를 자동으로 `.catch()` 로 넘겨주지 않는다. 따라서 수동으로 에러를 발생시켜 주어야 한다. http error 를 처리하는 전용함수를 만들어 쓰는 게 좋다.
+
+    ```javascript
+    fetch('https://example.com')
+      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(res.error);
+        }
+        return res;
+      })
+      .catch(err => console.log(error));
+
+    // 에러 처리 함수 만들기
+    function handleError(res) {
+      if (!res.ok) throw new Error(res.error);
+      return res;
+    }
+    fetch('https://example.com')
+      .then(res => res.json())
+      .then(handleError)
+      .then(res => console.log(res.data))
+      .catch(err => console.log(err));
+    ```
