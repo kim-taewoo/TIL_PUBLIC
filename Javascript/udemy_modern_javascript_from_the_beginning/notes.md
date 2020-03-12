@@ -1,6 +1,8 @@
 ## Types
 - `typeof` 는 항상 string 자료형으로 결과를 반환한다.
 - `typeof null` 은 obj 이다. (언어 설계상 실수.)
+- `null` 과 `undefined` 의 차이점은, `null` 은 **의도적**으로 비어있는 값이라고 명시할 때 쓰고, `undefined` 는 선언은 됐는데 값이 할당되지 않았을 때 자동으로 초기화되는 값이다. 
+- Primitive Values 빼고는 자바스크립트 내 다른 모든 건 OBJCET 이다.
 
 ## Type conversion
 Number() 로 형변환 했을 때, `null` 은 0 이지만 `undefined` 는 NaN 이다.

@@ -34,7 +34,7 @@ var fn = () => console.log('Hello!');
 ## this 키워드와 Arrow Function
 기존 함수 정의 방식은, 그 함수를 어디서 '호출'했냐에 따라 `this` 가 가리키는 context 가 달라진다. 그러나 Arrow Function 은 함수가 '정의' 되었던 때의 context 를 '유지' 한다(keep context). 
 
-예를 들어 전역 스코프에 함수를 정의했다면, 기존 함수 정의 방식으로는 전역 스코프에서 그 함수를 호출했다면 `window` 객체를, 어떤 html `<button>` 에서 그 함수를 이벤트로 호출했다면 해당 버튼 객체를 출력한다. 그러나 Arrow Function 이라면 어디서 호출하든 `window` 객체를 출력한다.
+예를 들어 전역 스코프에 함수를 정의했다면, 기존 함수 정의 방식으로는 전역 스코프에서 그 함수를 호출했다면 `window` 객체를, 어떤 html `<button>` 에서 그 함수를 이벤트로 호출했다면 해당 버튼 객체를 출력한다. 그러나 Arrow Function 이라면 어디서 호출하든 `window` 객체를 출력한다. 예전에 callback 을 쓸 때도 `self = this` 같이 기존 context 를 따로 저장해놓고 콜백 함수를 이용했었지만, Arrow Function 을 사용하면 그럴 필요가 없다. 
 
 ## Default Parameter (매개변수 기본값)
 매개변수에 기본값을 설정할 수 있다. 기본값으로 앞서 선언된 변수를 넣을 수도 있다는 걸 알고 있자!
@@ -116,6 +116,9 @@ Rest Operator 의 반대. 여러 인자들을 묶어서 Array 로 만들어주�
 ```javascript
 let numbers = [1,2,3,4,5]
 console.log(Math.max(...numbers));
+
+// 복사할 때 응용할 수도 있다. .slice() 처럼
+let numbers_copy = [...numbers]
 ```
 
 ## The for-of Loop

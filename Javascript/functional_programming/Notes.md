@@ -255,3 +255,8 @@ mAdd(2,3) === 5 // add() called
 mAdd(1,3) === 4 // add() called
 mAdd(2,3) === 5 // add() **Not** called
 ```
+
+# 유인동 - ES6+ 비동기 프로그래밍과 실전 에러 핸들링
+
+> [참고영상](https://youtu.be/o9JnT4sneAQ)
+

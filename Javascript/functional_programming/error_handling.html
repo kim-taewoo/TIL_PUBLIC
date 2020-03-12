@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <h1>Functional Programming Error handling</h1>
+
+  <script>
+    const imgs = [
+      { name: "flower1", url: "https://www.costco.co.kr/medias/sys_master/images/ha3/h6b/11585779105822.jpg" },
+      { name: "flower2", url: "https://m.marymond.kr/data/uploads/custom_view/pattern_peachblossom_story_01.jpg" },
+      { name: "flower3", url: "https://imgc.1300k.com/aaaaaib/goods/215024/71/215024713100.jpg?3" },
+      { name: "flower4", url: "https://i.pinimg.com/736x/bf/93/e0/bf93e03893cb1d940a028e3ddf6f68d1.jpg" },
+    ];
+
+    const loadImage = url => {
+      let img = new Image();
+      img.src = url;
+      console.log(img.height)
+      return img;
+    }
+  </script>
+
+  <script>
+    function f1() {
+      imgs
+        .map(({ url }) => {
+          let img = new Image();
+          img.src = url;
+          return img;
+        })
+        .map(img => img.height)
+        .forEach(a => console.log(a))
+    }
+    f1();
+  </script>
+</body>
+
+</html>
