@@ -4,7 +4,7 @@
 1. Block Scope 의 개념없이 모든 게 전역변수로 만들어졌던 Var 과 달리, Let 은 Block Scope 가 적용된다. 즉, 선언된 스코프를 벗어난 곳에서 Let 변수를 호출하려하면 에러가 발생한다.
 1. Let 변수는 Hoisting 되지 않는다. 
 
-> Hoisting : 모든 변수 선언이 파일 맨 앞쪽에서 선언된 것처럼 끌어올리는 자바스크립트 특유의 작동방식. `var age = 13` 와 같은 변수 선언이 해당 변수의 호출보다 아래에 있어도 이상없이 작동한다.
+> Hoisting : 모든 변수 선언이 파일 맨 앞쪽에서 선언된 것처럼 끌어올리는 자바스크립트 특유의 작동방식. `var age = 13` 와 같은 변수 선언이 해당 변수의 호출보다 아래에 있어도 `age === undefined` 로 존재한다.
  
 ## const
 - 한 번 정의된 변수가 가리키는 메모리 주소가 바뀌는 일이 없도록 막는다. 값 이 아닌 메모리 주소 라고 굳이 말한 이유는, const 를 쓴다고 해서 Array 나 Object 의 값을 수정하지 못하는 게 아니기 때문이다. (즉, value 가 const 한 게 아니라 binding 이 const 한 것이다.) 물론 단순 정수, 문자 같은 애초에 고정된 메모리만을 차지하는 변수면 값도 수정하지 못한다.
@@ -147,6 +147,8 @@ console.log(description)
 1. Rest Operator 사용이 가능하며,
 2. Default value 를 설정할 수 있기 때문에
 마치 함수를 쓰는 것처럼도 볼 수 있다.
+
+
 ```javascript
 let nums = [1,2,3];
 let [a,b] = nums;
@@ -210,7 +212,7 @@ greet();
 
 ## Modules 기본개념
 1. 변수나 함수 값을 '복사' 해서 가져오는 것이 아니라 참조만 하는 것이기 때문에, `import` 된 파일 내의 변수 값이 동적으로 바뀌면, 그 변수를 가지고 온 파일에서도 해당 변수가 가진 값은 바뀌어 있다.
-1. ES6에서 모든 모듈은 무조건 **Strinct Mode** 이다. 따라서 별개로 `"use strict"` 같은 정의를 해주지 않아도 된다. 
+1. ES6에서 모든 모듈은 무조건 **Strict Mode** 이다. 따라서 별개로 `"use strict"` 같은 정의를 해주지 않아도 된다. 
 1. 모듈은 shared 나 global 스코프를 가지지 않고 각각 별개의 스코프를 가진다. 
 
 ## import & export 문법
@@ -491,7 +493,7 @@ console.log(array); // [1,2,3]. 즉 원본이 수정된 것은 아님!
 let person = {
   name: 'Josh',
   hobbies: ['Sports', 'Cooking'],
-  [Symbol.iterator]: () => {
+  [Symbol.iterator]: function () {
     let i = 0;
     let hobbies = this.hobbies;
     return {
@@ -671,10 +673,10 @@ var obj2 = {
 }
 var obj = Object.assign(obj1, obj2);
 console.log(obj)
-// [object Object] {
+/* [object Object] {
   a: 1,
   b: 2
-}
+} */
 ```
 
 ```javascript
@@ -771,7 +773,7 @@ console.log(person.name); // 'Anne' , prototype 인 boss 까지 가서 찾아냄
 
 1. array.copyWithin() : 배열 안의 특정 값을 복사해 다른 인덱스에도 적용할 수 있다. 첫번째 인자는 바꾸고 싶은 인덱스, 두 번째 인자는 복사해올 원소의 인덱스를 넣는다. 옵션으로 세 번째 인자도 있으나, 사용하기 헷갈린다...
 
-1. array.entries() : 배열의 각 원소의 인덱스와 값을 배열로 묶어서 반환하는 Iterator 를 반환한다 python 의 enumerate 와 비슷하다고 생각하면 된다.
+1. array.entries() : 객체의 각 원소의 키와 값을 배열로 묶어서 반환하는 Iterator 를 반환한다. 자바스크립트에서 배열도 결국 인덱스 번호를 키로 가진 객체이기 때문에, 마치 python 의 enumerate 처럼 동작한다.
     ```javascript
     let array = [1,2,3];
     let it = array.entries();

@@ -19,26 +19,65 @@
       { name: "flower4", url: "https://i.pinimg.com/736x/bf/93/e0/bf93e03893cb1d940a028e3ddf6f68d1.jpg" },
     ];
 
-    const loadImage = url => {
+    const loadImage = url => new Promise((resolve, reject) => {
       let img = new Image();
       img.src = url;
-      console.log(img.height)
+      img.onload = () => {
+        resolve(img);
+      }
       return img;
-    }
+    })
   </script>
 
   <script>
+    /*
     function f1() {
       imgs
-        .map(({ url }) => {
-          let img = new Image();
-          img.src = url;
-          return img;
-        })
-        .map(img => img.height)
-        .forEach(a => console.log(a))
+        .map(({ url }) => loadImage(url))
     }
     f1();
+    */
+  </script>
+
+  <script>
+    // 함수를 적용시킨 원소를 만들기 위해 단순 루프를 돌리지 않고 
+    // generator 를 써서 한 개씩 처리하면
+    // 에러가 발생한 시점에 루프를 멈추는 등의 유연한 응용이 가능해진다.
+    function* map(f, iter) {
+      for (const a of iter) {
+        yield a instanceof Promise ? a.then(f) : f(a);
+      }
+    }
+
+    async function reduceAsync(f, acc, iter) {
+      for await (const a of iter) {
+        acc = f(acc, a)
+      }
+      return acc;
+    }
+
+    /*
+    // 이것마저도 개선할 수 있다.
+    // 에러 핸들링은 순수함수 내에서 안 하는 게 좋다.
+    // 부수효과(로그 찍기 등) 발생하는 부분에서 하는 게 낫지
+    async function f2(imgs) {
+      try {
+        return await reduceAsync((a, b) => a + b, 0,
+          map(img => img.height,
+            map(({ url }) => loadImage(url), imgs)))
+      } catch (e) {
+        console.log('서버에 에러 전달', e);
+        return 0;
+      }
+    }
+    */
+    const f2 = imgs => 
+      reduceAsync((a,b) => a+b, 0,
+        map(img => img.height, 
+          map(({url}) => loadImage(url), imgs)));
+
+    f2(imgs).then(console.log).catch()
+    f2(imgs2).then(console.log)
   </script>
 </body>
 

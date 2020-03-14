@@ -118,6 +118,8 @@ const partial = (fn, ...args) => {
 ### CURRYING
 위의 `partial` 함수조차도 따로 작성하지 않고 그냥 원하는 인자의 개수를 다 받을 때까지 실행하지 않다가 개수가 만족되면 결과를 반환하게 할 수 있다.
 
+> Currying : Creating a copy of a function but **with** some preset parameters 
+
 ```javascript
 const add = x => y => x + y;
 const add3 = add(3);

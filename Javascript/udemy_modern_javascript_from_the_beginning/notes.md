@@ -112,3 +112,26 @@ Asynchronous Javascript XML 의 약자지만, 사실 요즘은 XML 을 거의 �
       .then(res => console.log(res.data))
       .catch(err => console.log(err));
     ```
+
+
+## Regex
+1. i : `/regex/i` 처럼 정규표현식 슬래쉬 뒤에 i 를 붙이면 case insensitive, 즉 대소문자 구분을 안 하게 된다.
+1. ^ : 원래 ^ 는 ^ 다음에 오는 문자로 시작해야 한다는 의미이지만, **대괄호 안**에 들어가면 대괄호 안에 있는 문자여선 안된다는 의미가 된다. (대괄호 안 문자들의 여집합)
+1. {min_num, max_num} : quantifier 라고 부르며, 이 앞에 있는 문자가 몇번 반복되어야 하는지 숫자를 지정할 수 있다. 숫자를 하나만 넣으면 그 수만큼 반복되어야 한다는 뜻이 되고, 콤마를 중심으로 두 개를 넣으면 최소 반복, 최대 반복 수가 된다. 콤마만 찍고 뒤 숫자를 넣지 않으면, {최소 반복, 무한} 의 의미가 된다.
+1. () : grouping
+
+### Shorthand Character Classes :
+역슬래쉬 (\\) 로 시작하는 정규식 기호.
+
+1. `/\w/` : Word Characters (알파벳 혹은 언드스코어 _)
+1. `/\w+/` : + 기호는 one or more 을 의미한다.
+1. `/\W/` : 대문자 W 는 Non-Word Characters 를 뜻한다. 특수기호 등을 걸러낸다.
+1. `/\d/` : digits, 숫자
+1. `/\D/` : Non-digits
+1. `/\s/` : whitespace
+1. `/\S/` : non-whitespace
+1. `/Hell\b/i` : Word Boundary. 왼쪽 예시의 경우, Hell 만을 걸러낼 뿐 Hello 는 걸러내지 않는다. 단어에 포함된 것이 아니라 그 단어 자체가 모두 일치할 때만 걸러내도록 하는 정규표현식.
+
+### Assertions
+1. `re = /x(?=y)/` : y 가 x 뒤에 있는 경우에만 걸러냄.
+1. `re = /x(?!y)/` : y 가 x 뒤에 없는 경우에만 걸러냄.
