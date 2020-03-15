@@ -4,3 +4,7 @@
 .idea/
 *.xml
 *.iml
+*.lock
+.vscode
+package.json
+node_modules
