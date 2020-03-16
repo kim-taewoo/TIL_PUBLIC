@@ -96,9 +96,25 @@ var name = 'Lee'; // 에러가 발생하지 않음.
 [Github문서](https://github.com/FEDevelopers/tech.description/wiki/%EC%9E%90%EB%B0%94%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%EC%97%90%EC%84%9C-%EC%82%AC%EC%9A%A9%EB%90%98%EB%8A%94-this%EC%97%90-%EB%8C%80%ED%95%9C-%EC%84%A4%EB%AA%85-1#1-this%EC%97%90-%EB%8C%80%ED%95%9C-%EB%AF%B8%EC%8A%A4%ED%84%B0%EB%A6%AC)
 
 ## Events and Attributes
-1. JSX 으로 html 을 작성할 때, class 대신 className 을 써야 한다. 그냥 class 는 ES6 Javascript 의 class 와 겹치기 때문이다. JSX 에서 쓸 수 있는 html events, attributes 목록은 **JSX Dom Element** 로 검색해서 찾아보자.
+1. JSX 으로 html 을 작성할 때, class 대신 className 을 써야 한다. 그냥 class 는 ES6 Javascript 의 class 와 겹치기 때문이다. JSX 에서 쓸 수 있는 html events, attributes 목록은 **React Dom Element** 등으로 검색해서 찾아보자.
 
 1. `onClick={}` 문법으로 클릭시 호출할 자바스크립트 함수를 참조할 수 있다. 
 1. 어떤 이벤트로 변수 값이 변화하고, 따라서 화면도 새로 그려야 하는 상황에서, JSX 는 자동으로 데이터 변화를 binding 하는 기능은 없다. 즉, 화면을 새로 그려야 하는 이벤트가 발생할 때마다, 화면을 그리는 함수를 다시 호출해 주어야 한다. 끔찍하게 비효율적일 것 같지만, **그렇지 않다.** React 는 React 만의 가상 DOM 알고리즘을 가지고 있고, 이 알고리즘을 이용해 새로 그릴 필요가 있는 부분만을 찾아내 그 부분만 업데이트 한다. 따라서 화면 전체를 새로 그리지 않고, 효율적으로 필요한 부분만을 바꾼다. 화면을 새로 그리는 이벤트가 발생할 때마다 크롬 개발자 도구의 element 탭을 보면, 필요한 부분만이 반짝이며 바뀌는 것을 확인할 수 있다. 
 
 ## Forms and Inputs
+다른 자바스크립트 프로그래밍과 마찬가지로, `form` 태그를 이용하고, `onSubmit` 이벤트 핸들러로 어떤 함수를 호출할지 설정한다. `e.preventDefault()` 로 새로고침을 막는다.
+
+## Arrays in JSX
+JSX 가 Object 는 다루지 못하지만, Array 는 가능하다. 
+
+- 기본적으로 Array 의 원소 하나하나를 다 출력해 화면에 그려준다. 
+- 물론 `undefined`, `null`, `boolean` 은 Array 에 있더라도 여전히 무시된다.
+- `.map()` 함수로 배열의 각 원소를 어떤 html 태그에 넣어서 JSX 에 입력할 지 간편하게 만들 수 있다.
+
+```jsx
+<ol>
+  {
+    app.options.map((option) => <li key={option}>{option}</li>)
+  }
+</ol>
+```
