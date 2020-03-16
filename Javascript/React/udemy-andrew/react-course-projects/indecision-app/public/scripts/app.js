@@ -1,12 +1,38 @@
 'use strict';
 
-console.log('app.js is learning');
+console.log('app.js is running');
 
-// JSX - Javascript XML
+var user = {
+  name: 'Taewoo Kim',
+  age: 27,
+  location: 'Seoul'
+};
+function getLocation(location) {
+  if (location) {
+    return React.createElement(
+      'p',
+      null,
+      'Location: ',
+      location
+    );
+  }
+}
 var template = React.createElement(
-  'h1',
+  'div',
   null,
-  'This is JSX from app.js'
+  React.createElement(
+    'h1',
+    null,
+    user.name ? user.name : "Anonymous"
+  ),
+  user.age && user.age >= 18 && React.createElement(
+    'p',
+    null,
+    'Age: ',
+    user.age
+  ),
+  getLocation(user.location)
 );
+
 var appRoot = document.getElementById('app');
 ReactDOM.render(template, appRoot);
