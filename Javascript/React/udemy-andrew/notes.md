@@ -118,3 +118,27 @@ JSX 가 Object 는 다루지 못하지만, Array 는 가능하다.
   }
 </ol>
 ```
+
+## ES6 Classes
+1. Class 내에서는 `constructor()` 와 메서드들 사이에 콤마(,) 를 쓰지 않는다.
+1. 자식 클래스에서 부모 클래스 메서드를 오버라이딩 할 수 있다. 
+1. Arrow Function 으로 메서드를 만들면 현재 클래스를 제대로 가리키지 못하기 때문에, ES5 기존 함수 정의 방식이 개선된 방법으로 메서드를 정의해야 한다. (`function` 생략)
+
+## Class Based React Components
+1. 일반적인 html 태그와의 구분을 위해 React Component Class 의 이름은 반드시 대문자로 시작하도록 한다.
+1. React Component Class 는 반드시 `render` 메서드를 가지고 있어야 하며, jsx 를 반환한다.
+1. 일반적인 html 태그에 key="value" 로 속성을 부여하듯이 컴포넌트에 속성을 넣으면, 그 컴포넌트는 `this.props` 로 자신이 받은 속성들에 접근할 수 있다. 이 부여하는 값, 또 접근한 값을 자바스크립트로 유연하게 설정할 수 있다.
+1. 일반적인 자바스크립트 class 처럼 `constructor` 와 메서드를 만들어 `this` 로 접근할 수 있다. 다만 `constructor` 를 사용할 때, `super()` 를 맨 위에 반드시 넣고 시작해야 한다. (상속받은 것이니 당연.)
+
+## Method Binding
+`onClick` 이벤트는 해당 이벤트가 발생한 html element 를 `this` 로 받아오기 때문에, 이벤트가 발생했을 때 호출되는 클래스 메서드가 그 컴포넌트 클래스의 `this` 에 접근하지 못한다. 즉, `this.props` 같은 컴포넌트 객체에 접근할 수 없다. 따라서 따로 해당 메서드가 호출될 때의 `this` context 를 binding 해주어야 하는데, 
+
+    1. `render` 메서드에서 onClick 연결메서드가 호출될 때마다 `.bind(this)` 해주거나,
+    2. `constructor` 에서 아예 `.bind()` 를 미리 해놓는 방법이 있다.
+
+성능상의 이슈로 2번 방법을 더 많이 쓴다. 아예 화살표 함수로 만들면 안되냐는 의견이 있고, 실제로 그 실험적인 방식을 많이 쓰기도 하지만, 정식 지원되는 기능이 아니다.
+
+## Component State
+헷갈리는 부분.  
+지금까지 배운 내용으로는, 어떤 이벤트 발생으로 인한 데이터 변화로 화면을 다시 그려야 할 때는, 일일이 미리 정해둔 rendering 함수를 호출해주어야 했다. 그럼 ReactDOM 라이브러리가 변해야 하는 부분을 추적해 업데이트 했다. 그러나 `state` 를 이용하면, 컴포넌트 내의 변화를 인지해 알아서 새로 rendering 해준다.
+

@@ -1,55 +1,96 @@
-console.log('app.js is running');
-
-const app = {
-  title: '결정, 해드립니다',
-  subtitle: '고민중인 선택지를 입력하세요.',
-  options: []
-};
-
-const onFormSubmit = (e) => {
-  e.preventDefault();
-  const option = e.target.elements.option.value;
-
-  if (option) {
-    app.options.push(option);
-    e.target.elements.option.value = '';
-    render();
+class IndecisionApp extends React.Component {
+  render() {
+    const title = "Indecision App";
+    const subtitle = "Put your Life in the hands of a computer";
+    const options = ['A', 'B', 'C'];
+    return (
+      <div>
+        <Header title={title} subtitle={subtitle} />
+        <Action />
+        <Options options={options} />
+        <AddOption />
+      </div>
+    )
   }
-};
+}
 
-const onMakeDecision = () => {
-  const randomNum = Math.floor(Math.random() * app.options.length);
-  const option = app.options[randomNum];
-  alert(option);
-};
+class Header extends React.Component {
+  render() {
+    console.log(this.props)
+    return (
+      <div>
+        <h1>{this.props.title}</h1>
+        <h2>{this.props.subtitle}</h2>
+      </div>
+    )
+  }
+}
 
-const resetOption = () => {
-  app.options = [];
-  render();
-};
+class Action extends React.Component {
+  handlePick() {
+    alert('handlePick');
+  }
 
-const appRoot = document.getElementById('app');
+  render() {
+    return (
+      <div>
+        <button>What should I do?</button>
+      </div>
+    )
+  }
+}
 
-const render = () => {
-  const template = (
-    <div>
-      <h1>{app.title}</h1>
-      {app.subtitle && <p>{app.subtitle}</p>}
-      <p>{app.options.length > 0 ? '입력된 선택지 리스트' : '선택지가 없습니다.'}</p>
-      <button disabled={!app.options.length} onClick={onMakeDecision}>결정해주세요!</button>
-      <button onClick={resetOption}>모두 지우기</button>
-      <ol>
+class Options extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleRemoveAll = this.handleRemoveAll.bind(this);
+  }
+  handleRemoveAll () {
+    console.log(this.props.options)
+  }
+  render() {
+    return (
+      <div>
+        <button onClick={this.handleRemoveAll}>Remove All</button>
+        <p>Options</p>
         {
-          app.options.map((option) => <li key={option}>{option}</li>)
+          this.props.options.map((option) => <Option key={option} option={option} />)
         }
-      </ol>
-      <form onSubmit={onFormSubmit}>
-        <input type="text" name="option" />
-        <button>선택지 추가</button>
-      </form>
-    </div>
-  );
-  ReactDOM.render(template, appRoot);
-};
+      </div>
+    )
+  }
+}
 
-render();
+class Option extends React.Component {
+  render() {
+    return (
+      <div>
+        <p>{this.props.option}</p>
+      </div>
+    )
+  }
+}
+
+class AddOption extends React.Component {
+  handleAddOption(e) {
+    e.preventDefault();
+
+    const option = e.target.elements.option.value.trim();
+
+    if (option) {
+      alert(option);
+    }
+  }
+  render() {
+    return (
+      <div>
+        <form onSubmit={this.handleAddOption}>
+          <input type="text" name="option" />
+          <button>Add Option</button>
+        </form>
+      </div>
+    )
+  }
+}
+
+ReactDOM.render(<IndecisionApp />, document.getElementById('app'));

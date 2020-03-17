@@ -1,89 +1,85 @@
 'use strict';
 
-console.log('app.js is running');
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var app = {
-  title: '결정, 해드립니다',
-  subtitle: '고민중인 선택지를 입력하세요.',
-  options: []
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var onFormSubmit = function onFormSubmit(e) {
-  e.preventDefault();
-  var option = e.target.elements.option.value;
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-  if (option) {
-    app.options.push(option);
-    e.target.elements.option.value = '';
-    render();
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Counter = function (_React$Component) {
+  _inherits(Counter, _React$Component);
+
+  function Counter() {
+    _classCallCheck(this, Counter);
+
+    return _possibleConstructorReturn(this, (Counter.__proto__ || Object.getPrototypeOf(Counter)).apply(this, arguments));
   }
-};
 
-var onMakeDecision = function onMakeDecision() {
-  var randomNum = Math.floor(Math.random() * app.options.length);
-  var option = app.options[randomNum];
-  alert(option);
-};
-
-var resetOption = function resetOption() {
-  app.options = [];
-  render();
-};
-
-var appRoot = document.getElementById('app');
-
-var render = function render() {
-  var template = React.createElement(
-    'div',
-    null,
-    React.createElement(
-      'h1',
-      null,
-      app.title
-    ),
-    app.subtitle && React.createElement(
-      'p',
-      null,
-      app.subtitle
-    ),
-    React.createElement(
-      'p',
-      null,
-      app.options.length > 0 ? '입력된 선택지 리스트' : '선택지가 없습니다.'
-    ),
-    React.createElement(
-      'button',
-      { disabled: !app.options.length, onClick: onMakeDecision },
-      '\uACB0\uC815\uD574\uC8FC\uC138\uC694!'
-    ),
-    React.createElement(
-      'button',
-      { onClick: resetOption },
-      '\uBAA8\uB450 \uC9C0\uC6B0\uAE30'
-    ),
-    React.createElement(
-      'ol',
-      null,
-      app.options.map(function (option) {
-        return React.createElement(
-          'li',
-          { key: option },
-          option
-        );
-      })
-    ),
-    React.createElement(
-      'form',
-      { onSubmit: onFormSubmit },
-      React.createElement('input', { type: 'text', name: 'option' }),
-      React.createElement(
-        'button',
+  _createClass(Counter, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
         null,
-        '\uC120\uD0DD\uC9C0 \uCD94\uAC00'
-      )
-    )
-  );
-  ReactDOM.render(template, appRoot);
-};
+        React.createElement(
+          'h1',
+          null,
+          'Count: '
+        ),
+        React.createElement(
+          'button',
+          null,
+          '+1'
+        ),
+        React.createElement(
+          'button',
+          null,
+          '-1'
+        ),
+        React.createElement(
+          'button',
+          null,
+          'reset'
+        )
+      );
+    }
+  }]);
 
-render();
+  return Counter;
+}(React.Component);
+
+ReactDOM.render(React.createElement(Counter, null), document.getElementById('app'));
+
+// let count = 0;
+// const addOne = () => {
+//   count++;
+//   renderCounterApp();
+// };
+
+// const subtractOne = () => {
+//   count--;
+//   renderCounterApp();
+// };
+
+// const reset = () => {
+//   count = 0;
+//   renderCounterApp();
+// };
+
+// const appRoot = document.getElementById('app');
+
+// const renderCounterApp = () => {
+//   const templateTwo = (
+//     <div>
+//       <h1>Count: {count}</h1>
+//       <button onClick={addOne}>+1</button>
+//       <button onClick={subtractOne}>-1</button>
+//       <button onClick={reset}>reset</button>
+//     </div>
+//   );
+//   ReactDOM.render(templateTwo, appRoot);
+// }
+
+// renderCounterApp(); // initial render
