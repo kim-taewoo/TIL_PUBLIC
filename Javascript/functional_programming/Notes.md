@@ -2,7 +2,7 @@
 
 > [참고영상:"Functional Programming Basics in ES6"](https://youtu.be/FYXpOjwYzcs)
 
-자바스크립트의 가장 큰 특징 중 하나는 **First class functions** 이다. 쉽게 말하면, 모든 함수는 다른 일반적인 객체처럼 *first class citizen* 이고, 따라서 함수도 변수에 저장되거나, 인자로 전달되거나, `return` 될 수 있다. 이 유연한 특징 덕분에 OOP 뿐 아니라 Functional Programming 방식으로 자바스크립트를 사용할 수 있다. (어떻게 생각하면 반OOP 세력이라고 볼 수 있다. 클래스 사용보다 explicit 하게 함수들을 공개하는 스타일을 더 좋아한다.)
+자바스크립트의 가장 큰 특징 중 하나는 **First class functions** 이다. 쉽게 말하면, 모든 함수는 다른 일반적인 객체처럼 *first class citizen(Object)* 이고, 따라서 함수도 변수에 저장되거나, 인자로 전달되거나, `return` 될 수 있다. 이 유연한 특징 덕분에 OOP 뿐 아니라 Functional Programming 방식으로 자바스크립트를 사용할 수 있다. (어떻게 생각하면 반OOP 세력이라고 볼 수 있다. 클래스 사용보다 explicit 하게 함수들을 공개하는 스타일을 더 좋아한다.)
 > [참고글:"An Introduction to First-Class Functions"](https://medium.com/launch-school/javascript-weekly-an-introduction-to-first-class-functions-9d069e6fb137)
 
 - Functional programming 은, 

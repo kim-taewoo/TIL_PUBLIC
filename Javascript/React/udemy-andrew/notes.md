@@ -46,8 +46,13 @@
 1. 일반적인 if 문은, if **statement** 이기 때문에 단순히 중괄호 안에 if 문을 넣으면 JSX 가 이해하지 못한다. 그래서 따로 함수를 만들어 if 문은 그곳에 작성하고, 중괄호 안에서 함수를 호출해 `return` 값을 반환한다. 이 때, `return` 값이 html 태그를 포함할 수 있기 때문에 중괄호를 굳이 태그 안에만 넣을 필요 없이 그냥 원하는 위치에 넣어서 태그 통째로 그리거나 말거나 할 수 있다. 
 
 1. 삼항 연산자를 이용해 2가지 조건 중 하나를 골라 그릴 수 있다. 
-
+    ```jsx
+      <p>{app.options.length > 0 ? '입력된 선택지 리스트' : '선택지가 없습니다.'}</p>
+    ```
 1. *&&* logical operator 의 특성을 이용해 모든 조건을 만족하는 경우에만 마지막 부분의 html 태그를 그릴 수 있다. 
+    ```jsx
+      {!props.options.length && <p>"Please add an option to get started"</p>}
+    ```
 
 ```javascript
 var user = {
@@ -150,5 +155,138 @@ JSX 가 Object 는 다루지 못하지만, Array 는 가능하다.
 ## Alternative setState Syntax
 `setState` 에서 다른 콜백함수를 호출하지 않고 곧바로 객체를 `return` 하는 방식으로도 State 업데이트가 가능하다. 하지만 이 방식은 권장되지 않고, 이후 삭제될 것이라는 말도 있다. 왜냐하면, `setState` 는 비동기적으로 작동하는 메서드인데(상황을 체크하고 DOM을 업데이트 하는 등 해야할 일이 많아 비동기 방식으로 작동한다.), 콜백함수 호출이 아닌 방법으로 업데이트 하면 그 업데이트 시점이 꼬이면서 원하지 않는 결과로 이어질 수 있기 때문이다. **결론: 쓰지말자**
 
-## Prop 으로 함수 전달하기
+## 자식에게서 부모로 이벤트 발생 전달하기. - Prop 으로 함수 전달하기
 데이터의 흐름은 부모 -> 자식 컴포넌트 이지만, 자식 컴포넌트에서 발생한 이벤트를 부모가 알아야 하는 경우에는 그 흐름을 역으로 올라가야 한다. React 에서는, 부모가 가진 메서드를 자식 컴포넌트에게 prop 으로 넘기고, 자식이 그 메서드를 필요에 따라 호출함으로써 이 문제를 해결한다.
+
+## The Stateless Functional Component
+*State* 같은 추가 기능을 사용하지 못하는 제약이 있지만, 단순히 `render` 메서드만 있으면 되는 컴포넌트라면 `Class` 보다 일반 함수를 쓰는 것이 가독성도 좋고, 테스트 하기도 좋으며 약간 더 빠르기까지 하다. 일반 클래스 기반 컴포넌트에서의 `render()` 메서드 내용만을 따로 뺀 듯한 형태로 만들어지며, `this.props` 대신 인자로 `props` 를 받고 사용한다는 점에 주의하자.
+
+## React Devtool
+크롬이나 파이어폭스에서 React dev tool 을 설치해서 사용하면, React 의 컴포넌트 구조를 한 눈에 보고 각 컴포넌트의 State 나 Prop 등을 살펴보기 좋다. React Devtool 에서 어떤 컴포넌트를 클릭한 상태로, console 탭으로 돌아가 `$r` 을 치면, 그 컴포넌트에 대한 자세한 정보를 확인할 수 있다.
+
+## Default Props values
+컴포넌트에서 사용할 props 의 default 값들을 설정해놓을 수 있다.  
+컴포넌트 밖에서 해당 컴포넌트 클래스 혹은 함수(functional component인 경우) 의 `defaultProps` 속성에 접근해 객체를 할당해놓으면 된다.
+
+```javascript
+Count.defaultProps = {
+  count: 0
+};
+```
+
+## LifeCycle Methods 
+오직 Class based component 에서만 가능하다.  
+이미 정의되어 있는 메서드들을 사용하며, 크게 
+1. Mounting
+1. Updating
+1. Unmounting
+세 단계로 나누어 각각 몇가지 메서드들을 가지고 있다. 아래는 대표적으로 알아두어야 할 몇가지.
+
+1. componentDidMount()
+1. componentDidUpdate(prevProps, prevState)
+1. componentWillUnmount()
+
+## LocalStorage
+- 모든 게 문자열로 저장된다.
+    1. 숫자로 set 해도 문제 없이 저장되지만, 나중에 get 해보면 문자열로 변환되어 저장된 것을 확인할 수 있다. 
+    1. 배열이나 객체를 localStorage에 저장하고 싶다면 `JSON.stringify()` 을 이용하고 나중에 get 했을 때 `JSON.parse()` 로 다시 변환해주어야 한다.
+
+# Webpack
+asset bundler
+
+1. third part library 관리
+1. js 파일을 여러 개의 파일로 나누어 관리 가능 (organize js files). Webpack 을 통해 앱을 실행시키면, 결국 하나의 자바스크립트 파일이 됨 (bundle.js).
+1. `ES6 Import` 를 통해 다른 js 파일 내용을 가져오거나, npm 을 통해 설치된 외부 라이브러리를 쓰기 편하게 해줌. 
+1. Babel 도 대신 돌려줌.
+
+## Avoid Global Modules
+라이브러리를 Global 로 설치하면, 이 프로젝트를 다른 사람이 받았을 때, 필요한 모든 의존 라이브러리를 알 수 없게된다. 그리고, 만약 각 프로젝트마다 다른 버전의 라이브러리를 쓰고 싶을 때도 문제가 된다. 따라서 최대한 Global 모듈은 설치하지 않는 게 좋다.
+
+1. yarn 으로 설치한 글로벌 모듈 제거 (live-server 와 babel-cli 를 제거할 때)
+`yarn global remove live-server babel-cli`
+1. npm 으로 설치한 글로벌 모듈 제거
+`npm uninstall -g babel-cli`
+
+그런데 이렇게 글로벌이 아닌 프로젝트별 로컬 설치를 하게 되면, 터미널 창에서 `babel ~ ` 같이 곧바로 접근할 수 없게 된다. 따라서 `package.json` 파일에 따로 `"scripts"` 를 작성해서 원하는 모듈을 돌리는 명령어를 만들어야 한다.
+
+```json
+"scripts": {
+  "serve": "live-server public/",
+  "build-babel": "babel src/app.js --out-file=public/scripts/app.js --presets=env,react --watch"
+},
+```
+
+명령어를 만들었다면 `yarn run build` 혹은 `npm run build` 같이 마지막에 명령어를 붙인 `run` 커멘드로 실행할 수 있다.
+
+## installing & configuring Webpack
+
+> 주의!: jsx 가 포함된 기존 react 자바스크립트 코드를 곧바로 webpack 으로 돌릴 수 없으니, 단순 console.log 만 있는 새로운 파일을 만들고 그 파일을 대상으로 해야된다.
+
+1. webpack 설치: `yarn add webpack@3.1.0`
+2. **webpack.config.js** 파일을 project root 경로에 만들기
+3. 설정 파일 채우기
+    1. entry
+    2. output
+        1. path : 앞의 두 속성과 달리, 상대경로가 아닌 **절대경로**를 입력해야 함에 주의. 자바스크립트의 built-in 속성인 `__dirname` 으로 현재 경로를 구하고, 그 경로를 `node.js` 가 지원하는 `path.join()` 으로 원하는 경로로 조합해서 쓸 수 있다. 물론 `path.join()`대신 ES6 template string 으로 만들어도 된다. 
+
+## ES6 Import/Export
+Webpack 에서는 ES6 import 와 export 를 사용해 여러 .js 파일을 한 파일로(주로 메인 파일인 app.js 파일.) 불러와 사용할 수 있다. import/export 방식은, 변수와 함수 등의 이름이 겹쳐서 생기는 문제를 피하기 위해 파일별로 각각 별도의 scope 를 가지고 있다. 따라서 어떤 함수,클래스,변수를 내보낼 지 export 로 따로 명시해야 하고, import 하는 파일에서도 어떤 걸 가져올 지 명시해야 한다.
+
+1. named export
+    1. 변수마다 각각 export 할 때: `export const name1 = ...`
+    1. 모아서 한 번에 export 할 때: `export {name1, name2}`
+1. default export
+    1. 다른 named export 가 없을 때: `export default xx`
+    1. 다른 named export 가 있을 때: `export {name1, name2, xx as default}`
+1. named import
+    1. `import {name1, name2} from 'path'`
+1. default import
+    1. 다른 named import 가 없을 때: `import xx from 'path'`
+    1. 다른 named import 가 있을 때: `import xx, {name1, name2} from 'path'`
+
+- import 할 때 이름을 바꾸고 싶다면, default 는 그냥 원하는 이름으로 import 하면 되고, named 는 as 키워드를 써야 한다.
+- default export 는 named export 처럼 변수 정의 앞에 export default 붙여서 export 할 수 없다. 다만 익명 함수이거나, 클래스라면 가능하다.
+
+## importing npm Modules
+- `./` 를 붙이지 않고 곧바로 경로를 입력하면 webpack 이 알아서 `node_modules` 에서 찾아본다.
+
+- 3rd party library 의 경우, npm 공식 사이트에서 ES6 방식의 import 를 어떻게 해야하는지 설명하지 않는 경우가 있다. 그럴 경우에는 해당 라이브러리의 docs 를 직접 찾아가서 named import 를 쓸 지, default import 를 쓸 지 찾아보는 게 좋다.
+
+- React 의 경우, 제대로 import 하면 바로 쓸 수는 있지만, jsx 해석을 위한 babel 설정은 다시 해줘야 한다.
+
+## Setting up Babel with Webpack
+1. **babel-core** 설치
+    - babel-cli 가 command-line 으로 babel 을 실행시켜주는 것이었다면, **babel-core** 은 babel 을 webpack 과 같은 다른 도구에서 쓸 수 있도록 도와준다.
+1. **babel-loader** 설치
+    - webpack plugin 이며, webpack 이 어떤 파일을 봤을 때 babel 을 실행시켜야 하는 지 webpack 에게 알리는 역할을 한다.
+1. webpack.config.js 파일에 `module` 부분을 작성해 어떻게 loader 를 사용할지 설정한다.
+    - [공식webpack 문서](https://webpack.js.org)
+    - `test` 부분에는 어떤 파일에 loader 를 적용시킬지 정규표현식으로 작성한다.
+    - `exclude` 부분에는 어떤 파일을 제외할지 정규표현식으로 작성한다.
+1. 위까지의 과정으로 Babel 을 어떤 파일을 대상으로 실행할지는 설정했지만, 어떤 presets 을 가지고 Babel 을 돌릴 지는 프로젝트 root 경로에 `.babelrc` 라는 파일을 만들어 설정해주어야 한다. 
+    ```json
+    // .babelrc 파일
+    {
+      "presets": [
+        "env",
+        "react"
+      ]
+    }
+    ```
+
+1. 모든 설정을 마치고 다시 webpack 을 돌리면 (`yarn run build`) 이제 JSX 도 잘 해석하는 것을 알 수 있다. 변환된 파일의 길이가 상당히 긴 것은, production mode 로 갔을 때 개선될 수 있음을 알고 있자.
+
+## Source Maps with Webpack
+소스 코드에서 어떤 에러가 발생하면, 브라우저의 개발자 도구만으로는 에러를 파악하기 힘들다. 왜냐하면 브라우저가 인식하는 자바스크립트 파일은 webpack 을 거쳐 변환된 파일이고, 우리는 변환 전 파일들만을 코딩했기 때문이다. webpack 설정 파일에 `devtool` 이라는 속성을 추가해서 이 부분에 도움 받을 수 있다. (어떤 devtool 을 사용할 수 있는지는 공식 webpack document 를 참고하자. 이 프로젝트에서는 `devtool: 'cheap-module-eval-source-map'` 을 사용했다.)
+
+## Webpack devServer
+live-server 대신 webpack 자체 라이브 업데이트 서버를 돌리면 `index.html` 과 webpack 을 동시에 실행시키고 라이브 업데이트 할 수 있다. `devServer` 라는 속성을 사용한다. 
+> Webpack devServer 를 이용하면, 빠른 대신 물리적인 `bundle.js` 파일을 볼 수 없게 된다. 파일을 생성하고 싶다면 따로 `build` 관련 세팅을 해야할 것이고, 그게 나중에 배울 production 모드의 빌드파일이 될 것이다.
+
+## ES6 Class properties
+`yarn add babel-plugin-transform-class-properties@6.24.1` (버전은 다를 수 있음.)
+
+최신 webpack 플러그인 for Class Syntax  
+[babeljs.io](babeljs.io) 의 문서에서 볼 수 있는 State 2 preset 의 `transform-class-properties` 플러그인이다.  
+
+1. `consturctor()` 없이 그냥 클래스 내에서 instance Property 를 만들고, 원래 못쓰던 화살표 함수를 이용해 따로 `constructor` 내에서 `.bind(this)` 해줄 필요없이 메서드를 만들 수 있다. 
