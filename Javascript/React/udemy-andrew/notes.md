@@ -290,3 +290,89 @@ live-server 대신 webpack 자체 라이브 업데이트 서버를 돌리면 `in
 [babeljs.io](babeljs.io) 의 문서에서 볼 수 있는 State 2 preset 의 `transform-class-properties` 플러그인이다.  
 
 1. `consturctor()` 없이 그냥 클래스 내에서 instance Property 를 만들고, 원래 못쓰던 화살표 함수를 이용해 따로 `constructor` 내에서 `.bind(this)` 해줄 필요없이 메서드를 만들 수 있다. 
+
+# Using a Third-party Component
+
+## Passing Children to Component
+
+Child Component 를 `import` 해서 쓰는 방법 외에도, 어떤 컴포넌트에서 사용할 jsx 를 끼워넣는 방법이 더 있다.
+
+1. `props` 에 jsx 형태를 통째로 넘기는 방법이 있다.
+
+```javascript
+const Layout = (props) => {
+  return (
+    <div>
+      <p>header</p>
+      {props.content}
+      <p>footer</p>
+    </div>
+  );
+};
+
+const template = (
+  <div>
+    <h1>Page Title</h1>
+    <p>This is my page</p>
+  </div>
+);
+
+ReactDOM.render(<Layout content={template} />, document.getElementById('app'));
+```
+
+2. self closing tag 대신에, open, close tag 가 따로 있는 형태로 바꾼 후, 그 태그 사이에 jsx 를 통째로 넣으면 그 outer tag component 내에서 `{props.children}` 이라는 built-in props 로 접근, 렌더링이 가능하다. (Vue 에서의 slot 과 유사한 기능인듯.)
+
+## React-Modal
+```jsx
+const OptionModal = (props) => (
+  <Modal
+    isOpen={!!props.selectedOption}
+    contentLabel="Selected Option"
+    onRequestClose={props.handleClearSelectedOption}
+  >
+    <h4>Selected option</h4>
+    {props.selectedOption && <p>{props.selectedOption}</p>}
+    <button onClick={props.handleClearSelectedOption}>Okay</button>
+  </Modal>
+);
+```
+- `!!props.selectedOption` 처럼 앞에 느낌표를 두 개 붙이면, 해당 변수가 가진 값을 적절한 boolean 값으로 변환시킬 수 있다. 예를 들어, `undefined` 는 `false` 로, 빈 문자열은 false, 그 외 문자열은 `true` 가 된다. 
+- `onRequestClose` 속성은, 클라이언트 이용자가 ESC 키나, 모달밖 배경을 클릭했을 때 어떤 함수를 호출해야 하는 지 정할 수 있다. 즉, 주로 Modal 을 끌 수 있도록 도와준다. 
+
+# Styling React
+
+## Setting up Webpack with SCSS
+
+### webpack 으로 css 파일 관리하기. 
+2가지 라이브러리가 필요하다.
+1. **style-loader**: 자바스크립트 안에 있는 css 내용을 DOM 에 `style` 태그로 넣어줌으로써 실질적으로 css 가 적용되도록 한다.
+2. **css-loader**: css 파일들을 javascript 와 어울릴 수 있도록 변환해준다.
+3. 위 라이브러리들을 `yarn add` 로 추가한다.
+4. 그리고 webpack 설정 파일을 수정한다. 정규표현식으로 webpack 이 `.css` 파일을 보면 어떻게 처리할 지를 정하는데, CSS 파일에 적용할 라이브러리가 하나가 아니라 2개 이상이기 때문에, `loader` 가 아닌 `use` property 에 배열의 형태로 라이브러리를 넣어야 한다.
+5. 그리고 나서, `app.js` 파일에 CSS 파일을 `import` 하면, webpack 이 설정에 따라 해석하게 된다. 
+
+> 순서주의! : 사실 왜 그런지 이해하지 못했지만, style-loader 를 css-loader 보다 뒤 순서로 넣으면, 제대로 css 를 처리하지 못한다. 무조건 style-loader 가 먼저오도록 배열에 작성하자..
+
+```json
+module: {
+  rules: [{
+    loader: 'babel-loader',
+    test: /\.js$/,
+    exclude: /node_modules/
+  }, {
+    test: /\.css$/,
+    use: [
+      'style-loader',
+      'css-loader'
+    ]
+  }]
+},
+```
+
+## scss 사용
+sass 와 scss 는 사용문법에서 약간 차이가 있을 뿐, 같은 거라고 보면 된다. css 대신 scss 를 쓰기 위해 sass-loader 와 node-sass 를 설치하고 설정하자.
+
+### 외부 라이브러리 갈아엎기.
+> **scss 사용** 부분에서 라이브러리를 내 임의로 모두 갈아치웠다. sass-loader 와 node-sass 가 강사가 하는 것과 달리 기존 라이브러리들과 제대로 호환되지 않았기 때문. 어차피 내가 스스로 개발할 때는 최신버전으로 해야할 확률이 높으니, 강의에서처럼 일일이 버전명을 치지 않고 최신버전으로 모든 것을 맞추기로 했다. 결과적으로 성공했지만, 기록해놔야 할 것들이 꽤 있다. 
+
+- 결과적으로 직접 코드를 쳐 수정한 파일은 `package.json` 과 `.babelrc` 두 개다.
