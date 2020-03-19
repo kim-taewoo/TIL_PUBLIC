@@ -370,9 +370,95 @@ module: {
 ```
 
 ## scss 사용
-sass 와 scss 는 사용문법에서 약간 차이가 있을 뿐, 같은 거라고 보면 된다. css 대신 scss 를 쓰기 위해 sass-loader 와 node-sass 를 설치하고 설정하자.
+sass 와 scss 는 사용문법에서 약간 차이가 있을 뿐, 같은 거라고 보면 된다. scss 를 사용하면 프로그래밍 언어처럼 변수를 쓸 수 있고, 마치 javascript 처럼 다른 scss 파일 내용을 import 해서 합쳐 쓸 수 있다(모듈화). css 대신 scss 를 쓰기 위해 sass-loader 와 node-sass 를 설치하고 설정하자.
 
 ### 외부 라이브러리 갈아엎기.
 > **scss 사용** 부분에서 라이브러리를 내 임의로 모두 갈아치웠다. sass-loader 와 node-sass 가 강사가 하는 것과 달리 기존 라이브러리들과 제대로 호환되지 않았기 때문. 어차피 내가 스스로 개발할 때는 최신버전으로 해야할 확률이 높으니, 강의에서처럼 일일이 버전명을 치지 않고 최신버전으로 모든 것을 맞추기로 했다. 결과적으로 성공했지만, 기록해놔야 할 것들이 꽤 있다. 
 
-- 결과적으로 직접 코드를 쳐 수정한 파일은 `package.json` 과 `.babelrc` 두 개다.
+1. 결과적으로 직접 코드를 쳐 수정한 파일은 `package.json` 과 `.babelrc` 두 개다.
+1. 가장 큰 변경사항은 기존 `babel-core` 이라는 **6** 버전대의 Babel 이, **7** 버전대의 Babel 이 되어 **@** 와 **/** 이 사용된 `@babel/core` 로 바뀌었고, 이 core 에 맞춰 다른 모든 babel 관련 라이브러리, preset 및 plugin 들이 모두 유사한 형태의 다른 라이브러리로 이름이 바뀌거나 아예 다른 이름이 되었다. > 참고: [도움되는 github 질의응답](https://github.com/babel/babel/issues/6808)
+
+아래는 강의를 따라갔을 때의 `package.json` 상태와, 최신 버전으로 업데이트 한 `package.json` 상태다.
+
+```json
+// 변경하기 전
+"babel-cli": "6.24.1",
+"babel-core": "6.25.0",
+"babel-loader": "7.1.1",
+"babel-plugin-transform-class-properties": "6.24.1",
+"babel-preset-env": "1.5.2",
+"babel-preset-react": "6.24.1",
+"css-loader": "0.28.4",
+"live-server": "^1.2.1",
+"react": "16.0.0",
+"react-dom": "16.0.0",
+"react-modal": "2.2.2",
+"style-loader": "0.18.2",
+"validator": "8.0.0",
+"webpack": "3.1.0",
+"webpack-dev-server": "2.5.1"
+```
+
+```json
+// 변경 후
+"@babel/cli": "^7.8.4",
+"@babel/core": "^7.8.7",
+"@babel/plugin-proposal-class-properties": "^7.8.3",
+"@babel/preset-env": "^7.8.7",
+"@babel/preset-react": "^7.8.3",
+"babel-loader": "^8.0.6",
+"css-loader": "^3.4.2",
+"live-server": "^1.2.1",
+"node-sass": "^4.13.1",
+"react": "^16.13.0",
+"react-dom": "^16.13.0",
+"react-modal": "^3.11.2",
+"sass-loader": "^8.0.2",
+"style-loader": "^1.1.3",
+"validator": "^12.2.0",
+"webpack": "^4.42.0",
+"webpack-cli": "^3.3.11",
+"webpack-dev-server": "^3.10.3"
+```
+
+이 아래는 변경 후 `.babelrc` 파일 내용이다. 기존 `babel-plugin-transform-class-properties` 이 아예 이름이 바뀐 것을 확인할 수 있다.
+
+```json
+{
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react"
+  ],
+  "plugins": [
+    "@babel/plugin-proposal-class-properties"
+  ]
+}
+```
+
+결과적으로 컴파일된 걸 보면 최신버전의 webpack과 babel 을 활용한 것이 hidden modules 개수가 많이 줄어든 것 같으니 더 성능이 좋다고 추측된다.
+
+## SCSS
+`@import` 구문으로 다른 scss 파일을 가져올 수 있다. 부분적인 코드(partial)를 담고 있는 scss 파일명은 언더스코어(_) 로 시작한다. 이 부분적인 scss 파일을 one entry point SCSS 파일(중심파일)에 `@import` 할 때, 앞에 언더스코어부분을 생략하도록 되어있다.
+
+### rem
+이용자가 브라우저 상에서 폰트 크기를 조절할 수 있도록 하거나 기기별로 다른 설정을 지원하기 위해서는 단순 픽셀단위가 아닌 상대적인 크기를 폰트 크기로 지정할 필요가 있다. 따라서 **rem** 을 사용한다. 그런데 일반적인 브라우저 폰트 기본 사이즈는 16px 이다. 16px 을 기준으로 하면, 크기 조절을 할 때 계산하기가 너무 힘들기 때문에, 보통 `html` 태그의 css 속성에 font-size 를 0.625%, 즉 10px 로 해놓고, 그것에 대한 상대 크기를 조절하자. 물론 `body` 태그에 다시 1.6rem 으로 지정해서, 브라우저 기본 값을 되찾아주자.
+
+```css
+html {
+  font-size: 62.5%;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.6rem;
+}
+```
+
+### BEM
+**BEM**, Block Element Modifier Naming Convention   
+클래스 이름 붙이는 네이밍 컨벤션이다. `header__title` 같이, header 같은 큰 단위를 블럭, 그 안에 있는 title 같은 것을 element 라고 생각하며 __ 를 이용해 이름 붙인다. 자세한 내용이 필요하면 찾아보자
+
+### Reset CSS
+브라우저마다 기본 스타일링이 다르기 때문에, 모든 브라우저에서 똑같은 경험을 하게 하려면 먼저 모든 css 를 reset 해줄 필요가 있다. 정말 다양한 부분에서 다르기 때문에 직접 코딩하기에는 무리가 있고, `Normalize.css` 같은 이미 만들어진 것을 가져다 쓰는 게 좋다.
+
+`yarn add normalize.css` 로 설치한 후, `app.js` 에서 `import` 하자. 그리고 이전에 sass 이용을 위해 바꿔뒀던 sass 관련 loader 의 정규표현식을 `test: /\.s?css$/,` 로 바꿔서 scss 와 css 모두 해당되도록 해주자.
