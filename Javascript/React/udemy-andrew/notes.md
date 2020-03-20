@@ -256,8 +256,10 @@ Webpack 에서는 ES6 import 와 export 를 사용해 여러 .js 파일을 한 �
 
 ## Setting up Babel with Webpack
 1. **babel-core** 설치
+    
     - babel-cli 가 command-line 으로 babel 을 실행시켜주는 것이었다면, **babel-core** 은 babel 을 webpack 과 같은 다른 도구에서 쓸 수 있도록 도와준다.
 1. **babel-loader** 설치
+    
     - webpack plugin 이며, webpack 이 어떤 파일을 봤을 때 babel 을 실행시켜야 하는 지 webpack 에게 알리는 역할을 한다.
 1. webpack.config.js 파일에 `module` 부분을 작성해 어떻게 loader 를 사용할지 설정한다.
     - [공식webpack 문서](https://webpack.js.org)
@@ -472,4 +474,83 @@ body {
 ## word-break: break-all
 사용자가 지나치게 긴 글자를 입력했는데, 심지어 띄어쓰기도 없이 길게 이어졌다면, 주어진 박스 크기를 뚫고 나갈 수 있다. 따라서 css 에 `word-break: break-all` 을 써서 한 단어라도 줄 바꿈이 되도록 하는 게 좋다.
 
+# React-Router
+
+> [ReactTraining/react-router 사이트] (https://reacttraining.com/react-router) 
+
+## 설치
+
+1. web 버전은 `yarn add react-router-dom`
+2. Native 버전은 `yarn add react-router-native`
+
+
+
+## 역사/작동원리
+
+1. 자바스크립트를 이용한 라우팅은 React 가 처음 도입한 것은 아니고, 그 전에도 이미 많이 활용되던 기술이다. 특히 HTML5 의 `history` api 를 이용할 수 있게 되면서 사용이 더 용이해졌다. 
+2. 전통적인 **서버 사이드 라우팅** 과 상반되는 **클라이언트 사이드 라우팅**이 된 것으로, 페이지마다 서버에 요청하지 않고, 주소창은 구분을 위한 url 일 뿐, 실질적으로 각 주소마다 사용자에게 보여주는 파일은 오직 `index.html` 하나다. 즉, 어떤 경로로 접근하든 `index.html` 이 주어지고, 자바스크립트가 그 주소에 맞게 어떤 컴포넌트를 보여줄 지 동적으로 결정한다. 
+
+
+
+### 설정 코드
+
+1. `app.js` 파일에 `react-router` 와 관련된 설정을 한다. `exact` 설정을 해야 앞부분이 겹친다고 모두 렌더링되지 않고, 그 주소에 꼭 맞는 페이지가 로드된다. 물론 일부러 겹치는 모든 게 다 나오게 하는 경우도 있다.
+
+```js
+// app.js 파일
+import { BrowserRouter, Route } from 'react-router-dom';
+// ...
+const routes = (
+  <BrowserRouter>
+    <div>
+      <Route path="/" component={ExpenseDashboardPage} exact={true}></Route>
+      <Route path="/create" component={AddExpensePage} ></Route>
+    </div>
+  </BrowserRouter>
+);
+
+ReactDOM.render(routes, document.getElementById('app'));
+```
+
+
+
+1. webpack 설정파일에 `devServer` property 에 `historyApiFallback: true` 를 부여한다. 앱의 어떤 경로를 get 하는 것에 실패했을 때(기존 서버 사이드 라우팅 방식에 비교하면, 존재하지 않는 파일 경로는 실패한다.), 무조건 `index.html` 파일을 주도록 할 수 있다.
+
+```js
+// webpack.config.js
+devServer: {
+    contentBase: path.join(__dirname, 'public'),
+    historyApiFallback: true
+}
+```
+
+
+
+## 404 페이지
+
+맨 마지막 순서로 `path` 가 지정되지 않은 `<Route>` 태그를 두면, 앞서 설정된 Route 들 모두와 일치하지 않을 경우 404 페이지가 뜨도록 할 수 있다. 그런데, 단순히 맨 마지막에 `path` 없이 두면, 없는 페이지 상황 뿐 아니라 모든 경로에 다 뜨게 된다. (빈 루트는 어떤 것에든 일치하기 때문)    
+
+따라서 `react-router` 가 제공하는 컴포넌트 중 하나인 `<Switch>` 를 써야 한다. 스위치 컴포넌트를 써야, 매칭되는 한 가지 경우의 수를 찾았을 때, 그 페이지를 렌더링 하는 것에서 멈추고 더 탐색하지 않는다. 원래 `<BrowserRouter>` 가 하나의 요소만 허용했기 때문에 단순 div 태그로 감쌌었는데, Switch 로 바꿔주기만 하면 된다. 
+
+
+
+```js
+import { BrowserRouter, Route } from 'react-router-dom';
+// ...
+const routes = (
+  <BrowserRouter>
+    <Switch>
+      <Route path="/" component={ExpenseDashboardPage} exact={true}></Route>
+      <Route path="/create" component={AddExpensePage} ></Route>
+      <Route path="/edit" component={EditExpensePage} ></Route>
+      <Route path="/help" component={HelpPage} ></Route>
+      <Route component={NotFoundPage} ></Route>
+    </Switch>
+  </BrowserRouter>
+);
+```
+
+
+
+## Linking between routes
 
