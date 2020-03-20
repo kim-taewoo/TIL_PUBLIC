@@ -301,7 +301,7 @@ Child Component 를 `import` 해서 쓰는 방법 외에도, 어떤 컴포넌트
 
 1. `props` 에 jsx 형태를 통째로 넘기는 방법이 있다.
 
-```javascript
+```jsx
 const Layout = (props) => {
   return (
     <div>
@@ -496,7 +496,7 @@ body {
 
 1. `app.js` 파일에 `react-router` 와 관련된 설정을 한다. `exact` 설정을 해야 앞부분이 겹친다고 모두 렌더링되지 않고, 그 주소에 꼭 맞는 페이지가 로드된다. 물론 일부러 겹치는 모든 게 다 나오게 하는 경우도 있다.
 
-```js
+```jsx
 // app.js 파일
 import { BrowserRouter, Route } from 'react-router-dom';
 // ...
@@ -534,7 +534,7 @@ devServer: {
 
 
 
-```js
+```jsx
 import { BrowserRouter, Route } from 'react-router-dom';
 // ...
 const routes = (
@@ -553,4 +553,20 @@ const routes = (
 
 
 ## Linking between routes
+
+단순 html `<a>` 태그로 라우팅을 하면, 브라우저 기본 설정 상 무조건 새로고침을 해서 처음부터 다시 페이지를 로드한다. 그럼 SPA 의 장점이 사라지므로, 경로는 이동하되 a 태그는 누르지 않은 것처럼 되어야 한다. 그리고 이 기능을 react-router 가 `<Link>` 나 `<NavLink>` 를 통해 제공한다. `<NavLink>` 가 제공하는 기능이 더 많아 복잡하므로, 단순하게는 Link 를 사용해서 라우팅할 수 있다.
+
+```jsx
+<Link to="/">Go Home</Link>
+```
+
+
+
+### Layout?
+
+`<Switch>` 와 같은 레벨에 다른 컴포넌트를 넣어서, 언제나 렌더링 되는 header 나 footer 같은 걸 구현할 수 있다.
+
+
+
+## Query Strings and URL parameters
 
