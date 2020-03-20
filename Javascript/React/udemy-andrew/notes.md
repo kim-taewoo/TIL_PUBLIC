@@ -456,9 +456,20 @@ body {
 
 ### BEM
 **BEM**, Block Element Modifier Naming Convention   
-클래스 이름 붙이는 네이밍 컨벤션이다. `header__title` 같이, header 같은 큰 단위를 블럭, 그 안에 있는 title 같은 것을 element 라고 생각하며 __ 를 이용해 이름 붙인다. 자세한 내용이 필요하면 찾아보자
+클래스 이름 붙이는 네이밍 컨벤션이다. 
+
+1. `header__title` 같이, header 같은 큰 단위를 블럭, 그 안에 있는 title 같은 것을 element 라고 생각하며 __ 를 이용해 이름 붙인다.
+
+1. `button--link` 같이, 어떤 button 의 basic setting 에 추가적으로 **modified** 된 버전의 css 를 작성하면, -- 를 붙인다.
+
+자세한 내용이 필요하면 찾아보자
 
 ### Reset CSS
 브라우저마다 기본 스타일링이 다르기 때문에, 모든 브라우저에서 똑같은 경험을 하게 하려면 먼저 모든 css 를 reset 해줄 필요가 있다. 정말 다양한 부분에서 다르기 때문에 직접 코딩하기에는 무리가 있고, `Normalize.css` 같은 이미 만들어진 것을 가져다 쓰는 게 좋다.
 
 `yarn add normalize.css` 로 설치한 후, `app.js` 에서 `import` 하자. 그리고 이전에 sass 이용을 위해 바꿔뒀던 sass 관련 loader 의 정규표현식을 `test: /\.s?css$/,` 로 바꿔서 scss 와 css 모두 해당되도록 해주자.
+
+## word-break: break-all
+사용자가 지나치게 긴 글자를 입력했는데, 심지어 띄어쓰기도 없이 길게 이어졌다면, 주어진 박스 크기를 뚫고 나갈 수 있다. 따라서 css 에 `word-break: break-all` 을 써서 한 단어라도 줄 바꿈이 되도록 하는 게 좋다.
+
+
