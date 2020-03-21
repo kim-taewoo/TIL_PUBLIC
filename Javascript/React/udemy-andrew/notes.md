@@ -256,10 +256,10 @@ Webpack 에서는 ES6 import 와 export 를 사용해 여러 .js 파일을 한 �
 
 ## Setting up Babel with Webpack
 1. **babel-core** 설치
-    
+   
     - babel-cli 가 command-line 으로 babel 을 실행시켜주는 것이었다면, **babel-core** 은 babel 을 webpack 과 같은 다른 도구에서 쓸 수 있도록 도와준다.
 1. **babel-loader** 설치
-    
+   
     - webpack plugin 이며, webpack 이 어떤 파일을 봤을 때 babel 을 실행시켜야 하는 지 webpack 에게 알리는 역할을 한다.
 1. webpack.config.js 파일에 `module` 부분을 작성해 어떻게 loader 를 사용할지 설정한다.
     - [공식webpack 문서](https://webpack.js.org)
@@ -570,3 +570,163 @@ const routes = (
 
 ## Query Strings and URL parameters
 
+`<Route>` 가 무조건 `props` 로 받는 history, location, match 속성들을 이용해서 여러가지 라우팅 관련 일을 할 수 있다.
+
+
+
+# Redux
+
+> [공식문서](https://redux.js.org)
+
+
+
+기본적인 생성 코드는 다음과 같다. `createStore` 함수가 받는 `state` 매개변수는, 현재 상태의 state 를 말한다. 맨 처음 생성되었을 때는 아무런 state 가 없으므로, default Object 인 `{count: 0}` 을 넣고 테스트해 보았다. `getState` 로 현재 store 의 state를 받아볼 수 있다.
+
+```js
+import { createStore } from 'redux';
+
+const store = createStore((state = { count: 0 }) => {
+  return state
+});
+
+console.log(store.getState());
+```
+
+
+
+## Dispatching Actions
+
+- Action 은 Redux Store 에 보내지는 **Object** 이다. 이 Object 는 어떤 종류(type)의 액션을 할지를 `type` property 에 담아 `store` 에 `dispatch` 한다. 
+
+### Naming convention
+
+보통 action 의 type 이름은 모두 대문자(uppercase) 를 쓴다. 한 단어로 쓸 수 없는 경우, 언더스코어(_) 를 써서 구분한다. 
+
+### Using in store object
+
+redux 의 createStore 가 받는 함수는, `state` 뿐 아니라 `action` 도 받는다. 그리고 함수 내에서, if 문을 이용해서 `if (action.type === 'ACTION_NAME')` 과 같이 분기문을 작성해도 되겠지만, 얼마나 더 action 의 수가 많아질 지 모르는 상황이기 때문에 보통 `switch` 문을 많이 쓴다.
+
+```js
+import { createStore } from 'redux';
+
+const store = createStore((state = { count: 0 }, action) => {
+  switch (action.type) {
+    case 'INCREMENT':
+      return {
+        count: state.count + 1
+      };
+    default:
+      return state;
+  }
+
+  // if (action.type === 'INCREMENT') {
+  //   return {
+  //     count: state.count + 1
+  //   };
+  // } else {
+  //   return state;
+  // }
+});
+
+console.log(store.getState());
+
+store.dispatch({
+  type: 'INCREMENT'
+});
+
+console.log(store.getState());
+```
+
+
+
+## Subscribing and Dynamic Actions
+
+실제 어플리케이션을 만들었을 때, Store 의 상태가 변할 때마다 일일이 `getStore` 로 찍어볼 수는 없다. 변화가 생기면 자동으로 인식하고 그 변화에 맞춰서 새로 렌더링해줄 필요가 있기 때문이다. 그래서 변화를 인지하는 `subscribe()` 를 사용한다. 이 `subscribe` 메서드가 반환하는 것이 subscribe 를 중단하는 함수이기 때문에, 변수에 저장해놨다가 그 변수를 호출하면 그 시점에서 subscribe 가 중단된다.
+
+```js
+const unsubscribe = store.subscribe(() => {
+  console.log(store.getState());
+});
+
+store.dispatch({
+  type: 'INCREMENT'
+});
+
+unsubscribe(); // 중단
+
+store.dispatch({
+  type: 'DECREMENT'
+});
+```
+
+
+
+Action 에 `type` 외에 다른 property 를 만들고 그것을 활용할 수 있다. 
+
+```js
+// store 내 switch 문
+switch (action.type) {
+    case 'INCREMENT':
+        const incrementBy = typeof action.incrementBy === 'number' ? action.incrementBy : 1;
+        return {
+            count: state.count + incrementBy
+        };
+}
+
+store.dispatch({
+  type: 'INCREMENT',
+  incrementBy: 5
+});
+```
+
+## Action Generator
+
+ES6 의 Object destructuring 을 이용하면, 보다 깔끔하고, 오타를 방지하며, 덜 반복적인 방법으로 action 을 정의하고 이용할 수 있다.  (함수는 자동완성이 되니까)
+
+1. dispatch 에 직접 Object 를 넘기지 않고, Object 를 반환하는 함수를 호출한다.
+2. 그 Obejct 를 반환하는 함수는 매개변수로 해당 Action 을 위한 객체를 받지만, 아무것도 넘기지 않고 호출되도 작동할 수 있도록  default 값이 빈 Object 인 함수다. 그런데, Object destructuring 에서 좌변에도 default 값을 가질 수 있다는 점을 이용해, 객체가 인자로 주어지지 않았을 경우의 기본 값을 설정할 수 있다. 
+
+```js
+const incrementCount = ({incrementBy = 1} = {}) => ({
+    type: 'INCREMENT',
+    incrementBy
+});
+
+// ...
+
+store.dispatch(incrementCount()); // 객체를 넘겨주지 않아도 정상적으로 실행됨.
+```
+
+
+
+## Reducer
+
+단어의 어감은 무서워 보이지만 그냥 Action 이 들어왔을 때 정작 State 를 어떻게 변화시킬 지 결정하고 변화시키는 **Pure Function** 이 Reducer 다. 즉, `createStore` 의 인자로 들어가는 함수가 Reducer 다. 여기서 Pure Function 이란, 함수의 내용이 함수 밖의 Scope 와 전혀 연관이 없는 함수로, Output 도 오로지 Input 만을 가지고 만들어지는 함수를 뜻한다. (함수형 프로그래밍에서도 자주 쓰이는 개념이다. ) 
+
+어플리케이션이 하는 일이 많아질수록, `createStore` 는 여러개의 Reducer 를 가질 수 있고, 따라서 `createStore` 내에서 함수를 정의하기 보다는 따로 분리해서 Reducer 들을 만든 후, 나중에 그 함수들을 `combindReducers` 로 합쳐서 쓰는 식으로 구조를 짠다.
+
+Reducers 의 특징은, 
+
+1. Pure Functions 이다.
+2. Reducer 는 결코 state 와 action 을 직접적으로 변형시키지 않는다.
+
+
+
+## ES6 Spread Operator in Reducers
+
+Pure Function 이라는 Reducer 의 특징상, 관리하고 있는 배열이 있고, 그 배열에 원소를 추가하고 싶을 때, `.push` 메서드를 쓰면 안된다. 따라서 새로운 배열을 만들어 `return` 해야 한다. 주로 아래 2가지 방식이 쓰인다.
+
+1. `.concat` 메서드를 대신해서 쓴다.
+2. Spread Operator 을 써서 복사한다.
+
+
+
+## Object destructuring and Redux
+
+결국 redux 의 store 는, 각 reducer 가 관리하고 있는 State 를 (배열일수도, 객체일수도..) 통째로 갈아치우는 방식으로 작동한다. 즉, State 의 일부 property 만 바꾸려고 해도 나머지 모든 property 까지 합쳐서 `return` 해야한다. 그런데 모든 property 를 일일이 타이핑할 수는 없기 때문에, Array destructuring 혹은 Object destructuring 을 잘 활용해야 한다. 특히 앞쪽에 기존 state 를 모두 destructuring 해서 전부 복사한 뒤, 뒤쪽에 같은 key 를 가진 property(변화가 필요한 property) 를 재정의함으로써 덮어씌우는 방식이 많이 이용된다. 
+
+
+
+## Timestamp
+
+1970년 1월 1일 기준(unix epoch) 부터 milliseconds 단위로 증가해온 timestamp 로 날짜를 구분한다. **음수**도 지원하며, 그 경우에는 1970 년 이전이 된다.
