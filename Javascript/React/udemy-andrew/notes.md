@@ -730,3 +730,131 @@ Pure Function 이라는 Reducer 의 특징상, 관리하고 있는 배열이 있
 ## Timestamp
 
 1970년 1월 1일 기준(unix epoch) 부터 milliseconds 단위로 증가해온 timestamp 로 날짜를 구분한다. **음수**도 지원하며, 그 경우에는 1970 년 이전이 된다.
+
+
+
+### .sort() 와 compare function
+
+쉽게 생각하자면, 2개의 인자 중 첫번째가 -1, 두번째가 1 이라고 우선 생각하자.(-1 이 1보다 작다.) 그리고 아래 조건문을 작성한 뒤, 그 조건문이 return 하는 것이 -1 이면 첫번째가 -1 이었으니 그게 앞에 서고, return 하는 것이 1 이면 두번째 것이 1 이었으니 두번째가 앞에 선다. 
+
+# React with Redux
+
+## High Order Component (HOC)
+다른 컴포넌트를 생산하는 컴포넌트를 HOC 라고 부른다. 즉, 컴포넌트를 return 하는 함수라고 생각하면 된다. HOC 는 다른 함수로 감싸져서, 그 외부 함수가 인자로 받아오는 어떤 컴포넌트를 내부 HOC 함수가 상황에 맞게 그 컴포넌트를 렌더하는 방식으로 사용된다. 즉, 바깥 함수가 아닌 안에 있는 함수가 HOC Component 이다. Redux 가 React 에서 쓰일 수 있는 방식도, 비록 그냥 주어진 라이브러리를 쓰면 되긴 하지만, **내부적으로는 HOC 패턴**으로 구현된다. Redux Store 를 쓸 수 있는 컴포넌트로 재탄생시키는 것이다. 
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+const Info = (props) => (
+  <div>
+    <h1>Info</h1>
+    <p>The info is: {props.info}</p>
+  </div>
+);
+
+const withAdminWarning = (WrappedComponent) => {
+  return (props) => (
+    <div>
+      {props.isAdmin && <p>This is private info. Please don't share!</p>}
+      <WrappedComponent {...props} />
+    </div>
+  );
+};
+
+const requireAuthentication = (WrappedComponent) => {
+  return (props) => (
+    <div>
+      {props.isAuthenticated ? (
+        <WrappedComponent {...props} />
+      ) : (
+          <p>Please Login</p>
+        )}
+    </div>
+  );
+};
+
+const AdminInfo = withAdminWarning(Info);
+const AuthInfo = requireAuthentication(Info);
+
+// ReactDOM.render(<AdminInfo isAdmin={true} info="There are the details" />, document.getElementById('app'));
+ReactDOM.render(<AuthInfo isAuthenticated={false} info="There are the details" />, document.getElementById('app'));
+```
+
+
+
+## Connecting Store and Component with React-Redux
+
+`react-redux` 라는 라이브러리를 설치해서 이용한다. 그리고 메인 파일인 `app.js` 에서, `Provider` 를 import 해서 기존 메인 라우트 컴포넌트를 감싸준다. 이때 `Provider` 에 redux store props 를 넘겨주자. 이렇게 하고나면, 이제 `Provider` 안의 모든 컴포넌트에서 원할 때 redux store 를 연결해서 사용할 수 있게 된다.
+
+```jsx
+import { Provider } from 'react-redux';
+
+// ...
+
+const jsx = (
+  <Provider store = {store}>
+    <AppRouter />
+  </Provider>
+);
+
+ReactDOM.render(jsx, document.getElementById('app'));
+```
+
+
+
+### Store 를 사용하고자 하는 Component 에서 **connect** 로 store와 연결하기
+
+어떤 컴포넌트에서 redux store 를 활용하고자 한다면, 우선 `react-redux` 라이브러리의 `connect` 함수를 import 해야 한다. 이 `connect` 함수는 곧바로 HOC 를 반환하지는 않고, 앞서 배운 HOC 의 Outer function 과 같은 것을 반환한다. 즉, `connect` 의 반환 함수에 감싸고자 하는 **컴포넌트(wrappedComponent, 즉, redux 에 접근하고자 하는 컴포넌트)를 인자로 넣어** 또다시 호출해주어야만 HOC 가 정상적으로 작동한다.  그럼 **`connect` 의 함수호출부 괄호에는 어떤 인자가 들어갈까?** 바로, 감싸진 component 에게 props 로 넘겨질 객체다. 물론 우리가 넘겨주고자 하는 객체는 redux store 의 state 다. 그래서 이 connect 호출부의 인자는 store의 state 를 기본인자로 받는 또다른 함수이다. **왜 함수냐?** 는 조금 더 생각해보면 이해할 수 있다. 계속해서 데이터가 바뀌고 있는 상황일 때, state 가 변하면 그때그때 함수로 새로 호출해줘야만 최신 state를 가져올 수 있다는 것으로 해석하면 된다.(실제로 `store.subscribe()` 나 `getState()` 같은 함수 호출 없이도 reactive 하게 컴포넌트가 다시 렌더링된다.) 아무튼, 이 `connect` 인자 함수는 wrappedComponent 가 props 로 받을 객체를 key-value 로 설정해 반환한다. (store의 모든 state 가 필요하지 않을테니, 필요한 부분만 다시 key-value 로 만들어 props 로 넘기는 것이다.)
+
+```jsx
+import React from 'react';
+import { connect } from 'react-redux';
+
+const ExpenseList = (props) => (
+  <div>
+    <h1>
+      Expense List
+    </h1>
+    {props.expenses.length}
+  </div>
+);
+
+const ConnectedExpenseList = connect((state) => {
+  return {
+    expenses: state.expenses
+  };
+})(ExpenseList);
+
+export default ConnectedExpenseList; // ExpenseList 컴포넌트가 HOC 를 통해 redux store 와 연결된 상태인 ConnectedExpenseList 라는 새로운 컴포넌트가 되고, 그것을 다른 컴포넌트에서 사용할 수 있도록 export 됨.
+```
+
+
+
+실전예제에서는, `connect` 함수를 곧바로 export default 해버리고, `connect` 의 인자로 들어가는 함수도 `mapStateToProps` 같은 이름의 함수로 따로 분리하는 경우가 많다. (함수명에서 보다시피 store 의 state 중 일부를 wrappedComponent 의 props 로 변환하는 과정이다.)
+
+```jsx
+const mapStateToProps = (state) => {
+  return {
+    expenses: state.expenses
+  };
+};
+
+export default connect(mapStateToProps)(ExpenseList);
+```
+
+데이터를 어떤 규칙을 따라 filtering 하거나 sorting 할 필요가 있다면, 같은 파일 내에서 규칙을 작성하여 변환해도 되지만 따로 `selectors` 같은 폴더를 만들어 state 를 조건에 따라 변환하는 함수를 작성하면 좋다. 
+
+
+
+```jsx
+import selectExpense from '../selectors/expenses';
+
+// ...
+const mapStateToProps = (state) => {
+  return {
+    expenses: selectExpense(state.expenses, state.filters)
+  };
+};
+```
+
