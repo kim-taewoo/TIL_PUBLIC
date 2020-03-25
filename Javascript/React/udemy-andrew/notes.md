@@ -858,3 +858,35 @@ const mapStateToProps = (state) => {
 };
 ```
 
+
+
+## store 와 `connect` 된 컴포넌트에서 `dispatch` 사용하기
+
+`connect` 된 컴포넌트의 props 에는, `mapStateToProps` 로 넘겨준 state 외에도, store 의`dispatch` 메서드도 존재한다. 즉, 컴포넌트에서 곧바로 `dispatch` 할 수 있다. 물론 `dispatch` 의 인자로 넘겨줄 action generator 는 미리 만든 것을 가져와서 쓰는 게 좋다.
+
+## Controlled Inputs for Filters
+
+아래처럼 input 내용이 바뀔 때마다 store 의 `setTextFilter` 를 호출해줄 수 있다. `(props)` 대신에 `({dispatch})` 하면, 앞에 `props` 붙일 필요 없이 `dispatch` 사용가능하다.
+
+```jsx
+import React from 'react';
+import { connect } from 'react-redux';
+import {setTextFilter} from '../actions/filters'
+
+const ExpenseListFilters = (props) => (
+  <div>
+    <input type="text" value={props.filters.text} onChange={(e)=> {
+      props.dispatch(setTextFilter(e.target.value));
+    }} />
+  </div>
+);
+
+const mapStateToProps = (state) => {
+  return {
+    filters: state.filters
+  };
+};
+
+export default connect(mapStateToProps)(ExpenseListFilters);
+```
+
