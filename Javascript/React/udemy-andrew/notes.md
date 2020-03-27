@@ -890,3 +890,38 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps)(ExpenseListFilters);
 ```
 
+
+
+# Testing with JEST
+
+- jest 는 facebook 에서 개발한, react 를 테스트 할 수 있는 라이브러리다.
+- Test 의 목적은 인간의 손으로 할 수 없는 것을 테스트하는 게 아니라, 앱이 복잡해졌을 때, 일일이 사람이 할 필요 없이 테스팅을 하기 위함이다. 
+- 공식문서가 아주 잘 되어 있기 때문에, 공식문서를 잘 활용하자. [공식문서](https://jestjs.io/docs/en/getting-started)
+
+## 설치 & 실행
+
+1. `yarn add jest`
+2. `package.json` 파일의 scripts 에 `"test": "jest"` 추가
+3. `yarn run test` 혹은 `yarn test` 로 검사 시작. test 는 워낙에 많이 쓰여, **`run` 이 생략가능**하다.
+
+
+
+## test 만들기
+
+1. `src` 폴더 아래에 `tests` 폴더 만들기. 
+2. `tests` 폴더 안에 `add.test.js` 처럼 가운데 `.test` 가 들어간 파일을 만들어 사용.
+3. 상황에 따라 `throw new Error()` 함수를 직접 작성할수도 있지만, Jest 가 제공하는 `expect` 와, 그 메서드를 잘 활용하는 것이 훨씬 효율적이다.
+
+```js
+const add =(a,b) => a + b;
+
+test('should add two numbers', () => {
+  const result = add(3,4);
+  // 직접 에러를 발생시키는 함수를 만들 경우
+  // if (result !==7) {
+  //   throw new Error('You added 4 and 3. The result was ${result}. Expected 7');
+  // }
+  expect(result).toBe(7);
+})
+```
+
