@@ -1023,3 +1023,140 @@ devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
 2. 자바스크립트 파일이 로드될 때까지 CSS 도 적용되지 못한다.
 
 그래서 웹팩 설정을 바꿔서 번들은 자바스크립트만을 포함하고, css 는 따로 파일로 추출해서 만들어줄 수 있도록 해야 한다. 이를 위해서 사용할 라이브러리는 `extract-text-webpack-plugin` 이다. 그런데 이 플러그인은 웹팩 버전 3 까지만 지원하고 있다. 따라서 설치할 때 뒤에 `@next` 를 붙여서 설치하거나, 아예 다른 라이브러리인 `mini-css-extract-plugin` 을 사용하도록 하자.
+
+1. 플러그인에 만들어질 css 파일 이름을 포함한 인스턴스를 등록하고, 설정을 수정하면 다음과 같다.
+
+```JS
+// webpack.config.js
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+// module.exports = {
+module.exports = (env) => {
+  console.log(env);
+  const isProduction = env === 'production';
+  return {
+    entry: './src/app.js',
+    output: {
+      path: path.join(__dirname, 'public'),
+      filename: 'bundle.js'
+    },
+    module: {
+      rules: [{
+        loader: 'babel-loader',
+        test: /\.js$/,
+        exclude: /node_modules/
+      }, {
+        test: /\.s?css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            "css-loader",
+            "sass-loader"
+          ]
+        })
+        // use: [
+        //   'style-loader',
+        //   'css-loader',
+        //   'sass-loader'
+        // ]
+      }]
+    },
+    plugins: [
+      new ExtractTextPlugin("styles.css"),
+    ],
+    devtool: isProduction ? 'source-map' : 'cheap-module-eval-source-map',
+    devServer: {
+      contentBase: path.join(__dirname, 'public'),
+      historyApiFallback: true
+    }
+  };
+}
+```
+
+CSS 를 위한 source-map 을 적용하기 위해서는, 다른 devtool 과 loader 들에 추가적인 옵션 부여가 필요하다.
+
+```js
+const path = require('path');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+// module.exports = {
+module.exports = (env) => {
+  console.log(env);
+  const isProduction = env === 'production';
+  return {
+    entry: './src/app.js',
+    output: {
+      path: path.join(__dirname, 'public'),
+      filename: 'bundle.js'
+    },
+    module: {
+      rules: [{
+        loader: 'babel-loader',
+        test: /\.js$/,
+        exclude: /node_modules/
+      }, {
+        test: /\.s?css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              options: {
+                sourceMap: true
+              }
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true
+              }
+            }
+          ]
+        })
+      }]
+    },
+    plugins: [
+      new ExtractTextPlugin("styles.css"),
+    ],
+    devtool: isProduction ? 'source-map' : 'inline-source-map',
+    devServer: {
+      contentBase: path.join(__dirname, 'public'),
+      historyApiFallback: true
+    }
+  };
+}
+```
+
+
+
+## Express 로 간단한 웹서버 만들기
+
+```js
+// server/server.js
+const path = require('path');
+const express = require('express');
+const app = express();
+const publicPath = path.join(__dirname, '..', 'public');
+
+app.use(express.static(publicPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(publicPath, 'index.html'));
+});
+
+app.listen(3000, () => {
+  console.log('Server is running')
+});
+```
+
+
+
+## Heroku 로 배포
+
+1. `heroku create *app-name` 으로 heroku remote repository 를 만들어준 후에, heroku 에 파일을 올리면 heroku 가 알아서 배포할 수 있도록 설정해주어야 한다. 
+2. 우선 package.json 파일에 `start` 스크립트를 등록해 간단히 만든 express 서버가 돌아가도록 한다. 
+3. 그리고 express 코드도, 포트 3000이 아닌  heroku 가 주는 포트번호를 쓰도록 수정한다. (`process.env.PORT`) 
+4. 마지막으로 `.gitignore` 파일에 `index.html` 파일을 제외한 다른 파일을 추가하고,
+5. `package.json` 에, heroku 가 `yarn install` 로 dependency 를 설치한 후에 실행하는 스크립트인 `  "heroku-postbuild": "yarn run build:prod"` 를 추가해준다.
+
