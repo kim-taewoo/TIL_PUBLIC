@@ -128,16 +128,25 @@ class DoublyLinkedList:
 
 
 T = int(input())
-for t in range(1, T+1):
-    n, m = map(int, input().split())
-    lls = [DoublyLinkedList() for _ in range(m)]
-    for i in range(m):
-        for idx, j in enumerate(map(int, input().split()), start=1):
-            lls[i].insertAt(idx, Node(j))
-    for i in range(1, m):
-        targetNode = lls[0].findBigger(lls[i].getAt(1).data)
-        lls[0].concatBefore(targetNode, lls[i])
+for t in range(1, 1 + T):
+    N, M, K = map(int, input().split())
+    ll = DoublyLinkedList()
+    for idx, i in enumerate(map(int, input().split()), start=1):
+        ll.insertAt(idx, Node(i))
 
-    answer = lls[0].reverseTraverse(10)
+    target = ll.getAt(1)
+    for _ in range(K):
+        for i in range(M):
+            if not target.data:
+                target = ll.getAt(1)
+            target = target.next
+        if not target.data:
+            val1 = ll.getAt(1).data
+        else:
+            val1 = target.data
+        ll.insertBefore(target, Node(val1 + target.prev.data))
+        target = target.prev
+
+    answer = ll.reverseTraverse(10)
     answer = " ".join(map(str, answer))
     print("#{} {}".format(t, answer))
