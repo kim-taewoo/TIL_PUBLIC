@@ -4,7 +4,6 @@ import GithubContext from './githubContext';
 import GithubReducer from './githubReducer';
 import {
   SEARCH_USERS,
-  SET_ALERT,
   SET_LOADING,
   CLEAR_USERS,
   GET_REPOS,
@@ -46,7 +45,17 @@ const GithubState = (props) => {
       payload: res.data,
     });
   };
-  // Get Repos
+  // Get Single User Repos
+  const getUserRepos = async (username) => {
+    setLoading();
+    const res = await axios.get(
+      `https://api.github.com/users/${username}/repos?per_page=5&sort=create:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`
+    );
+    dispatch({
+      type: GET_REPOS,
+      payload: res.data
+    })
+  };
 
   // Clear Users
   const clearUsers = () => dispatch({ type: CLEAR_USERS });
@@ -63,6 +72,7 @@ const GithubState = (props) => {
         searchUsers,
         clearUsers,
         getUser,
+        getUserRepos
       }}
     >
       {props.children}
