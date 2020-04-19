@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://acoustic:dn106204@contactkeeper-nsad4.gcp.mongodb.net/test?retryWrites=true&w=majority",
+  "jwtSecret": "secret"
+}
