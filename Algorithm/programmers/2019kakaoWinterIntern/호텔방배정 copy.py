@@ -1,8 +1,8 @@
 def solution(k, room_number):
-    unf = [i for i in range(k+2)]
+    unf = {}
 
     def find(v):
-        if v == unf[v]:
+        if v == unf.get(v, v):
             return v
         else:
             unf[v] = find(unf[v])
