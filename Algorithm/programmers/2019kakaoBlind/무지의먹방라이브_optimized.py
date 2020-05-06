@@ -1,4 +1,4 @@
-# 이래도 결국 실패하길래 멘탈 터져서 다른 사람 코드로 갈아탐
+# 이래도 결국 실패하길래 멘탈 터져서 다른 사람 코드로 수정함.
 def solution(food_times, k):
     length = len(food_times)
     sorted_food_times = sorted(food_times)
@@ -21,6 +21,7 @@ def solution(food_times, k):
         return -1
 
     lst = []
+    # 뒤에서부터 집어넣어놔야지 나중에 역순으로 거슬러 선택하는 효과를 낼 수 있다. 지금 하려는 게 초과분을 뒤에서부터 빼는 거니까..
     for j in range(length-1, -1, -1):
         if food_times[j] - sorted_food_times[last_idx] > 0:
             lst.append(j+1)
