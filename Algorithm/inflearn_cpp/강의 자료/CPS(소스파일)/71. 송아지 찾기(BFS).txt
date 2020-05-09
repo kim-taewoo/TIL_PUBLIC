@@ -1,0 +1,68 @@
+#include<stdio.h>
+#include<vector>
+#include<queue>
+#include<algorithm>
+using namespace std;
+int ch[10001], d[3]={1, -1, 5};
+int main(){
+	//freopen("input.txt", "rt", stdin);
+	int s, e, x, pos, i;
+	queue<int> Q;
+	scanf("%d %d", &s, &e);
+	ch[s]=1;
+	Q.push(s);
+	while(!Q.empty()){
+		x=Q.front();
+		Q.pop();
+		for(i=0; i<3; i++){
+			pos=x+d[i];
+			if(pos<1 && pos>10000) continue;
+			if(pos==e){
+				printf("%d\n", ch[x]);
+				exit(0);
+			}
+			if(ch[pos]==0){
+				ch[pos]=ch[x]+1;
+				Q.push(pos);
+			}
+		}
+	}
+	return 0;
+}
+
+
+
+
+
+
+
+#include<stdio.h>
+#include<algorithm>
+int queue[10050], front=-1, back=-1;
+int ch[10050], d[3]={1, -1, 5};
+int main(){
+	freopen("input.txt", "rt", stdin);
+	int i, s, e, x, pos;
+	scanf("%d %d", &s, &e);
+	queue[++back]=s;
+	ch[s]=1;
+	while(front<=back){
+		x=queue[++front];
+		for(i=0; i<3; i++){
+			pos=x+d[i];
+			if(pos<1 && pos>10000) continue;
+			if(pos==e){
+				printf("%d\n", ch[x]);
+				exit(0);
+			}
+			if(ch[pos]==0){
+				queue[++back]=pos;
+				ch[pos]=ch[x]+1;
+			}
+		}
+	}
+	return 0;
+}
+
+
+
