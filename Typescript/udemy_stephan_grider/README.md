@@ -83,7 +83,9 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 두 개의 타입을 | 로 엮어두면, 그 두 개의 타입을 서로 비교해 겹치는 property 영역만을 남긴다. 즉, 해당 조건이 들어간 곳의 함수 선언 내부에서 쓸 수 있는 property 가 제한된다. 그런데, 어차피 겹치는 것만 남기도록 연산된다면, 차라리 `interface` 로 사용할 property 를 따로 정의해서 사용하는 게, 대상 타입이 추가될 때마다 일일이 | 로 추가하는 짓을 안해도 되고 좋다. 
 
-즉, 이렇게 `interface` 를 잘 사용하면 어떤 함수의 argument 가 되기 위한 **조건** 을 문지기로 두는 것과 같고, 문지기를 설정해놓았기 때문에, 굳이 타입들을 `import` 해서 직접 | 조건연산자로 묶어둘 필요가 없어진다.
+즉, 이렇게 `interface` 를 잘 사용하면 어떤 함수의 argument 가 되기 위한 **조건** 을 문지기로 두는 것과 같고, 문지기를 설정해놓았기 때문에, 굳이 타입들을 `import` 해서 직접 `| ` 조건연산자로 묶어둘 필요가 없어진다. ~ 이러한 조건에 맞으면 무엇이든 가능하다는 의미를 가지게 되는 것이다. 
+
+> `interface` 는 두 개의 클래스가 서로 어떻게 연결될 것인지 **계약(Contract)** 을 맺어두는 것과 같다. 어떤 형식을 만족하면 어떤 것이든 받아들이겠다는 약속인 것이다.
 
 
 ## Better typescript Environment
@@ -101,3 +103,7 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 1. Number, String, Boolean, Symbol 인 경우: `typeof() == ''` 같이 일반적인 타입 검사 문법을 사용해 검사한다.
 1. Object, Array, Class 등인 경우: `instanceof` 로 검사한다.
 
+## interface & Abstract Class
+
+- Abstract Class 를 쓰게 되면 interface 가 필요없어진다.
+- 서로에게 종속된 클래스라면 상속과 Abstract Class 를 사용하고, 서로 별개의 클래스라면 interface 를 쓰는 게 맞다.
