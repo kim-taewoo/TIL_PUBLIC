@@ -95,6 +95,18 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 1. `outDir` 에 `./build` 작성해서 컴파일된 소스 코드 폴더 지정
 1. 이제 `tsc` 라고만 치면 알아서 `tsconfig.json` 을 참고해서 컴파일 해준다.
 1. 게다가 `tsc -w` 라고 하면, `rootDir` 폴더 내의 변경사항이 있으면 자동으로 컴파일해준다...  
+1. 이제 전체 프로젝트 실행환경 세팅을 추가해보자.
+1. `concurrently` 로, `nodemon` 과 `tsc -w` 를 동시에 실행해서 변경사항이 있을 때마다 타입스크립트 컴파일과 `nodejs` 로 파일 실행을 동시에 할 수 있다.
+1. `npm install concurrently nodemon` 을 해주고,
+1. `package.json` 에 다음 실행스크립트를 추가하자.
+    ```json
+      "start:build": "tsc -w",
+      "start:run": "nodemon build/index.js",
+      "start": "concurrently npm:start:*"
+    ```
+1. 참고로 `npm:start:*` 는, `start:` 뒤에 뭐든 붙은 모든 걸 한꺼번에 지칭하는 것이다.
+1. 이제 `npm start` 를 하면, 처음에는 `nodemon` 이 타입스크립트 컴파일 되기 전에 `build/index.js` 파일을 실행시키려하기 때문에 에러가 발생한다.
+1. 그러므로 일단 `ctrl + c` 로 종료한 후, 다시 실행하면 세팅이 완료된다.
 
 ## Type Guards
 
