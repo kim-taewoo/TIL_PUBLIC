@@ -119,3 +119,30 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 - Abstract Class 를 쓰게 되면 interface 가 필요없어진다.
 - 서로에게 종속된 클래스라면 상속과 Abstract Class 를 사용하고, 서로 별개의 클래스라면 interface 를 쓰는 게 맞다.
+
+## Node js 기본 라이브러리의 Type Definition File
+
+`fs`, `os`, `http` 같은 node 기본 라이브러리도 외부 라이브러리처럼 `@types/*` 같은 Type Definition File 을 다운 받아서 써야한다. 다만 그냥 `@types/node` 안에 전부 포함되어 있다.
+
+## Type assertion
+
+`row[5] as MatchResult,` 처럼 `row[5]` 가 `MatchResult` 의 타입(여기선 MatchResult 는 enum 타입) 일부임이 확실하다는 걸 타입스크립트에게 알려주기 위해 사용한다. 
+
+## tuple 사용
+어떤 배열의 각 요소마다 데이터타입이 다른 경우에, tuple 을 사용함으로써 모든 데이터 타입을 | 로 union 하는 짓을 막을 수 있다. tuple 은 일단 기본적으로 `Array` 로 여겨진다.
+
+## Generics
+
+- **Like function arguments**, but for types in class/function definitions
+- Allows us to define the type of a property/argument/return value at a future point
+- Used heavily when writing reusable code
+
+흔히 `<T>` 로 많이 표시하는 것으로, 같은 클래스에 다양한 타입의 데이터를 멤버변수로 받아 사용하고 싶을 때, 데이터 타입마다 새로 클래스를 정의하지 않고 Generic 을 사용한다.
+
+## A Huge Misconception around Composition
+
+> "Favor object composition over class inheritance"  __ Design Patterns, page 20
+
+디자인 패턴 책에 나와 유명해진 말인데, 대부분의 사람이 이것을 자바스크립트에 적용할 때 이상하게 오해해서 사용하고 있다. 많은 사람들이 Composition 이 단순히 여러 Object 를 합쳐서 사용함으로써 필드를 사용하는 방법을 늘리는 것으로 생각한다. 그러나 단순히 `Object.assign(obj1, obj2, obj3...)` 을 이용해서 Object 를 합쳐서 사용하는 것은, 겹치는 이름의 필드 혹은 메서드가 있기만 해도 그 합치는 순서에 따라 결과가 달라지는 아주 취약한 구조의 사용법이다. 
+
+위 사용법은 `Multiple Inheritance`, 즉 그냥 여러 곳에서 단순 복사 붙여넣기해서 사용하는 수준에 불과하다. **Design patterns** 의 저자가 권장하는 composition 은 그런 것이 아니라, 주로 **Delegation** 개념을 이용해, 어떤 요청이 들어왔을 때, 두 개의 클래스가 그 요청을 처리하게 되고, 한 클래스가 다른 클래스에 특정 데이터 처리(data operation) 을 위임(delegation)해서 요청을 처리하게 된다.
