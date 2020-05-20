@@ -81,36 +81,35 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 ## | (or 조건연산자)
 
-두 개의 타입을 | 로 엮어두면, 그 두 개의 타입을 서로 비교해 겹치는 property 영역만을 남긴다. 즉, 해당 조건이 들어간 곳의 함수 선언 내부에서 쓸 수 있는 property 가 제한된다. 그런데, 어차피 겹치는 것만 남기도록 연산된다면, 차라리 `interface` 로 사용할 property 를 따로 정의해서 사용하는 게, 대상 타입이 추가될 때마다 일일이 | 로 추가하는 짓을 안해도 되고 좋다. 
+두 개의 타입을 | 로 엮어두면, 그 두 개의 타입을 서로 비교해 겹치는 property 영역만을 남긴다. 즉, 해당 조건이 들어간 곳의 함수 선언 내부에서 쓸 수 있는 property 가 제한된다. 그런데, 어차피 겹치는 것만 남기도록 연산된다면, 차라리 `interface` 로 사용할 property 를 따로 정의해서 사용하는 게, 대상 타입이 추가될 때마다 일일이 | 로 추가하는 짓을 안해도 되고 좋다.
 
-즉, 이렇게 `interface` 를 잘 사용하면 어떤 함수의 argument 가 되기 위한 **조건** 을 문지기로 두는 것과 같고, 문지기를 설정해놓았기 때문에, 굳이 타입들을 `import` 해서 직접 `| ` 조건연산자로 묶어둘 필요가 없어진다. ~ 이러한 조건에 맞으면 무엇이든 가능하다는 의미를 가지게 되는 것이다. 
+즉, 이렇게 `interface` 를 잘 사용하면 어떤 함수의 argument 가 되기 위한 **조건** 을 문지기로 두는 것과 같고, 문지기를 설정해놓았기 때문에, 굳이 타입들을 `import` 해서 직접 `|` 조건연산자로 묶어둘 필요가 없어진다. ~ 이러한 조건에 맞으면 무엇이든 가능하다는 의미를 가지게 되는 것이다.
 
 > `interface` 는 두 개의 클래스가 서로 어떻게 연결될 것인지 **계약(Contract)** 을 맺어두는 것과 같다. 어떤 형식을 만족하면 어떤 것이든 받아들이겠다는 약속인 것이다.
 
-
 ## Better typescript Environment
 
-1. `tsc --init` 으로 `tsconfig.json` 생성. 
+1. `tsc --init` 으로 `tsconfig.json` 생성.
 1. `rootDir` 에 `./src` 를 작성해서 원본 소스 코드 폴더 지정
 1. `outDir` 에 `./build` 작성해서 컴파일된 소스 코드 폴더 지정
 1. 이제 `tsc` 라고만 치면 알아서 `tsconfig.json` 을 참고해서 컴파일 해준다.
-1. 게다가 `tsc -w` 라고 하면, `rootDir` 폴더 내의 변경사항이 있으면 자동으로 컴파일해준다...  
+1. 게다가 `tsc -w` 라고 하면, `rootDir` 폴더 내의 변경사항이 있으면 자동으로 컴파일해준다...
 1. 이제 전체 프로젝트 실행환경 세팅을 추가해보자.
 1. `concurrently` 로, `nodemon` 과 `tsc -w` 를 동시에 실행해서 변경사항이 있을 때마다 타입스크립트 컴파일과 `nodejs` 로 파일 실행을 동시에 할 수 있다.
 1. `npm install concurrently nodemon` 을 해주고,
 1. `package.json` 에 다음 실행스크립트를 추가하자.
-    ```json
-      "start:build": "tsc -w",
-      "start:run": "nodemon build/index.js",
-      "start": "concurrently npm:start:*"
-    ```
+   ```json
+     "start:build": "tsc -w",
+     "start:run": "nodemon build/index.js",
+     "start": "concurrently npm:start:*"
+   ```
 1. 참고로 `npm:start:*` 는, `start:` 뒤에 뭐든 붙은 모든 걸 한꺼번에 지칭하는 것이다.
 1. 이제 `npm start` 를 하면, 처음에는 `nodemon` 이 타입스크립트 컴파일 되기 전에 `build/index.js` 파일을 실행시키려하기 때문에 에러가 발생한다.
 1. 그러므로 일단 `ctrl + c` 로 종료한 후, 다시 실행하면 세팅이 완료된다.
 
 ## Type Guards
 
-`|` 로 인자로 가능한 여러 데이터 타입을 union 해서 정의해놓으면, 그 두 데이터 타입의 교집합 속성 및 멤버함수만을 함수 내에서 사용할 수 있다. 즉, 둘 중 어떤 타입의 데이터가 오더라도 온전하게 사용할 수 없고 조각난 상태로 사용하게 된다.. 이 부분을 해결하기 위해 `|` 로 여러 타입을 union 해서 받아온 뒤, `if` 문으로 따로 type 검사를 하면 똑똑한 타입스크립트가 다시 온전한 상태의 데이터로 복원시켜 준다. 데이터 타입에 따라 Type guard 를 달리 쓴다. 
+`|` 로 인자로 가능한 여러 데이터 타입을 union 해서 정의해놓으면, 그 두 데이터 타입의 교집합 속성 및 멤버함수만을 함수 내에서 사용할 수 있다. 즉, 둘 중 어떤 타입의 데이터가 오더라도 온전하게 사용할 수 없고 조각난 상태로 사용하게 된다.. 이 부분을 해결하기 위해 `|` 로 여러 타입을 union 해서 받아온 뒤, `if` 문으로 따로 type 검사를 하면 똑똑한 타입스크립트가 다시 온전한 상태의 데이터로 복원시켜 준다. 데이터 타입에 따라 Type guard 를 달리 쓴다.
 
 1. Number, String, Boolean, Symbol 인 경우: `typeof() == ''` 같이 일반적인 타입 검사 문법을 사용해 검사한다.
 1. Object, Array, Class 등인 경우: `instanceof` 로 검사한다.
@@ -126,9 +125,10 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 ## Type assertion
 
-`row[5] as MatchResult,` 처럼 `row[5]` 가 `MatchResult` 의 타입(여기선 MatchResult 는 enum 타입) 일부임이 확실하다는 걸 타입스크립트에게 알려주기 위해 사용한다. 
+`row[5] as MatchResult,` 처럼 `row[5]` 가 `MatchResult` 의 타입(여기선 MatchResult 는 enum 타입) 일부임이 확실하다는 걸 타입스크립트에게 알려주기 위해 사용한다.
 
 ## tuple 사용
+
 어떤 배열의 각 요소마다 데이터타입이 다른 경우에, tuple 을 사용함으로써 모든 데이터 타입을 | 로 union 하는 짓을 막을 수 있다. tuple 은 일단 기본적으로 `Array` 로 여겨진다.
 
 ## Generics
@@ -141,8 +141,28 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 ## A Huge Misconception around Composition
 
-> "Favor object composition over class inheritance"  __ Design Patterns, page 20
+> "Favor object composition over class inheritance" \_\_ Design Patterns, page 20
 
-디자인 패턴 책에 나와 유명해진 말인데, 대부분의 사람이 이것을 자바스크립트에 적용할 때 이상하게 오해해서 사용하고 있다. 많은 사람들이 Composition 이 단순히 여러 Object 를 합쳐서 사용함으로써 필드를 사용하는 방법을 늘리는 것으로 생각한다. 그러나 단순히 `Object.assign(obj1, obj2, obj3...)` 을 이용해서 Object 를 합쳐서 사용하는 것은, 겹치는 이름의 필드 혹은 메서드가 있기만 해도 그 합치는 순서에 따라 결과가 달라지는 아주 취약한 구조의 사용법이다. 
+디자인 패턴 책에 나와 유명해진 말인데, 대부분의 사람이 이것을 자바스크립트에 적용할 때 이상하게 오해해서 사용하고 있다. 많은 사람들이 Composition 이 단순히 여러 Object 를 합쳐서 사용함으로써 필드를 사용하는 방법을 늘리는 것으로 생각한다. 그러나 단순히 `Object.assign(obj1, obj2, obj3...)` 을 이용해서 Object 를 합쳐서 사용하는 것은, 겹치는 이름의 필드 혹은 메서드가 있기만 해도 그 합치는 순서에 따라 결과가 달라지는 아주 취약한 구조의 사용법이다.
 
 위 사용법은 `Multiple Inheritance`, 즉 그냥 여러 곳에서 단순 복사 붙여넣기해서 사용하는 수준에 불과하다. **Design patterns** 의 저자가 권장하는 composition 은 그런 것이 아니라, 주로 **Delegation** 개념을 이용해, 어떤 요청이 들어왔을 때, 두 개의 클래스가 그 요청을 처리하게 되고, 한 클래스가 다른 클래스에 특정 데이터 처리(data operation) 을 위임(delegation)해서 요청을 처리하게 된다.
+
+## Optional Interface props
+
+interface props 뒤에 ? 를 붙여 선택적으로 넣을 수 있게 할 수 있다.
+
+```typescript
+interface UserProps {
+  name?: string;
+  age?: number;
+}
+```
+
+## 함수 타입 정의
+
+함수도 물론 타입으로 정의할 수 있다. 아래는 아무런 인자도 받지 않고, 리턴하는 것도 없는 함수타입의 정의다.
+
+`type Callback = () => void;`
+
+`() => {}` 라고 해버리면 object 를 반환하는 게 되어버림에 주의해야 한다.
+
