@@ -125,7 +125,8 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 
 ## Type assertion
 
-`row[5] as MatchResult,` 처럼 `row[5]` 가 `MatchResult` 의 타입(여기선 MatchResult 는 enum 타입) 일부임이 확실하다는 걸 타입스크립트에게 알려주기 위해 사용한다.
+`row[5] as MatchResult,` 처럼 `row[5]` 가 `MatchResult` 의 타입(여기선 MatchResult 는 enum 타입) 일부임이 확실하다는 걸 타입스크립트에게 알려주기 위해 사용한다.  
+`const id = attrs.get('id') as number` 같은 식으로도 씀. 
 
 ## tuple 사용
 
@@ -138,6 +139,10 @@ interface 는 타입을 정의하지만, 어떤 obj 가 interface 에서 정의�
 - Used heavily when writing reusable code
 
 흔히 `<T>` 로 많이 표시하는 것으로, 같은 클래스에 다양한 타입의 데이터를 멤버변수로 받아 사용하고 싶을 때, 데이터 타입마다 새로 클래스를 정의하지 않고 Generic 을 사용한다.
+
+### Generic constraint
+
+`<T extends SomeInterface>` 와 같은 문법으로, generic 이 받을 수 있는 **다양한** 타입의 범위를 줄여줄 수 있다. 마치 "아무나는 아니고, 이건 만족시켜야 돼" 같은 제약 조건을 걸어주는 것이다. (남녀 조건 따지는 것 같네)
 
 ## A Huge Misconception around Composition
 
@@ -166,3 +171,80 @@ interface UserProps {
 
 `() => {}` 라고 해버리면 object 를 반환하는 게 되어버림에 주의해야 한다.
 
+
+## 재사용 가능한 코드를 만들기 위한 Two important rules
+
+단순히 클래스를 generic 이라고 만들어 놓아도, 정작 클래스 안의 메서드들은, 어떤 Type 를 인자로 받고, 그에 따라 어떤 타입을 반환하게 될 지 모르게 된다. 그런데 그렇다고 **Union** 을 이용해서 죄다 **|** 로 이 중에 암거나.. 라고 써 놓으면 그 타입들끼리 중복되는 attribute 혹은 method 만 사용 가능하기 때문에 개발에 상당한 지장이 생긴다. 그렇다고 또 일일이 **type guard** 를 if 문으로 만들어 쓰려면 손에 쥐가 난다. 이 상황을 해결하기 위해 쓰이는 것이 메서드 함수에 또다른 generic 을 붙이는 것이다. 그리고 이 메서드 제네릭을 이해하기 위한 2가지 규칙이 아래와 같다.
+
+1. In typescript, strings can be types
+1. In JS(and therefore TS), all objects keys are strings
+
+1 번 룰 예:
+
+```typescript
+type BestName = 'Taewoo';
+
+const printName = (name: BestName): void => {
+
+};
+
+// 위처럼 해놓은 경우, 오직 `Taewoo` 만이 인자로 들어갈 수 있다. 
+
+printName('Taewoo'); // 이것 외엔 모두 에러 발생
+```
+
+2번 룰 예:
+
+```javascript
+const colors = {}
+colors[5] = 'red'
+colors[5] // 'red'
+// 위처럼 했을 때, 비록 숫자가 key 가 된 것 같아 보이지만,
+// 실제로는 colors['5'] 처럼 저장되어 있다.
+// 즉 자바스크립트 객체의 키는 모두 string 이다.
+```
+
+위 2개의 룰이 무슨 상관인가 할 수 있다. 하지만 위 두 개를 조합하면,
+
+> Keys of an object can be types
+
+라는 뜻이 된다. 
+
+그래서 이제 어떤 generic class 를 만들었을 때 **T** 라는 객체를 넘겨준다면, 오직 그 **T** 가 가지고 있는 **Keys**, 즉 **K** 만이 사용될 수 있음을 typescript 에게 알려줄 수 있다. 마치 클래스 메서드의 generic constranit 를 `extends` 키워드로 먹였듯이, 메서드에도 generic constranit 를 먹이면 된다.
+
+```typescript
+export class Attributes<T> {
+  constructor(private data: T) {}
+
+  get<K extends keyof T>(key: K): T[K] {
+    return this.data[key];
+  }
+}
+```
+
+## `get` accessor 의 delegation 위주 composition 패턴에서의 활용법.
+
+클래스 메서드 앞에 `get` 키워드를 붙이면, getter 가 되어 메서드임에도 호출할 때 괄호를 붙이지 않아도 된다. 즉, "오직 클래스 attribute 에 접근할 뿐이지, 어떤 걸 변경하는 행동을 수행할 의도가 없다." 라는 것을 확실히 할 수 있다.
+
+그런데 이게 클래스가 자신이 가진 메서드 내에서 처리를 하는 게 아닌 composition 디자인 패턴에서 매우 유용하다. 자신이 위임한 클래스까지 타고 들어가 그 클래스의 메서드를 실행해야 한다면 최상단에서 유저가 어떤 메서드를 호출하고 싶을 때 호출 코드가 `.` 을 타고타고 들어가는 못생긴 코드가 될 것이다. 그런데 `getter` 를 잘 활용하면, 오직 reference 만을 반환함으로써, 최상단에서 유저가 괄호(`()`) 로 호출 하는 메서드가 처리를 위임받은 깊숙한 곳의 메서드가 되도록 할 수 있다. 물론 `this` 가 엉키는 사태가 일어나는데, 그래서 위임받는 클래스들의 메서드들은 거의 100% 화살표 함수로 정의하는 것이 좋다.
+
+이걸 **Passthrough Methods** 라고 부른다. 좀 더 짧게 쓰는 팁이 있다면, 애초에 reference 를 반환할 뿐이기 때문에, 굳이 `get` 키워드 쓰지 않고 클래스 attribute 처럼 곧바로 써도 똑같이 동작한다.
+
+
+```typescript
+  // 오직 reference 만을 반환한다.
+  // 근데 그렇기 땜에 `get` 이란 키워드 없이
+  // 그냥 attribute 처럼 써놔도 똑같이 동작한다.
+  // get on() {
+  //   return this.events.on;
+  // }
+  on = this.events.on; // 아래 것들도 이렇게 가능.
+
+  get trigger() {
+    return this.events.trigger;
+  }
+
+  get get() {
+    return this.attributes.get;
+  }
+```
