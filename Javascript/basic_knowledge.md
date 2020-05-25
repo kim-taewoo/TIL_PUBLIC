@@ -49,7 +49,7 @@
 
 When the context and scope of program changes, this at that particular point changes accordingly.
 
-1. global context 에서는 브라우저에서는 `window`, nodejs 에서는 `process` 가 되겠지
+1. global context 에서는 브라우저에서는 `window`, nodejs 에서는 `process` 가 되겠지.
 
 1. call, apply, bind 같은 메서드를 쓰지 않는다면, 일반 함수에서의 `this` 역시 `window` 다. 부모의 scope 가 자식에게 상속되기 때문. 다만 Object, 객체 내에서는 객체 자기 자신을 가리킨다. 
 
@@ -65,6 +65,8 @@ person.identity; // returns {who: "Stranger", howOld: 24}
 ```
 
 자신이 현재 속해있는 스코프를 지칭하는 것으로, 쉽게 생각하면, 그냥 . 앞에 있는 거라고 생각하면 된다. 글로벌 스코프이면, `window.` 이니까 window 가 this 가 된다. 글로벌 스코프가 전체 집이라고 생각하면, 어떤 객체는 하나의 방이라고 생각할 수 있다. 방 안에 있는 것에 접근하려면 `window.room.xx` 같이 한 단계를 더 써줘야 하는거겠지? `xx`가 속한 곳이 `room` 이므로, `xx`의 this 는 `room` 일 것이다. 
+
+다만 명심해야될 것은, 애초에 태생이 브라우저 런타임내에서 실행되기 위해 만들어진 언어인 만큼, `this` 가 정해지는 시점은 그 함수가 **호출되는 시점** 이다. 그래서 그 함수가 정의된 때의 `this` 가 아닌 호출되는 시점의 `this` 가 사용되며, 이게 맘에 안들면 `bind`, `apply`, `call` 과 같이 `this` 를 따로 정해주는 메서드를 써야 한다.
 
 ### What is a closure and how do you use it?
 
@@ -82,14 +84,96 @@ JavaScript Scope can throw a lot of problems at you! understand it thoroughly
 In traditional JavaScript, there is the concept of inheritance in a camouflage. It is by using a technique of prototyping. All the new class syntax you see in ES5, ES6 is just a **syntactical sugar coating** for the underlying prototypical OOP. Creating a class is done using a function in JavaScript.
 
 
-I defined one more specific function called Dog. Here, in order to inherit the Animal class, we need to perform call function(we discussed it earlier) with passing this and other arguments. We can instantiate a German Shepard like this.
+I defined one more specific function called Dog. Here, in order to inherit the Animal class, we need to perform call function(we discussed it earlier) with passing this and other arguments. We can instantiate a German Shepard like below.
 
 ```javascript
+var animalGroups = {
+  MAMMAL: 1,
+  REPTILE: 2,
+  AMPHIBIAN: 3,
+  INVERTEBRATE: 4
+};
+
+function Animal(name, type) {
+  this.name = name;
+  this.type = type;
+}
+
+Animal.prototype.shout = function() {
+    console.log(this.name + 'is ' + this.sound + 'ing...');
+}
+
 function Dog(name, type) {
    Animal.call(this, name, type);
    this.sound = "bow";
 }
+
+// Usage
+var pet = Dog("germanShepard", animalGroups.MAMMAL);
+console.log(pet); // returns Dog {name: "germanShepard", type: 1, sound: "bow"}
 ```
+
+We are not assigning name and type in the child function, we are calling super function Animal and setting the respective properties. The pet is having the properties(name, type) of the parent. But what about the methods. Are they inherited too? Let us see!
+
+```javascript
+pet.shout(); // Throws error
+
+// Link prototype chains
+Dog.prototype = Object.create(Animal.prototype);
+var pet = new Dog("germanShepard", animalGroups.MAMMAL);
+// Now shout method is available
+pet.shout(); // germanShepard is bowing...
+```
+
+We can check what is the class of given object in JavaScript using the object.constructor function.
+
+```javascript
+pet.constructor; // returns Animal
+```
+
+It is vague. The Animal is a parent class. But what type exactly is the pet? It is a Dog type. This occurs because of the constructor of Dog class. We should set it to Dog class itself so that all instances(objects) of the class should give correct class name where it belongs to.
+
+```javascript
+Dog.prototype.constructor; // returns Animal
+
+// Change it
+Dog.prototype.constructor = Dog;
+```
+
+These five things you should remember about prototypical inheritance.  
+
+1. Class properties are bound using this
+1. Class methods are bound using prototype object
+1. To inherit properties, use call function passing this object
+1. To inherit methods, use Object.create to link prototypes of parent and child
+1. Always set child class constructor to itself for getting the right identity of its objects
+
+> Note: These are things happens under the hood even with new class syntax. Knowing this is valuable for your JS knowledge. In JS, call function and prototype object provides inheritance
+
+## Understand the callbacks and promises well
+
+Callbacks are the functions those executed after an I/O operation is done. 
+
+```javascript
+function reqListener () {
+  console.log(this.responseText);
+}
+
+var req = new XMLHttpRequest();
+req.addEventListener("load", reqListener);
+req.open("GET", "http://www.example.org/example.txt");
+req.send();
+```
+
+## Understand Map, Reduce and Filter well & Functional Programming
+
+- A **pure function** always returns the same output for the given input. The functions we discuss now also satisfy the purity.
+
+## What is a Promise?
+
+In simple words “A promise is a word taken for some action, the other party who gave the promise might fulfill it or deny it”. In the case of fulfilling, the promise gets resolved, and in another case, it gets rejected.
+
+A Promise is a proxy for a value not necessarily known when the promise is created. It allows you to associate handlers to an asynchronous action's eventual success value or failure reason. This lets asynchronous methods return values like synchronous methods: instead of the final value, the asynchronous method returns a promise for the value at some point in the future.
 
 ### Arrow Function
 
