@@ -20,6 +20,10 @@
 
 `freeze` 됐는지의 여부를 `Object.isFrozen(object)` 로 Boolean 값으로 받아볼 수 있다. `isSealed()` 로 `seal` 여부도 체크 가능하다.
 
+## Decorators
+
+
+
 ## Tricky Questions
 
 1. `console.log([] + [])` === ""

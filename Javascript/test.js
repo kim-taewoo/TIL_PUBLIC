@@ -34,3 +34,6 @@ var person = {
   },
 };
 console.log(person.identity());
+
+console.log(global);
+console.log(process);

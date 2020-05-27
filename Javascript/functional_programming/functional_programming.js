@@ -12,12 +12,13 @@ function mapForEach(arr, fn) {
 
 let log = console.log;
 let arr1 = [1, 2, 3];
-log(arr1);
 
 let arr2 = mapForEach(arr1, function (item) {
   return item * 2;
 });
 
+// 원본 배열 변화없음
+log(arr1)
 log(arr2);
 
 let arr3 = arr1.map((i) => i * 2)
