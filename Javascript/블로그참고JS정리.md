@@ -58,3 +58,18 @@ count();
 - 객체가 메서드를 호출할 경우, 메서드를 호출한 객체가 this입니다.
 - 일반 함수인 경우, 브라우저 상에서 window가 this입니다.
 - 이벤트가 발생한 경우, 이벤트를 발생한 객체가 this입니다.
+
+## for in, for of 차이점
+1. prototype chain 에 의한 iterable 을 대상으로 포함하는가
+for in은 iterable object라면 모두 반복의 대상이 됩니다.
+prototype chain에 의해서 Array 객체가 foo 함수를 갖기 때문에 foo함수가 반복의 대상이 된 것입니다.
+반면 for of는 prototype chain에 의한 프로퍼티는 신경쓰지 않습니다.
+따라서 순수한 arr배열의 원소만 출력합니다.
+2. 변수의 값이 다르다.
+arr 배열의 각 원소를 임시 변수로 담을 value에는 몇 번 째 반복되고 있는지 index가 담겨있습니다.
+반면 for of에서 value에는 실제 원소의 값만 순서대로 담깁니다.
+
+
+개발을 하다보면 for of와 for in의 차이점으로 인하여 원하는 결과를 얻지 못할 때가 있습니다.
+
+for of와 for in의 결과가 달랐던 것은 이처럼 Itertation, prototype chain과 관련이 있습니다.
