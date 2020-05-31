@@ -39,3 +39,30 @@ inline styling 을 할 때 중괄호를 사용해서 자바스크립트를 사�
 1. **Component Nesting**: A component can be shown inside of another
 1. **Component Reusability**: We want to make componentse that can be easily reused through out application
 1. **Component Configuration**: We should be able to configure a component when it is created
+
+## Rules of Class Components
+
+1. Must be a Javascript Class
+1. Must extend (subclass) React.Component
+1. Must define a `render` method that returns some amount of JSX
+
+## Rules of State
+
+1. Only usable with class components
+1. You will confuse props with state :(
+1. 'state' is a JS object that contains data relevant to a component
+1. Updating 'state' on a component causes the component to (almost) instantly rerender
+1. State must be initialized when a component is created
+1. State can only be updated using the function `setState`
+
+### Default Props
+functional Component 의 경우, 컴포넌트 함수 밖에 `defaultProps` 를 따로 선언해줌으로써 props 의 기본값을 설정할 수 있다.
+
+```javascript
+Spinner.defaultProps = {
+  message: 'Loading...'
+}
+```
+
+### Helper Method
+`render()` 메서드에 조건 분기가 많아지는 것은 나쁘다. 따라서 만약 조건분기에 따라 다른 화면을 그려줘야 하는 상황이라면, 따로 helper method 를 만들어서, 그곳에서 조건분기를 처리하고, 결과값만을 return 받아 `render` 메서드 내에서 사용하는 것이 맞다.
