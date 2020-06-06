@@ -200,5 +200,50 @@ export const fetchPosts = () => async dispatch => {
 2. Produces 'state', or data to be used inside of your app using only previous state and the action (reducers are pure). (위 1번 rule 과 거의 같은 내용. 맨 처음 앱이 실행될 때 기본 설정값이 바로 설정되기에 곧 previous state 가 된다.)
 3. Must not return reach 'out of itself' to decide what value to return (reducers are pure). Reducers 는 오직 이전 state 와 Action 만으로 변하기 때문에 외부 api 요청이나 DOM 에 접근해서 값을 받아오는 등의 행위가 reducers 내에서 일어나면 안 된다는 것을 뜻한다. 
 4. Must not mutate its input 'state' argument
-   1.  이 마지막 룰이 오해가 많다. 사실 redux 코드를 뜯어보면, reducer 가 반환한 state 가 이전 state 와 같은지 다른지를 `!==` 로 비교하고 있다. 그래서 비교해보고 변화가 있으면 변화를 업데이트하고 아니면 넘어간다. 그런데 알다시피 reducer 는 `Action` type 가 일치하는 게 없으면 이전 state 를 그대로 반환한다. 즉, reducer 내부에서 인자로 받은 state 를 어떻게 `mutate` 하든간에, **새로운** state 로 다시 복사해서 반환하지 않으면 메모리 상에서 가리키는 주소는 똑같다. (`!==` 비교 오퍼레이터는 어차피 메모리 주소만 비교한다.) 그래서 변화시키든 말든 사실 상관없다. 뭘 반환하는지가 중요하지.. 즉, 너무 겁먹고 **인자로 받은 state 의 어떤 것도 변화시키지 않으려고 할 필요가 없다**.
+   1.  이 마지막 룰이 오해가 많다. 사실 redux 코드를 뜯어보면, reducer 가 반환한 state 가 이전 state 와 같은지 다른지를 `!==` 로 비교하고 있다. 그래서 비교해보고 변화가 있으면 변화를 업데이트하고 아니면 넘어간다. 그런데 알다시피 reducer 는 `Action` type 가 일치하는 게 없으면 이전 state 를 그대로 반환한다. 즉, reducer 내부에서 인자로 받은 state 를 어떻게 `mutate` 하든간에, **새로운** state 로 다시 복사해서 반환하지 않으면 메모리 상에서 가리키는 주소는 똑같다. (`!==` 비교 오퍼레이터는 어차피 메모리 주소만 비교한다.) 그래서 변화시키든 말든 사실 상관없다. 뭘 반환하는지가 중요하지.. 즉, 너무 겁먹고 **인자로 받은 state 의 어떤 것도 변화시키지 않으려고 할 필요가 없다**. **물론!** 절대 권장되지 않으므로, 걍 맘편하려면 변화시키면 안된다고 기억하는 게 좋다. 
 
+
+
+### API call action 최적화
+
+어떤 정보를 받아올 때, 똑같은 정보를 얻기위해 복수의 api 호출을 하는 상황이 종종 발생한다. 예를 들어 어떤 유저 정보가 페이지 내에서 여러번 필요할 때, 그때마다 그 유저 정보를 다 받아오면 자원 낭비가 심하다. 그래서, 앱 내에서 정보를 일종의 캐싱해놓고 쓸 필요가 있다. Redux 를 사용할 때는, 데이터를 가져오기 위한 `Action` 을 생성하는 Action Creator 를 변경해서 최적화를 노린다. 
+
+1. lodash 를 이용한 최적화
+   1. 기존 Action Creator 를 Action Creator 외부의 함수를 호출하는 형태로 변형해서 그 외부 함수에 어떤 인자에 대한 결과값을 저장해놓는 방법이다. **lodash** 의  `_.memoize()` 를 사용한다.
+   2. 그러나 이 방법을 사용하면, 한 번 사용된 인자면 무조건 같은 값만을 반환하기 때문에, 업데이트 되었거나 이런 걸 받아볼 수 없고, 코드도 얼핏보면 이해하기 어렵다.
+
+```javascript
+export const fetchUser = (id) => (dispatch) => {
+  _fetchUser(id, dispatch);
+};
+
+const _fetchUser = _.memoize(async (id, dispatch) => {
+  const response = await jsonPlaceholder.get(`/users/${id}`);
+  dispatch({ type: 'FETCH_USER', payload: response.data });
+});
+```
+
+
+
+2. lodash 보다 훨씬 범용적으로, 또 유연하게 많이 쓰이는 방법
+   1. 기존 `fetchUser` 나 `fetchPosts` 같은 Action Creator 를 변형하지 않고, 각각의 Action Creator 를 내부에서 호출하는 큰 함수를 만든다.
+   2. 즉, 상황에 맞게 어떤 순서와 방법으로 두가지 이상의 Action Creator 를 효과적으로 **합칠지** 고민한다. 
+
+```javascript
+export const fetchPostsAndUsers = () => async (dispatch, getState) => {
+  console.log('About to fetch posts');
+  await dispatch(fetchPosts());
+  // const userIds = _.uniq(_.map(getState().posts, 'userId'))
+  // ES6 버전
+  const uniqueUsers = [...new Set(getState().posts.map((post) => post.userId))];
+  uniqueUsers.forEach(id => {
+    dispatch(fetchUser(id))
+  });
+}
+```
+
+
+
+## React Router
+
+React Router 는 하나의 `path` 에 단 하나의 컴포넌트가 배정되는 것이 **아니다** 라는 것을 잘 인지하고 있어야 한다. 즉, 어떤 **Nested Routes** 같이 상황에 따라 부분만 일치하는 `path` 들도 모두 화면에 그려질 수 있으며, 한 컴포넌트가 다른 데 쓰였다고 해서, 또다른 `path` 에 사용 불가능한 것도 아니다. (이런 걸 피하고 싶다면`exact` 키워드를 쓰거나 하자.)
