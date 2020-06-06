@@ -107,3 +107,98 @@ store.dispatch(action) // store.dispatch(createPolicy('Joshua', 27)) 처럼 줄�
 console.log(store.getState())
 ```
 
+
+
+### React-Redux
+
+Redux 는 React만을 위해서 만들어진 것이 아니기 때문에, `React-Redux` 라는 라이브러리를 따로 설치해서 사용해주어야 한다. 
+
+1. React 앱의 최상단 컴포넌트였던 `App.js` 보다도 더 높은 곳에 `Provider` 라는 최최상단 컴포넌트를 둔다.
+2. `Provider` 컴포넌트의 `prop` 으로 리덕스 `Store`를 넘겨준다. 즉, `Provider` 컴포넌트만이 내부적으로 `Store` 에 접근 권한을 가지고 있다.
+3. 이제 `Store` 에 접근해서 데이터를 가져오고 싶은 컴포넌트가 있다면 그 컴포넌트를 `Connect` 라는 컴포넌트로 감싸준다. 이 `Connect` 라는 컴포넌트는 내부적인 로직을 통해 `Provider` 와 직접적인 소통이 가능하다. 즉, 컴포넌트 계층 구조와 상관없이 `Provider` 컴포넌트와 소통할 수 있다.  이 과정에서 컴포넌트를 감싸는 `Connect` 컴포넌트는 내가 직접적으로 만드는 게 아니라 `React-Redux` 라이브러리가 제공해준다.
+4. 이제 `Action Creators` 로 생성된 `Action` 을 `Connect` 컴포넌트가 `Provider` 에게 전달해서 데이터를 받아온 후, 그 데이터가 필요한 자식 컴포넌트에 `Props` 로 넘겨주어, 그 컴포넌트 내부에서 데이터를 사용할 수 있게 한다. 
+
+
+
+### Redux project Structure
+
+![image-20200605160548232](./markdownStatic/image-20200605160548232.png)
+
+
+
+## Async Actions with Redux Thunk
+
+비동기적으로 데이터를 가져올 때, 컴포넌트의 `componentDidMount` 생명주기에서 `Action creator` 를 호출해 데이터를 가져온다. 그런데 `Action creator` 가 반환하는 `Action` 의 `payload` 속성에, Async-await 관련 코드가 들어가면 에러가 발생한다. `Action` 은 plain javascript object 를 반환해야 하는데 그러지 못하고 있기 때문이다. (async 함수는 보이는 것보다 내부적으로 훨씬 더 복잡하기에 겉보기와 달리 plain 자바스크립트 객체를 반환하는 게 아니다.) 그렇다고 단순히 Promise 객체를 `payload` 로 넣어준다고 리덕스가 알아서 그걸 기다렸다가 다시 싸이클을 돌려주지 않는다. 
+
+그래서 `Redux Thunk` 같은 미들웨어를 이용해야 한다. 
+
+### 미들웨어
+
+리덕스에서 미들웨어란, `Action` 이 dispatch 될 때마다 호출되는 함수다. 이 함수는 `Action` 을 **멈추**거나 **수정**하는 등 `Action` 을 갖고 놀 수 있다. 오픈소스 미들웨어의 종류는 다양한데, 가장 유명한 미들웨어는 비동기 `Action` 을 처리하기 위한 것들이며, 그 중 `Redux Thunk` 를 배울 것이다. (물론 비동기 외에도 다른 용도에도 충분히 활용 가능한 미들웨어다.)
+
+### Redux Thunk 의 Rules
+
+본래 **Rules of Actions** 은
+
+1. Action Creators must return action objects
+2. Actions must have a type property
+3. Actions can optionally have a 'payload'
+
+였다. 
+
+그런데 Redux Thunk 는 이 룰을 수정한다. 즉, 
+
+1. Action creators **can** return action objects
+2. Action creators **can** return **Functions**
+3. If an action object gets returned, it must have a type property
+4. If an action object gets returned , it can optionally have a 'payload'
+
+즉, 이제 **함수** 를 반환하는 `Action Creator` 가 있다. Redux Thunk 는 원래처럼 객체를 반환하는 Action Creator 는 상관하지 않고, **함수를 반환하는 경우에만** 특별한 처리를 도와준다.
+
+### 비동기 함수와 Redux Thunk
+
+어떤 Action Creator 가 비동기 요청을 처리하는 함수를 반환하는 경우,  redux thunk 는 그 함수가 `dispatch` 와 `getState` 에 접근할 수 있는 권한과 함께(인자로 받아서 가지고 간다.) 호출되게 한다. 그리고, 비동기 처리가 끝난 후에 비동기 결과 데이터를 담은 `Action` 을 담아 다시 `dispatch` 한다.
+
+>  Redux Thunk 의 깃헙 코드를 찾아가보면 고작 **14줄** 짜리 놀라운 코드를 볼 수 있다.  
+
+
+
+아래는 사용 예시다. 
+
+```javascript
+export const fetchPosts = async () => {
+  // 비동기 실패 Bad approach. ERROR: Actions must be plain objects!
+  // const response = await jsonPlaceholder.get('/posts');
+
+  // return {
+  //   type: 'FETCH_POSTS',
+  //   payload: response,
+  // };
+
+  // Redux Thunk 로 함수를 반환하면 비동기 처리가 이용가능하다.
+  return async function (dispatch, getState) {
+    const response = await jsonPlaceholder.get('/posts');
+    
+    dispatch({type: 'FETCH_POSTS', paylaod: response})
+  }
+};
+
+// 위 Action Creator 를 화살표 함수로 간략화하면 아래와 같다.
+export const fetchPosts = () => async dispatch => {
+    const response = await jsonPlaceholder.get('/posts');
+    dispatch({type: 'FETCH_POSTS', payload: response})
+}
+```
+
+
+
+## Redux Store Design
+
+### Rules of Reducers
+
+1. Must return any value besides 'undefined'. 즉 `action` 의 type 속성이 일치하는 게 없다면 현재 값, 현재 값도 없다면 매개변수로 받을 때 default state value 로 `null` 이든 `[]` 같은 빈 리스트든 빈 객체든 뭐든 넣어놨다가 반환해야 한다.
+2. Produces 'state', or data to be used inside of your app using only previous state and the action (reducers are pure). (위 1번 rule 과 거의 같은 내용. 맨 처음 앱이 실행될 때 기본 설정값이 바로 설정되기에 곧 previous state 가 된다.)
+3. Must not return reach 'out of itself' to decide what value to return (reducers are pure). Reducers 는 오직 이전 state 와 Action 만으로 변하기 때문에 외부 api 요청이나 DOM 에 접근해서 값을 받아오는 등의 행위가 reducers 내에서 일어나면 안 된다는 것을 뜻한다. 
+4. Must not mutate its input 'state' argument
+   1.  이 마지막 룰이 오해가 많다. 사실 redux 코드를 뜯어보면, reducer 가 반환한 state 가 이전 state 와 같은지 다른지를 `!==` 로 비교하고 있다. 그래서 비교해보고 변화가 있으면 변화를 업데이트하고 아니면 넘어간다. 그런데 알다시피 reducer 는 `Action` type 가 일치하는 게 없으면 이전 state 를 그대로 반환한다. 즉, reducer 내부에서 인자로 받은 state 를 어떻게 `mutate` 하든간에, **새로운** state 로 다시 복사해서 반환하지 않으면 메모리 상에서 가리키는 주소는 똑같다. (`!==` 비교 오퍼레이터는 어차피 메모리 주소만 비교한다.) 그래서 변화시키든 말든 사실 상관없다. 뭘 반환하는지가 중요하지.. 즉, 너무 겁먹고 **인자로 받은 state 의 어떤 것도 변화시키지 않으려고 할 필요가 없다**.
+
