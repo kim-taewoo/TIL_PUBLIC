@@ -1,3 +1,26 @@
 {
-  "streams": []
+  "streams": [
+    {
+      "title": "eee",
+      "description": "aaa",
+      "id": 1
+    },
+    {
+      "title": "eee",
+      "description": "aaa",
+      "id": 2
+    },
+    {
+      "title": "new STream",
+      "description": "stream added",
+      "userId": "116220927758753351863",
+      "id": 3
+    },
+    {
+      "title": "programmatic Navigation",
+      "description": "will be pushed",
+      "userId": "116220927758753351863",
+      "id": 4
+    }
+  ]
 }

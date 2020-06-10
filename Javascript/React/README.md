@@ -267,7 +267,12 @@ React Router 는 하나의 `path` 에 단 하나의 컴포넌트가 배정되는
 1. `index.html` 에서 전역 스크립트를 불러와 전역 스코프에서 `gapi` 를 사용할 수 있게 먼저 세팅한다. 이 시점에서 그 스크립트는 `  <script src="https://apis.google.com/js/api.js"></script>` 이다.
 2. `gapi` 는 그냥 다른 구글 api 를 불러오는 시작점일 뿐이고, `load` 메서드를 이용해 앱에서 쓸 다른 api 라이브러리를 끌어와야 한다. 일단 로그인부터 해보자.
 3. 구글 로그인이 필요한 컴포넌트에서 `window.gapi.load('client:auth2')` 로 로그인 OAuth 관련 라이브러리를 우선 불러온다. 그런데 이렇게 불러오는 과정에서 시간이 걸리기 때문에, 두번째 인자로 콜백함수를 넣어줘야 한다. 즉, `window.gapi.load('client:auth2', () => {})` 와 같이 콜백함수를 2번째 인자로 넣을 것이며, 이 콜백 함수는 사용할 구글 라이브러리 및 인증 정보를 더 세부적으로 담게 된다.
-4. 
 
 
+
+## React-Router
+
+> With React-Router, each component needs to be designed to work in isolation (fetch its own data!)
+
+위 말은, 각 Route의 컴포넌트에서 사용할 데이터는 다른 컴포넌트에서 불러오는 데이터에 의존해서는 안된다는 것이다. 즉, 다른 컴포넌트의 `componentDidMount` 같은 라이프 싸이클에서 불러오는 데이터는 그 컴포넌트가 로드되기 전에는 Redux 에 업데이트되지 않는다. 그래서 그 데이터의 일부를 사용하려면 그 컴포넌트를 먼저 방문해야만 한다.. 즉 직접적으로 부분 데이터만 쓰는 Route 에 새로고침이나 주소창에 쳐서 접근하면 참조할 데이터가 없으므로 `undefined` 가 되는 것이다. 즉 모든 Route 컴포넌트는 자기자신의 data 를 따로 불러와야 한다. (fetch its own data)
 

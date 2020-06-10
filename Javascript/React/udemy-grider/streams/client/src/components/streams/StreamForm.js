@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Field, reduxForm } from 'redux-form';
-import {connect} from 'react-redux'
-import {createStream} from '../../actions'
 
-export class StreamCreate extends Component {
+export class StreamForm extends Component {
   renderError({ error, touched }) {
     if (touched && error) {
       console.log(touched, error);
@@ -18,7 +16,9 @@ export class StreamCreate extends Component {
   // formProps 를 destructuring 해서 많이 쓴다.
   renderInput = (formProps) => {
     // console.log(formProps);
-    const className = `field ${formProps.meta.error && formProps.meta.touched ? 'error' : ''}`
+    const className = `field ${
+      formProps.meta.error && formProps.meta.touched ? 'error' : ''
+    }`;
     return (
       <div className={className}>
         <label htmlFor=''>{formProps.label}</label>
@@ -30,8 +30,8 @@ export class StreamCreate extends Component {
 
   onSubmit = (formValues) => {
     // console.log(formValues);
-    this.props.createStream(formValues);
-  }
+    this.props.onSubmit(formValues);
+  };
 
   render() {
     // console.log(this.props);
@@ -66,20 +66,8 @@ const validate = (formValues) => {
   return errors;
 };
 
-const formWrapped = reduxForm({
+export default reduxForm({
   // 이 form 이름 붙이기
-  form: 'streamCreate',
+  form: 'streamForm',
   validate,
-})(StreamCreate);
-
-
-const mapStateToProps = (state) => ({
-  
-})
-
-const mapDispatchToProps = {
-  createStream
-}
-
-
-export default connect(mapStateToProps, mapDispatchToProps )(formWrapped)
+})(StreamForm);
