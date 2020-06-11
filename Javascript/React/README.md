@@ -428,4 +428,30 @@ export class Button extends Component {
 
 1. Make it easy to share logic between components 
 
-가 가장 큰 이유다. 찬찬히 알아보도록 하자.
+가 가장 큰 이유다. 말이 어렵지만, 결국 **코드 재사용성** 을 높여준다는 뜻이다. 왜냐면 함수라는 건 결국 **인풋** 에 따른 **아웃풋** 이 있는 것이고, 따라서 함수형 컴포넌트에서 어떤 로직을 **다른 함수로** 분리해 놓기만 하면, 다른 컴포넌트에서도 그 함수를 불러다 쓰면 된다. 즉, 분리된 그 함수는 어떤 컴포넌트에도 종속되지 않은 개별 함수가 되어, 자유롭게 불려다 쓰일 수 있다. 
+
+
+
+### useState
+
+클래스 기반 컴포넌트와 달리 `Object` 에 state 를 담는 게 강제되지 않는다. 그냥 사용할 state 하나하나를 `useState` 로 만들어서 쓴다.
+
+`const [currentValue, setCurrentValue] = useState(initialValue)`
+
+
+
+### useEffect
+
+`componentDidMount` 와 `componentDidUpdate` 를 합친 것이라고도 볼 수 있다. `useEffect` 에 정의된 함수는, 컴포넌트가 initialized 되거나 updated 될 때마다 실행되기 때문이다. `useEffect` 는 class 기반 컴포넌트에서 `componentDidUpdate` 를 쓸 때의 귀찮음을 상당수 덜어준다. `componentDidUpdate` 는 자칫하면 **무한 루프**에  빠지는 코드를 짜는 경우가 있었다. 그걸 방지하기 위해 매개변수로 `prevProps` 같은 걸 받아서, 이전 값과 현재 값이 다른지 같은 지 분기문을 써줘야 했다. 그러나 `useEffect` 에서는 그냥 어떤 state 에 의존해서 업데이트를 할 것인지 두번째 인자로 명시만 하면 끝이다. 컴포넌트가 다시 렌더링 될 때, 그 state 가 변형된 경우에만 다시 함수를 호출한다. 
+
+`useEffect(() => { method to call }, [resource])`
+
+#### useEffect 의 두 번째 인자에 따른 작동
+
+1. 아예 두 번째 인자를 작성하지 않으면 **항상** 함수를 호출한다. 코드에 따라 무한 루프가 발생할 수 있다. `componentDidUpdate` 와 동일한 것처럼 생각하면 된다.
+2. `[]` 처럼 빈 배열을 넘겨주면 **처음 한 번** 만 호출된다. 즉 `componentDidMount` 와 동일하다.
+3. **똑같은 key,value 쌍을 가진 Object** 를 넘겨줄 경우, **항상 호출** 된다. 자바스크립트에서 객체는 항상 서로 다른 것이기 때문이다.
+4. `[1,2]` 와 같이 쉼표로 구분된 값들을 넣어주면 그 값이 같은 경우 두번째는 호출되지 않는다. (`[[1,2]]`) 같이 배열을 통째로 넘겨주면 어떻게 되는지 확인해보지 못했다.
+
+
+
