@@ -276,3 +276,55 @@ React Router 는 하나의 `path` 에 단 하나의 컴포넌트가 배정되는
 
 위 말은, 각 Route의 컴포넌트에서 사용할 데이터는 다른 컴포넌트에서 불러오는 데이터에 의존해서는 안된다는 것이다. 즉, 다른 컴포넌트의 `componentDidMount` 같은 라이프 싸이클에서 불러오는 데이터는 그 컴포넌트가 로드되기 전에는 Redux 에 업데이트되지 않는다. 그래서 그 데이터의 일부를 사용하려면 그 컴포넌트를 먼저 방문해야만 한다.. 즉 직접적으로 부분 데이터만 쓰는 Route 에 새로고침이나 주소창에 쳐서 접근하면 참조할 데이터가 없으므로 `undefined` 가 되는 것이다. 즉 모든 Route 컴포넌트는 자기자신의 data 를 따로 불러와야 한다. (fetch its own data)
 
+
+
+## Redux-Form
+
+Redux-Form 이 감싸고 있는 컴포넌트는 자동으로 가지게 되는 속성들과 메서드들이 많다. 예를 들어 부모 컴포넌트에서 Redux-Form 이 감싸고 있는 컴포넌트에 `initialValues` 라는 `props` 로 Redux-Form 의 각 `name` 에 맞는 초기값을 넘겨줄 수 있다. 
+
+
+
+## React-Portal
+
+어떤 컴포넌트에서 다른 컴포넌트를 불러온다는 건 보통 **자식 컴포넌트로서** 불러오는 것이다. 그런데 **Modal** 과 같이, 현재 그려진 화면의 최상단 부근에 HTML 요소를 그려야할 때가 종종 발생한다. 이럴 때 CSS 속성 조절을 통해 최상단 위에 그려지도록 하는 건 앱의 복잡도(깊이) 에 따라 사실상 불가능하다.(CSS 에 Stacking content 라는 개념이 있다. 결국 최상단 부모 요소의 css 가 z-index 등의 최우선 비교대상이 된다는..) 이런 상황에서 쓰는 게 **React-Portal** 이다. React-Portal 을 이용하면 특정 상황에 일반적인 방법으로 컴포넌트를 불러오되, 그 불러온 컴포넌트를 그리는 위치가 자기 자신의 자식 컴포넌트로서가 아닌 원하는 컴포넌트의(주로 최상단, body element 밑인 경우가 많다. Modal 의 경우처럼) 자식 요소로 컴포넌트를 불러와 화면에 그릴 수 있다.	
+
+물론 실제 사용할 때, `body` 요소에 붙여버리면 앱이 통째로 덮어씌워져 사라지는 참사가 발생하기 때문에, React-Portal 을 쓸 때는 현재 React SPA 이 그려지고 있는 `#root` 외에 `div` 요소를 따로 생성하고, 그곳에 React-Portal 로 만들어진 컴포넌트 내용을 삽입하는 형태를 쓴다.
+
+```javascript
+// Modal.js
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+import history from '../history'
+
+const Modal = props => {
+  return ReactDOM.createPortal(
+    <div onClick={() => history.push('/')} className="ui dimmer modals visible active">
+      <div onClick={(e) => e.stopPropagation()} className="ui standard modal visible active">
+        <div className="header">{props.title}</div>
+        <div className="content">
+          {props.content}
+        </div>
+        <div className="actions">
+          {props.actions}
+        </div>
+      </div>
+    </div>,
+    document.getElementById('modal')
+  )
+}
+
+export default Modal;
+```
+
+
+
+## React.Fragment
+
+컴포넌트끼리 jsx 를 넘겨주는 상황에서, 때로는 root element 가 한 개여야만 한다는 조건이 문제가 될 때가 있다. 특히 css 스타일링과 관련해서 에러가 종종 발생한다. 이럴 때는 `React.Fragment`, 즉 `<React.Fragment>` 로 감싸주면, 그 안에 있는 다른 html 요소들만 DOM 에 렌더링 해준다. 그런데 굳이 Fragment 의 풀네임을 쓸 필요 없이 그냥 **아무것도 적혀있지 않은 html 요소**를 쓰면 알아서 React.Fragment 임을 인지한다!! (예: `<></>`) 물론 이걸 에러로 생각하는 eslint 도 있으니 그럴 땐 풀네임을 써주자.
+
+
+
+## PUT vs PATCH
+
+많은 사람들이 실수 하는 게, `PUT` 요청은 기존 데이터를 아예 **대체** 해버린다는 것이다. 만약 일부 속성만을 업데이트하는 게 목적이고, 다른 속성은 그대로이길 바란다면, `PATCH` 요청을 해야함을 명심하자.
