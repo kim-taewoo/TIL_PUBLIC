@@ -368,7 +368,9 @@ Context Object 에 데이터를 집어넣는(in) 방법은 크게 2가지, Conte
 
 ### 심화 사용법 (Provider, Consumer)
 
-Context Object 를 가져와 마치 컴포넌트인 것처럼, 다만 뒤에 `.Provider` 를 붙인 형태로 감싼다. 그럼 그 사이에 있는 컴포넌트는 그 Context Object 에 `value` 의 값이 추가된 객체를 받아 쓸 수 있게 된다.
+### #Provider
+
+Context Object 를 가져와 마치 컴포넌트인 것처럼, 다만 뒤에 `.Provider` 를 붙인 형태로 감싼다. 그럼 그 사이에 있는 컴포넌트는 그 Context Object 에 `value` 의 값이 추가된 객체를 받아 쓸 수 있게 된다. (Redux 에도 Provider 가 있으나, 같은 게 아니다. 우연히 이름이 겹쳤을 뿐)
 
 ```jsx
 <LanguageContext.Provider value={this.state.language}>
@@ -376,7 +378,7 @@ Context Object 를 가져와 마치 컴포넌트인 것처럼, 다만 뒤에 `.P
 </LanguageContext.Provider>
 ```
 
-
+### #Consumer
 
 오직 하나의 Context Object 에 접근할 생각이라면 단순히 `this.context` 로 접근하는 방식을 써도 된다. 하지만 여러 개의 Context Object 에 접근해서 데이터를 받아올 예정이라면, `Consumer` 컴포넌트를 사용해야 한다. `Consumer` 컴포넌트 내에는 반드시 **함수** 형태의 jsx 문법이 들어가야 한다. 여러 개의 Context 가 있다면 그 `Context` 컴포넌트를 중첩해서 작성한다.
 
@@ -402,3 +404,28 @@ export class Button extends Component {
 }
 ```
 
+
+
+## Replacing Redux with Context?
+
+대신해서 쓸 수 있게 구조를 변경시킬 수 있으나, 리덕스가 쓸모 없어졌다고 하기에는 어렵다.
+
+우선 Context 를 Redux 처럼 쓸 수 있으려면
+
+1. We need to be able to get data to any component in our hierarchy
+2. We need to be able to separate our view logic from business logic
+3. We need to be able to split up business logic (not have a single file with 10000 lines of code)
+
+
+
+## Hooks
+
+원래 Function-based Components 는 Class-Based Components 와 달리 State 도, Lifecycle Methods 도 가지지 못하는 단순한 jsx 반환용 컴포넌트에 쓰였다. 그런데 Hook 이 등장함으로써 State 와 Lifecycle methods의 흉내를 낼 수 있게 되었다. 
+
+#### 근데 왜?
+
+잘 쓰던 Class 기반 컴포넌트 대신 굳이 Hooks 을 이용해 Function-Based 컴포넌트를 쓰려는 이유는
+
+1. Make it easy to share logic between components 
+
+가 가장 큰 이유다. 찬찬히 알아보도록 하자.
