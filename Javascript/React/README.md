@@ -328,3 +328,77 @@ export default Modal;
 ## PUT vs PATCH
 
 많은 사람들이 실수 하는 게, `PUT` 요청은 기존 데이터를 아예 **대체** 해버린다는 것이다. 만약 일부 속성만을 업데이트하는 게 목적이고, 다른 속성은 그대로이길 바란다면, `PATCH` 요청을 해야함을 명심하자.
+
+
+
+## The Context System
+
+리덕스를 대체한다고 말하는 사람들이 많지만 그렇지는 않다. Context System 은 단순히 특정 컴포넌트에서 다른 컴포넌트로 **Context Object** 를 통해 곧바로 데이터를 전달할 수 있게 할 뿐이다.
+
+Context Object 를 만드는 건 그냥  `export default React.createContext()` 만 하면 끝난다. 중요한 것은 그 Context Object 에 데이터를 넣는 방법과, 빼내서 쓰는 방법이다. 
+
+Context Object 에 데이터를 집어넣는(in) 방법은 크게 2가지, Context Object 에서 데이터를 꺼내는 방법도 크게 2가지다. 왜 1가지 방법으로 통일되어 있지 않고 2가지냐면, 특정 상황마다 어울리는 게 달라서라고 한다. 
+
+
+
+### 꺼낼 때
+
+1. Default Value
+2. Parent Component 에서 `Provider` 컴포넌트 사용
+
+
+
+### 빼낼 때
+
+1. `this.context` 
+2. `Consumer` 컴포넌트 사용
+
+
+
+### 기초 사용법
+
+1. `src` 폴더 아래에 `contexts` 폴더를 생성한다.
+2. 관리할 데이터 이름을 따 `~Context.js` 파일을 만든다.
+3. 위 파일에서는 그저 `export default React.createContext()` 만 한다. 
+4. `createContext()` 의 인자로 Default Value 를 넣을 수 있다. `createContext('english')` 같이
+5. 이제 이 Context Object 를 사용하고 싶은 컴포넌트에서 `~Context.js` 를 import 한 뒤에, 클래스 내에 `static contextType = ~Context` 처럼 static attribute 를 작성한다. **이름을 다르게 지어서는 안된다! 반드시 contextType 이어야 한다.**
+6. 이제 해당 컴포넌트 내에서 `this.context` 로 Context object 내용을 가져올 수 있다. 
+
+
+
+### 심화 사용법 (Provider, Consumer)
+
+Context Object 를 가져와 마치 컴포넌트인 것처럼, 다만 뒤에 `.Provider` 를 붙인 형태로 감싼다. 그럼 그 사이에 있는 컴포넌트는 그 Context Object 에 `value` 의 값이 추가된 객체를 받아 쓸 수 있게 된다.
+
+```jsx
+<LanguageContext.Provider value={this.state.language}>
+    <UserCreate />
+</LanguageContext.Provider>
+```
+
+
+
+오직 하나의 Context Object 에 접근할 생각이라면 단순히 `this.context` 로 접근하는 방식을 써도 된다. 하지만 여러 개의 Context Object 에 접근해서 데이터를 받아올 예정이라면, `Consumer` 컴포넌트를 사용해야 한다. `Consumer` 컴포넌트 내에는 반드시 **함수** 형태의 jsx 문법이 들어가야 한다. 여러 개의 Context 가 있다면 그 `Context` 컴포넌트를 중첩해서 작성한다.
+
+```jsx
+export class Button extends Component {
+  renderSubmit(value) {
+    return value === 'english' ? 'Submit' : '제출'
+  }
+
+  render() {
+    return (
+      <ColorContext.Consumer>
+        {(color) => (
+          <button className={`ui button ${color}`}>
+            <LanguageContext.Consumer>
+              {(value) =>  this.renderSubmit(value)}
+            </LanguageContext.Consumer>
+          </button>
+        )}
+      </ColorContext.Consumer>
+    )
+  }
+}
+```
+
