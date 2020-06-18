@@ -1,25 +1,57 @@
+# TYPESCRIPT
+
+
+
 ## 명령어 단축
 
 `ts-node index.ts` : `tsc index.ts` + `node index.js`
 
+
+
+## 컴파일 옵션
+
+`tsc index.ts` 처럼 `tsc` 명령어로 타입스크립트 파일을 컴파일하면 되지만, 컴파일 옵션을 다양하게 바꿀 수 있다는 걸 알아야 한다. 명령어 조합으로 옵션을 바꿀 수도 있지만 보통 `touch tsconfig.json`과 같은 명령어로 `tsconfig.json` 파일을 만들어서 따로 컴파일 옵션을 지정한다. 
+
+
+
+### target
+
+어떤 자바스크립트로 컴파일할 지 결정한다. 예를 들어 "ESNext"  로 설정하면 `async`, `await` 도 natively 지원하는 최신 문법으로 컴파일한다. (즉, 컴파일 결과물이 달라지는 거의 게 없다.)  Default value 는 `"ES3"` 로, `async`, `await` 을 쓰고 있었다면 비슷한 결과를 내기 위해 미친듯이 복잡한 자바스크립트 코드로 컴파일되는 걸 볼 수 있다.
+
+```json
+{
+    "compilerOptions": {
+        "target": "ESNext"
+    }
+}
+```
+
+### watch
+
+`"watch" : true` 는 파일을 저장할 때마다 recompile 을 자동으로 해주는 옵션이다.
+
+
+
+
+
 ## types
 
 **Type** : Easy way to refer to the different properties + functions that a value has.
-**이름을 붙이는** 것이라 생각하자. 어떤 json data 를 받았을 때, 그 json data 가 어떤 property 를 가진 data 인지를 계속 말하기 보다, 그냥 `User` 라고 이름 붙이는 거다. 그래서 이 json data 는 `User` 다. 라고 말할 수 있게 된다. 물론 그 `User` 가 그래서 뭘 가지고 있는지는 `interface` 로 정의했던 `User` 를 더 들여다보면 되겠지.
+**이름을 붙이는** 것이라 생각하자. 어떤 json data 를 받았을 때, 그 json data 가 어떤 property 를 가진 data 인지를 하나하나씩 설명하기 보다, 그냥 `User` 라고 이름 붙이는 거다. 그래서 이 json data 는 `User` 다. 라고 말할 수 있게 된다. 물론 그 `User` 가 그래서 뭘 가지고 있는지는 `interface` 로 정의했던 `User` 를 더 들여다보면 되겠지.
 
 ## Type annotations and Type inference
 
 annotations 은 개발자가 타입스크립트가 곧바로 알 수 있게 직접 작성하는 것이고, Inference 는 타입스크립트가 알아서 예측하는 것이다.
 
-Inference 의 경우, 변수의 선언과 함께 곧바로 초기화를 하면 쉽게 예측한다. 따라서, 대부분의 단순 변수 선언에서 굳이 Type annotation 을 해줄 필요는 없이 Type inference 에 의존할 수 있다.
+Inference 의 경우, 변수의 **선언과 함께 곧바로 초기화**를 하면 쉽게 예측한다. 따라서, 대부분의 단순 변수 선언에서 굳이 Type annotation 을 해줄 필요는 없이 Type inference 에 의존할 수 있다.
 
 함수의 inference 는 매개변수는 추측하지 않고 return value 만 추측한다.
-그래서 매개변수에 대한 타입을 적어놨다면 return 타입은 보통 알아서 추측해준다. **하지만** 무조건 리턴 값 타입도 쓰는걸 추천한다. 그래야만 혹시나 return 구문을 빼먹거나 헀을 때 경고를 받을 수 있다.
+그래서 매개변수에 대한 타입을 적어놨다면 return 타입은 보통 알아서 추측해준다. **하지만** 무조건 리턴 값 타입도 쓰는걸 추천한다. 그래야만 혹시나 return 구문을 빼먹거나 헀을 때 경고를 받을 수 있다. (return 값의 타입은 매개변수를 넣는 괄호 오른쪽에 쓴다.)
 
 ## parameter destructuring
 
-타입은 무조건 : 로 구분해서 오른쪽에다 쓴다. destructuring 이 일어났을 때도!
-그리고 destructuring 을 했다면, 오른쪽 타입들도 그 destructuring 문법을 따라해주어야 한다. (obj 분해했으면 타입도 중괄호 안에 넣어야 함)
+타입은 무조건 **:** 로 구분해서 오른쪽에다 쓴다. destructuring 이 일어났을 때도!
+그리고 destructuring 을 했다면, 오른쪽 타입들도 그 destructuring 문법을 따라해주어야 한다. (obj 분해했으면 타입도 중괄호(객체처럼) 안에 넣어야 함)
 
 ```js
 const logWeather = (forecast: { date: Date, weather: string }): void => {
@@ -248,3 +280,219 @@ export class Attributes<T> {
     return this.attributes.get;
   }
 ```
+
+
+
+## Decorators
+
+
+
+데코레이터는 그냥 Function 인데, 
+
+1. 내 source code 에 hook in 해서, 그 코드의 기능을 확장하거나 수정할 수 있다.
+2. meta data 로 주석을 남길 수 있다. 이 주석 다는 기능은 사실 angular compiler 같이 dependency injection 같은 기능이 필요할 때 쓴다.. 1번에 집중하자.
+
+### 추가 설명(udemy)
+
+1. **class** 내의 property/method 를 수정하고, 바꾸는 등의 역할을 할 수 있는 함수들
+2. vanilla javascript 의 decorator와 **다르다.**
+3. 오직 `class` 내부에서만 사용된다. 
+4. 데코레이터가 실행되는 순서를 이해하는 것이 중요하다. (decorator 는 composable 하기에, 여러 개가 한 번에 한 대상에 적용될 수 있다. 보통은 위에서 아래로 실행된다.)
+5. 아직 실험중인 기능이다.
+
+### 추가 설명(Toast UI Article)
+
+[아주 정성들여 설명해주고 있는 글이다.](https://ui.toast.com/weekly-pick/ko_20200102/) 이 글을 읽으면 자바스크립트 객체의 숨겨진 작동방식 중 하나인 **속성 설명자**, 즉 `PropertyDescriptor` 가 데코레이터를 이해하는 데 큰 도움이 된다는 것을 알 수 있다.
+
+
+
+### 5 things that can be decorated
+
+#### 01. class definitions (덜 중요)
+
+- class decorator는 constructor 를 인자로 받는다.
+
+```typescript
+function Frozen(constructor: Function) {
+    Object.freeze(constructor);
+    Object.freeze(constructor.prototype);
+}
+
+// 컴포넌트 class 에 Decorator 적용사례
+@Frozen
+export class IceCreamComponent {
+    
+}
+
+// 제대로 적용되었는지 확인
+console.log(Object.isFrozen(IceCreamComponent))
+
+class Froyo extends IceCreamComponent {} // 에러 발생! readonly 상태기 때문에 부모 컴포넌트가 될 수 없다.
+```
+
+
+
+#### 02.properties (중요!)
+
+- 상당히 실용적으로 많이 쓰이는 사례. 예를 들어 `스텐실` 이라는 웹 컴포넌트 프레임워크에서는, 그냥 클래스 property 에 `@state` 를 붙이기만 하면 그 속성이 변경될 때 리렌더링이 발생하게 할 수 있다. 마법같이!
+- property decorator 가 인자로 받는 2가지는 target(parent class) 와 key (property we are decorating)이다
+- property decorator 는 factory Function 으로 쓰이는 게 권장된다. 왜냐하면 필요에 따라 자신의 custom 데이터를 **클로저**의 특성을 이용해 사용할 수 있기 때문이다.
+
+```typescript
+// Property decorator
+/// Factory Function 임을 알 수 있다. 
+function Emoji() {
+    // 여기에 어떤 변수를 작성하면 클로저를 이용해 privately 하게 쓸 수 있겠지
+    return function(target: Object, key: string | symbol) {
+        let val = target[key];
+        const getter = () => {
+            return val;
+        };
+        const setter = (next) => {
+            console.log('updating flavor...');
+            val = `:-) ${next} :-)`;
+        };
+        
+        // override initial property
+        Object.defineProperty(target, key, {
+            get: getter,
+            set: setter, 
+            enumerable: true,
+            configurable: true
+        });
+    }
+}
+
+export class IceCreamComponent {
+    @Emoji() // Emoji 데코레이터는 Factory Function 이다.
+    flavor = 'vanilla'; // 앞 뒤로 ':-)' 붙음
+}
+```
+
+
+
+#### 03. method decorator (중요!)
+
+- 얘도 주로 factory function 쓴다.
+- 3개를 인자로 받는데, 앞 2개는 property decorator 와 동일하고, 3번째는 대상 method 자기 자신이다. 자료형이 `propertyDescriptor` 인 이유는, **메서드도 결국 어떤 object 의 property** 며, 단지 그 값이 함수일 뿐이기 때문이다. 
+
+```typescript
+function Confirmable(message: string) {
+    return function(target: Object, key: string|Symbol, descriptor: PropertyDescriptor){
+        // 원본 값은 original 에 저장
+   		const original = descriptor.value;
+        // 원하는대로 메서드 수정(다만 화살표 함수여선 안 된다. this 를 쓸 일이 있어)
+        descriptor.value = function(...args: any[]) {
+            // 여기서는 단순히 confirm 메시지 참/거짓에 따라 실행 or 취소
+            const allow = confirm(message);
+            if(allow) {
+                const result = original.apply(this, args);
+                return result;
+            } else {
+                return null;
+            }
+        }
+    }
+}
+
+export class IceCreamComponent {
+    @Emoji()
+    flavor = 'vanilla';
+	
+	toppings = [];
+	
+	@Confirmable('Are you sure?')
+	@Confirmable('checked again?') // 데코레이터는 composable 하기에 여러 개 적용가능
+	addToping(topping = 'sprinkles') {
+        this.topings.push(topping);
+    }
+}
+```
+
+
+
+#### 04. accessors
+
+- getter 이나 setter 을 말함
+- 대체로 method decorator 와 비슷하지만, 기존 descriptor 의 `value` 가 아닌 `get`  을 override 한다. 
+
+```typescript
+function WithTax(rate: number) {
+    return function(target: any, key: string, descriptor: PropertyDescriptor) {
+        const original = descriptor.get;
+        
+        descriptor.get = function() {
+            const result = original.apply(this);
+            return (result * (1+rate)).toFixed(2);
+        };
+        return descriptor;
+    }
+}
+
+export class IceCreamComponent {
+    @Emoji()
+    flavor = 'vanilla';
+	
+	toppings = [];
+	
+	@Confirmable('Are you sure?')
+	addToping(topping = 'sprinkles') {
+        this.toppings.push(topping);
+    }
+	
+	@WithTax(0.15)
+	get price() {
+        return 5.00 + 0.25 * this.toppings.length;
+    }
+	
+}
+```
+
+
+
+#### 05. Parameters
+
+- 음.. 이건 다음에
+
+
+
+### Decorator 로 Angular 에 React Hook 같은 걸 만들어보기
+
+
+
+```typescript
+import {Component} from '@angular/core';
+
+@component({
+    selector: 'app-hooks',
+    template: `
+		<p>You clicked {{count}} times </p>
+		<button (click)="setCount(count+1)">Click me! </button>
+	`,
+})
+export class HooksComponent {
+    @useState(0) count; setCount; // property decorator. 0 초기값, getter, setter 순
+    
+    @useEffect() // method decorator. initial value 나 변화시마다 동작
+    onEffect() {
+        document.title = `You clicked ${this.count} times`;
+    }
+}
+
+function UseState(seed: any) {
+    return function(target, key) {
+        target[key] = seed;
+        // 메서드 정의
+        target[`set${key.replace(/^\w/, c => c.toUpperCase())}`] = (val) => target[key]
+    }
+}
+
+function UseEffect() {
+    // 앵귤러에 이미 내재된 life cycle hook 이용
+    return function (target, key, descriptor) {
+        target.ngOnInit = descriptor.value;
+        target.ngAfterViewChecked = descriptor.value;
+    }
+}
+```
+
