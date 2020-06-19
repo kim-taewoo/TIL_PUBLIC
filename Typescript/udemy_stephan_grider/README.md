@@ -496,3 +496,235 @@ function UseEffect() {
 }
 ```
 
+
+
+
+
+## Typescript with React
+
+- `npx create-react-app --template typescript` 를 이용하면 간편하게 타입스크립트가 적용된 프로젝트를 생성할 수 있다.
+
+- 컴포넌트를 반환해야 하는 경우, 확장자가 `.tsx` 라는, jsx 를 사용하는 타입스크립트 파일을 사용한다. 그럴 필요가 없으면 그냥 `.ts` 파일을 쓴다.
+
+### props with Typescript
+
+`React.Component` 에 마우스를 올려보면, Generic 으로 `P = {}`, 즉 props 를 받는다는 걸 알 수 있다. 그래서 interface 안에 props 로 들어갈 것들을 정의하고, 그것을 `React.Component<AppProps>` 같은 형식으로 넣어주면 된다. 
+
+
+
+### state with Typescript
+
+React 컴포넌트 내에서 `constructor` 내에서 `this.state = {~~}` 와 같이 state 를 정의하려고 하면, 제대로 그 state 를 쓰지 못하는 사태가 발생한다. 그 이유는, 기본적으로 React.Component 의 `S`, 즉 state 는 `ReadOnly` 이기 때문이다. 즉 React.Component 내부에서 State 를 쓰고 싶다면 아래 두 가지 중 하나를 써야 한다.
+
+1. 클래스 내부에서 property 로 직접적으로 State 를 선언해서 Overriding 해버리거나,
+2. Props 를 Generic 으로 넣어줬듯이 두번째 Generic 으로 State 에 대한 `interface` 를 넣어줘야 한다.
+
+혹시나 두 가지 방법을 동시에 써버리면, 오버라이딩 해버린 게 더 뒤에 작동하므로, 오버라이딩된 state 가 사용됨에 유의하자!
+
+
+
+```typescript
+interface AppProps {
+  color: string;
+}
+
+interface AppState {
+  counter: number;
+}
+
+class App extends React.Component<AppProps, AppState> {
+  // state = {counter: 0}; // STATE 를 사용하는 한가지 방법. 이건 extend 한 Component의 state 를 오버라이딩 해버리고 사용한다.
+	
+  // constructor 를 사용.
+  constructor(props: AppProps) {
+    super(props);
+    this.state = {counter: 0}
+  }
+
+  onIncrement = ():void => {
+    this.setState({counter:this.state.counter+1})
+  };
+
+  onDecrement = ():void => {
+    this.setState({counter: this.state.counter - 1})
+  }
+  
+  render() {
+    return (
+      <div>
+        <button onClick={this.onIncrement}>Increment</button>
+        <button onClick={this.onDecrement}>Decrement</button>
+        {this.state.counter}
+      </div>
+    )
+  }
+}
+```
+
+
+
+
+
+### Functional Component with Typescript
+
+`JSX.Element` 타입을 반환하는 함수형 컴포넌트를 사용할 수 있다.
+
+```typescript
+const App = (props: AppProps): JSX.Element => {
+    return <div>{props.color}</div>
+}
+```
+
+
+
+## Async Action Creator with Typescript
+
+`redux-thunk` 미들웨어를 사용한 Async 액션을 생성하려고 해도, 인자로 받는 `dispatch` 등이 어떤 type 이어야하는지 알기 어렵다. 이럴 때 라이브러리를 파고들어 분석할 필요가 있다. `import 'redux'` 와 같이 임의로 라이브러리를 불러들이는 코드를 만든 후, `ctrl` + `click` 을 통해 `dispatch` 가 어떤 type 이어야 하는지 찾을 수 있다. 검색 등을 통해 찾아보면, Axios 내에 `Dispatch` 라는 interface 가 정의되어 있음을 알 수 있고, 그럼 그 `interface` 를 `import` 해서 사용할 수 있다. 완성된 코드는 아래와 비슷할 것이다.
+
+
+
+```typescript
+import axios from 'axios'
+import {Dispatch} from 'redux';
+
+const url = 'https://jsonplaceholder.typicode.com/todos'
+
+export const fetchTodos = () => {
+  return async (dispatch: Dispatch) => {
+    const response = await axios.get(url);
+
+    dispatch({
+      type: 'FETCH_TODOS',
+      payload: response.data
+    });
+  };
+};
+```
+
+
+
+하지만 이렇게 만든 코드도 여전히 
+
+1. `response` 변수가 받아오는 값이 어떤 타입인지 정보가 없으며,
+2. 현재 action creator 가 반환하는 action Object 내의`payload` 도 오류가 발생하기 쉬운 단순 문자열로 전달되고 있음을 볼 수 있다.  (enum 을 이용해 해결)
+
+1번 문제의 경우, 우리가 API 를 통해 받아올 JSON 데이터에서 사용할 property 들을 일일이 interface 로 정의해서, 그 객체의 리스트를 받아올 것임을(상황에 따라 그냥 객체일수도 있고) 명시하면 된다. 
+
+2번 문제의 경우, `enum` 을 사용하면 굳이 문자열로 정의할 필요도 없이, 순서대로 0부터 고유값이 배정되는 `enum` 의 특성을 살려 action 을 구분하는 type 을 정의할 수 있다.
+
+```typescript
+import axios from 'axios'
+import {Dispatch} from 'redux';
+import {ActionTypes} from './types'
+// ActionType 의 형태
+//export enum ActionTypes {
+//  fetchTodos
+//}
+
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const url = 'https://jsonplaceholder.typicode.com/todos'
+
+export const fetchTodos = () => {
+  return async (dispatch: Dispatch) => {
+    const response = await axios.get<Todo[]>(url);
+
+    dispatch({
+      type: ActionTypes.fetchTodos,
+      payload: response.data
+    });
+  };
+};
+```
+
+
+
+### Action interface
+
+위와 같이 ActionCreator 내부에서 반환하는 Action 이 결국 어떤 형태여야 하는지 `Optional Generic` 으로 추가하고 `interface` 를 집어넣음으로써, 의도치 않게 이상한 Action 을 dispatch 하게 되는 상황을 막을 수 있다.
+
+```typescript
+interface FetchTodosAction {
+  type: ActionTypes.fetchTodos;
+  payload: Todo[];
+}
+
+const url = 'https://jsonplaceholder.typicode.com/todos'
+
+export const fetchTodos = () => {
+  return async (dispatch: Dispatch) => {
+    const response = await axios.get<Todo[]>(url);
+
+    // 실수 방지
+    dispatch<FetchTodosAction>({
+      type: ActionTypes.fetchTodos,
+      payload: response.data
+    });
+  };
+};
+```
+
+
+
+## reducers and Typescript
+
+개별 Reducer 뿐만 아니라 전체 Reducers 를 합치는 `reducers/index.ts` 파일의 `combineReducers` 에도 typescript 를 이용해 데이터 결함을 방지할 수 있다. 
+
+
+
+`combineReducers` 함수의 Generic 으로 사용될 `interface` 를 정의해놓으면, 전체 store 가 어떤 데이터를 가져야만 하는지 한 눈에 볼 수 있게 된다.
+
+```typescript
+import { combineReducers } from 'redux';
+import { todosReducer } from './todos';
+import { Todo } from '../actions';
+
+export interface StoreState {
+  todos: Todo[];
+}
+
+export const reducers = combineReducers<StoreState>({
+  todos: todosReducer,
+});
+```
+
+
+
+### Connecting a component to Redux Store with Typescript
+
+
+
+`connect` 를 이용해 컴포넌트를 redux 에 연결할 때도, 추가적으로 작업할 게 있다. 우선 컴포넌트가 받을 `AppProps` 의 types 를 interface 로 정의해서 component 의 generic 으로 넣어야 하며, typescript 에서는 `export default` 를 사용하지 않는 것을 권장하기 때문에, 기본 컴포넌트를 `_ComponentName` 같이 언더바를 붙인 형태의 이름 붙였다가, `connect` 를 통해 연결된 것을 언더바를 제거한 형태의 이름으로 export 한다.
+
+```typescript
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { Todo, fetchTodos } from '../actions';
+import { StoreState } from '../reducers';
+
+interface AppProps {
+  todos: Todo[];
+  fetchTodos(): any;
+}
+
+class _App extends Component<AppProps> {
+  render() {
+    return <div>Hi there!</div>;
+  }
+}
+
+const mapStateToProps = ({todos}: StoreState): { todos: Todo[] } => ({
+  todos: todos,
+});
+
+const mapDispatchToProps = {
+  fetchTodos
+};
+
+export const App = connect(mapStateToProps, mapDispatchToProps)(_App);
+```
+
