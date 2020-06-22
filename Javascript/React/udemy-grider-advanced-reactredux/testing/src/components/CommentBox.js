@@ -11,7 +11,7 @@ export class CommentBox extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    this.props.saveComment(this.state.comment)
+    this.props.saveComment(this.state.comment);
     this.setState({ comment: '' });
   };
 
@@ -25,6 +25,7 @@ export class CommentBox extends Component {
             <button>확인</button>
           </div>
         </form>
+        <button onClick={this.props.fetchComments}>Fetch Comments</button>
       </div>
     );
   }
