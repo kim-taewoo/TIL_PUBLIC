@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import comments from 'reducers/comments'
 
 export class CommentList extends Component {
   renderComments() {

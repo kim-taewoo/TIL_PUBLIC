@@ -64,3 +64,51 @@ it('has a text area that users can type in', () => {
 ## Describe
 
 하나의 테스트 파일 내부에 몇 개의 겹치는 내용을 가지고 있는 테스트들이 있고, 그렇다고 그 파일 내 모든 테스트에 겹치는 내용이 아니라면, 공통된 부분이 있는 그 몇 개의 테스트들만 `describe` 로 묶어서 어떤 공통된 부분이 있는 그룹처럼 짝지을 수 있다. 이렇게 하면 좋은 점이, 그 그룹마다 별개의 `beforeEach`, 와 `afterEach` 를 가진다.
+
+## Moxios
+
+Axios 는 Enzyme 이 사용하는 가상 JSDOM 브라우저 환경에서 제대로 request 요청을 하지 못한다. 그래서 Moxios 라는 애로, 정상적인 Axios 요청을 도중에 가로채서, 마치 제대로 된 response 를 받아온 척 흉내낼 수 있다. 그런데 Async 요청과 마찬가지로 Moxios 요청도 가짜 데이터를 반환하는 데까지 시간이 좀 걸린다. 그렇기 때문에 `moxios.wait` 같은 메서드를 활용해서 가짜 response 를 반환하는 시간을 벌어줘야 한다. 
+
+### Moxios 사용시 주의할 점
+
+1. `install` 과 `uninstall` 을 `beforeEach` 와 `afterEach` 에 꼭 해주자.
+1. `moxios.wait` 내부에 들어갈 내용은 반드시 정상적인 axios 요청을 포함해선 **안** 되며, moxios 반환 값 관련만 있어야 한다. 
+
+예시 코드)
+
+```javascript
+it('can fetch a list of comments and display them', (done) => {
+  // Attempt to render the *entire* App
+  const wrapped = mount(
+    <Root>
+      <App />
+    </Root>
+  );
+  // find the 'fetchComments' button and click it
+  // 이게 정상적인 axios 요청을 호출하는 버튼 클릭이며, 이 정상 요청은 반드시 `moxios.wait` 밖에 있어야 한다.
+  wrapped.find('.fetch-comments').simulate('click');
+  // Introduce a TINY little pause
+  // 짧은 주어진 시간 동안 정상 요청을 가로채서 가짜 response 를 반환한다.
+  moxios.wait(() => {
+    // Expect to find a list of comments!
+    let request = moxios.requests.mostRecent();
+    request.respondWith({
+      status: 200,
+      response: [
+        {
+          name: 'Fetched #1'
+        },
+        {
+          name: 'Fetched #2'
+        }
+      ]
+    }).then(() => {
+      wrapped.update();
+      expect(request.config.url).toEqual('http://jsonplaceholder.typicode.com/comments')
+      expect(wrapped.find('li').length).toEqual(2);
+      done()
+      wrapped.unmount();
+    })
+  }); 
+});
+```
