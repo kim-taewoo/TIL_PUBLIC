@@ -57,3 +57,128 @@ Hooks 의 `useState` 에서 Object 를 사용하면, class based Component 에�
 
 ## cleanup
 `useEffect` 의 첫번째 인자 함수가 `return` 하는 또다른 **함수** 는 클래스 컴포넌트의 생명주기 중 `componentWillUnmount` 때 실행될 것들을 작성하는 곳이다. 주로 `componentDidMount` 때 등록했던 이벤트 listener 들을 제거하는 용도로 많이 사용한다.
+
+## 자주하는 실수
+
+`setInterval` 과 같이 이벤트 등록, 제거 자체는 한 번만 하고 한 번만 제거하면 되지만 지속해서 값의 변화를 관찰해주어야 하는 경우에는, `setState` 에 이전 값을 참조해주는 함수형태의 인자를 넣는 것이 실수 방지에 도움이 된다.
+
+```javascript
+const tick = () => {
+  // setCount(count + 1)
+  setCount(prevCount => prevCount + 1)
+}
+
+useEffect(() => {
+  const interval = setInterval(tick, 1000);
+  return () => {
+    clearInterval(interval)
+  }
+}, [])
+```
+
+## Fetching data with useEffect
+
+가까운 시일 내에 `suspense` 라는 게 데이터 fetch 를 도맡게 되겠지만, 현재엔 `useEffect` 를 잘 쓰는 게 도움이 된다.
+
+# Context API
+Context provides a way to pass data through the component tree without having to pass props down manually at every level.
+
+## 사용법
+1. createContext
+1. Provider 로 자식 컴포넌트 감싸기
+1. 자식 컴포넌트에서 Consumer 로 이용하기
+
+근데 단순히 이렇게 이용하면 너무 지저분하고 품이 많이 든다. 그래서 context hook 을 이용한다. hook 을 써도 앞 2단계는 동일하다. 다만 comsumer 단계가 간소화된다.
+
+`import` 해야되는 것은 동일하지만, 마치 `useState` 를 쓰듯이, `useContext` 의 인자로 `import` 해 온 Context 를 넣고 변수로 받기만 하면 해당 Context 가 가지고 있는 데이터를 받아서 쓸 수 있다. 
+
+### 사용예시
+```javascript
+// App.js
+import React, { createContext } from 'react';
+import ComponentA from 'components/contextAPI/ComponentA';
+
+export const UserContext = createContext()
+
+function App() {
+  return (
+    <div className="App">
+      <UserContext.Provider value={{name: 'Taewoo', age: 27}}>
+        <ComponentA />
+      </UserContext.Provider>
+    </div>
+  );
+}
+
+export default App;
+```
+
+```javascript
+import React, {useContext} from 'react'
+import {UserContext} from 'App'
+
+function ComponentA() {
+  const user = useContext(UserContext)
+  return (
+    <div>
+      {JSON.stringify(user)}
+    </div>
+  )
+}
+
+export default ComponentA
+```
+
+# useReducer
+
+1. useReducer is a hook that is used for state management.
+1. It is an **alternative** to useState
+1. What's the difference?
+1. useState is built using useReducer. 즉, useState 보다 더 primitive 한 hook 이다.
+1. When to use `useReducer` vs `useState`? 좀 더 배우고 나서 답을 알아보도록 하자.
+
+## What is reducers?
+꼭 Redux 를 알아야 할 필요는 없지만 도움은 된다.
+
+바닐라 자바스크립트의 `Array.prototype.reduce()` 의 설명을 보면, 아래와 같다.
+
+> The `reduce()` method executes a **reducer** function (that you provide) on each element of the array, resulting in a single output value
+
+즉, reducer 라는 건 reducer function 과 initial value 라는 두가지 매개변수를 가지고, 결과적으로 하나의 결과값을 반환하는 것이다. 
+
+### useReducer 사용 예
+
+마치 간소화된 redux reducer 처럼 작성된다.
+
+```javascript
+import React, { useReducer } from 'react'
+
+const initialState = 0
+const reducer = (currentState, action) => {
+  switch (action) {
+    case 'increment':
+      return currentState + 1
+    case 'decrement':
+      return currentState - 1
+    case 'reset':
+      return initialState
+    default:
+      return currentState
+  }
+}
+
+function CounterOne() {
+  const [count, dispatch] = useReducer(reducer, initialState)
+  return (
+    <div>
+      <div>Count : {count}</div>
+      <button onClick={() => dispatch('increment')}>Increment</button>
+      <button onClick={() => dispatch('decrement')}>Decrement</button>
+      <button onClick={() => dispatch('reset')}>Reset</button>
+    </div>
+  );
+}
+
+export default CounterOne
+```
+

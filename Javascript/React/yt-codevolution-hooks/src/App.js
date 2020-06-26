@@ -1,13 +1,11 @@
 import React from 'react';
 import './App.css';
-import IntervalClassCounter from 'components/IntervalClassCounter';
-import IntervalHookCounter from 'components/IntervalHookCounter';
+import CounterOne from 'components/useReducer/CounterOne';
 
 function App() {
   return (
     <div className="App">
-      {/* <IntervalClassCounter /> */}
-      <IntervalHookCounter />
+      <CounterOne />
     </div>
   );
 }
