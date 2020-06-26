@@ -420,6 +420,8 @@ export class Button extends Component {
 
 ## Hooks
 
+> `yt-Codevolution-hooks` 폴더 내 개별 문서 존재.
+
 원래 Function-based Components 는 Class-Based Components 와 달리 State 도, Lifecycle Methods 도 가지지 못하는 단순한 jsx 반환용 컴포넌트에 쓰였다. 그런데 Hook 이 등장함으로써 State 와 Lifecycle methods의 흉내를 낼 수 있게 되었다. 
 
 #### 근데 왜?
@@ -442,7 +444,7 @@ export class Button extends Component {
 
 ### useEffect
 
-`componentDidMount` 와 `componentDidUpdate` 를 합친 것이라고도 볼 수 있다. `useEffect` 에 정의된 함수는, 컴포넌트가 initialized 되거나 updated 될 때마다 실행되기 때문이다. `useEffect` 는 class 기반 컴포넌트에서 `componentDidUpdate` 를 쓸 때의 귀찮음을 상당수 덜어준다. `componentDidUpdate` 는 자칫하면 **무한 루프**에  빠지는 코드를 짜는 경우가 있었다. 그걸 방지하기 위해 매개변수로 `prevProps` 같은 걸 받아서, 이전 값과 현재 값이 다른지 같은 지 분기문을 써줘야 했다. 그러나 `useEffect` 에서는 그냥 어떤 state 에 의존해서 업데이트를 할 것인지 두번째 인자로 명시만 하면 끝이다. 컴포넌트가 다시 렌더링 될 때, 그 state 가 변형된 경우에만 다시 함수를 호출한다. 
+`componentDidMount` 와 `componentDidUpdate`, `componentWillUnmount` 를 합친 것이라고도 볼 수 있다. `useEffect` 에 정의된 함수는, 컴포넌트가 initialized 되거나 updated 될 때마다 실행되기 때문이다(따로 dependency 설정이 없을 경우). `useEffect` 는 class 기반 컴포넌트에서 `componentDidUpdate` 를 쓸 때의 귀찮음을 상당수 덜어준다. `componentDidUpdate` 는 자칫하면 **무한 루프**에  빠지는 코드를 짜는 경우가 있었다. 그걸 방지하기 위해 매개변수로 `prevProps` 같은 걸 받아서, 이전 값과 현재 값이 다른지 같은 지 분기문을 써줘야 했다. 그러나 `useEffect` 에서는 그냥 어떤 state 에 의존해서 업데이트를 할 것인지 두번째 인자로 명시만 하면 끝이다. 컴포넌트가 다시 렌더링 될 때, 그 state 가 변형된 경우에만 다시 함수를 호출한다. 
 
 `useEffect(() => { method to call }, [resource])`
 
@@ -452,6 +454,7 @@ export class Button extends Component {
 2. `[]` 처럼 빈 배열을 넘겨주면 **처음 한 번** 만 호출된다. 즉 `componentDidMount` 와 동일하다.
 3. **똑같은 key,value 쌍을 가진 Object** 를 넘겨줄 경우, **항상 호출** 된다. 자바스크립트에서 객체는 항상 서로 다른 것이기 때문이다.
 4. `[1,2]` 와 같이 쉼표로 구분된 값들을 넣어주면 그 값이 같은 경우 두번째는 호출되지 않는다. (`[[1,2]]`) 같이 배열을 통째로 넘겨주면 어떻게 되는지 확인해보지 못했다.
+5. `return` 값이 `componentWillUnmount` 때 작동하는 코드가 된다.
 
 
 
