@@ -1,11 +1,12 @@
 import React from 'react';
 import './App.css';
-import CounterOne from 'components/useReducer/CounterOne';
+
+import Counter from 'components/useMemo/Counter'
 
 function App() {
   return (
     <div className="App">
-      <CounterOne />
+      <Counter />
     </div>
   );
 }

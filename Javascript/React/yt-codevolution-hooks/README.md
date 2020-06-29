@@ -131,7 +131,7 @@ export default ComponentA
 
 # useReducer
 
-1. useReducer is a hook that is used for state management.
+1. useReducer is a hook that is used for state management. (즉, useState 나 useReducer 나 state management 를 위한 것이므로 대체재? 로 볼 수 있다.)
 1. It is an **alternative** to useState
 1. What's the difference?
 1. useState is built using useReducer. 즉, useState 보다 더 primitive 한 hook 이다.
@@ -146,9 +146,21 @@ export default ComponentA
 
 즉, reducer 라는 건 reducer function 과 initial value 라는 두가지 매개변수를 가지고, 결과적으로 하나의 결과값을 반환하는 것이다. 
 
+vanilla JS 의 `reduce()` 의 형태와도 거의 동일하다. `accumulator` 보다는 `currentState`, `currentValue` 보다는 `action` 이라는 용어가 쓰이긴 해도 조금 확장해서 생각하면 작동 방식이 거의 동일하다.
+
+```js
+// vanilla JS reduce method
+const array1 = [1, 2, 3, 4];
+const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+console.log(array1.reduce(reducer, 0));
+```
+
+
+
 ### useReducer 사용 예
 
-마치 간소화된 redux reducer 처럼 작성된다.
+마치 `action creator` 가 생략된, 간소화된 redux reducer 처럼 작성된다.
 
 ```javascript
 import React, { useReducer } from 'react'
@@ -182,3 +194,107 @@ function CounterOne() {
 export default CounterOne
 ```
 
+
+
+## Fetching data with useReducer
+
+`useState` 보다 `useReducer` 가 보기 좋을 때는, 관련된 데이터를 하나의 object 로 묶어 관리하기 더 좋아진다는 것이다. 어떤 상황(action) 에 따라 여러 개의 `state` 들이 변해야 하는 상황이라면, 하나의 `reducer` 함수 내의 하나의 `case` 내에서 변화하는 게 보기 간편하다. (결국 소형화된 redux 이다.)
+
+```js
+import React, { useEffect, useReducer } from 'react';
+import axios from 'axios';
+
+const initialState = {
+  loading: true,
+  error: '',
+  post: {},
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'FETCH_SUCCESS':
+      return {
+        loading: false,
+        post: action.payload,
+        error: '',
+      };
+    case 'FETCH_ERROR':
+      return {
+        loading: false,
+        post: {},
+        error: 'Something went wrong!',
+      };
+    default:
+      return state;
+  }
+};
+
+function DataFetchingTwo() {
+  // 보통 state 로 묶어서 state.loading 과 같이 접근하나, 그냥 destructuring 해봤다.
+  const [{loading, error, post}, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    (async function () {
+      try {
+        const response = await axios.get(
+          'https://jsonplaceholder.typicode.com/posts/1'
+        );
+        dispatch({ type: 'FETCH_SUCCESS', payload: response.data });
+      } catch (error) {
+        dispatch({ type: 'FETCH_ERROR' });
+      }
+    })();
+  }, []);
+
+  return (
+    <div>
+      {loading ? 'Loading...' : post.title}
+      {error ? error : null}
+    </div>
+  );
+}
+
+export default DataFetchingTwo;
+```
+
+
+
+## Again, `useState` vs `useReducer`
+
+| 시나리오                    | useState                | useReducer             |
+| --------------------------- | ----------------------- | ---------------------- |
+| Type of state               | Number, String, Boolean | Object or Array        |
+| Number of state transitions | One or two              | Too many               |
+| Related state transitions   | No                      | Yes                    |
+| Business Logic              | No business logic       | Complex business logic |
+| Local vs global             | Local                   | Global                 |
+
+
+
+# useCallback
+
+## Performance Optimization
+
+리액트의 컴포넌트들은 기본적으로 화면의 어떤 요소가 변하면 그 변화가 자신과 관계가 없어도 모두 **rerendering** 된다. 이 것을 막기 위해서는, 컴포넌트를 `export` 할 때 `React.memo` 로 감싸 주어야 한다. 그러나 이 경우에도 상위 컴포넌트(부모 컴포넌트) 가 props 로 넘겨주는 **함수 **(callback 함수) 는 마치 그 때마다 재정의되는 것으로 여겨지기 때문에, 해당 함수를 prop (callback 함수) 으로 받고 있는 경우엔 실질적으로 함수의 내용이 바뀌지 않았어도 마치 새로운 함수처럼 여겨 자식 컴포넌트가 **rerender** 되어 버린다. 
+
+위 문제를 해결하기 해서 사용하는 것이 `useCallback` 이다. 
+
+
+
+## What is useCallback?
+
+`useCallback` is a hook that will return a memoized version of the callback function that only changes if one of the dependencies has changed.
+
+## Why useCallback?
+
+It is useful when passing callbacks to optimized(React.memo) child components that rely on reference equality yo prevent unnecessary renders.
+
+## How to use useCallback?
+
+**부모 컴포넌트** 에서 callback 함수를 정의할 때,  function expression 의 바디 부분을 `useCallback` 으로 주고, 그 첫번째 인자로 원하는 함수 정의, 두번째 정의로 dependency 를 준다.
+
+
+
+# useMemo
+
+캐싱할 `return` 값을 반환하는 함수를 첫번째 인자로 가진다. 두 번째 인자로는, 언제 다시 계산할 지, 즉 어떤 값이 변했을 때 다시 계산할지를 결정하는 **dependency** 를 배열 안에 넣는다. 그리고 이런 인자를 가진 `useMemo` 전체를 어떤 변수에 할당한다. 그러면 그 변수는 `useMemo` 가 캐싱했거나, 때에 따라 새로 계산한 값을 가지게 된다. 즉, 원래 **함수** 여서 JSX 상에서 `()` 로 호출하며 결과값을 얻었던 것이, `useMemo` 를 사용함으로써 함수가 아닌 변수가 된다는 점에 유의하자.
