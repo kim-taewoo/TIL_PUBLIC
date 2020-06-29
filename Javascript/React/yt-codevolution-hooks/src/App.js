@@ -1,12 +1,14 @@
 import React from 'react';
 import './App.css';
+import FocusInput from 'components/useRef/FocusInput';
+import HookTimer from 'components/useRef/HookTimer';
 
-import Counter from 'components/useMemo/Counter'
+
 
 function App() {
   return (
     <div className="App">
-      <Counter />
+      <HookTimer />
     </div>
   );
 }
