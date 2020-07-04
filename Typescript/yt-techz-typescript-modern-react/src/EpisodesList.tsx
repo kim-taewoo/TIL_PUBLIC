@@ -8,7 +8,7 @@ export default function EpisodesList(props: any): Array<JSX.Element> {
       <section key={episode.id} className='episode-box'>
         <img src={episode.image.medium} alt={`Rick & Morty ${episode.name}`} />
         <div>{episode.name}</div>
-        <section>
+        <section style={{ display: 'flex', justifyContent: 'space-between' }}>
           Season: {episode.season} Number: {episode.number}
           <div>
             <button type='button' onClick={() => toggleFavAction(episode)}>
