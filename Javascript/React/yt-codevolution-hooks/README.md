@@ -6,14 +6,14 @@
 
 ## 기존의 React 문제점 1
 
-1. Understand how `this` keyword works in Javascript
+1. Need to understand how `this` keyword works in Javascript
 1. Remember to bind event handlers in class components
 1. Classes don't minify very well and make hot reloading very unreliable
 
 ## 기존의 React 문제점 2
 
 1. There is no particular way to reuse stateful component logic
-1. 위 문제를 해결하기 위해 HOC and render props patterns do address this problem 를 도입하지만, 한 컴포넌트를 다른 여러 컴포넌트로 감싸는 등 이상하고 복잡해짐
+1. 위 문제를 해결하기 위해 HOC and render props patterns do address this problem 를 도입하지만, 한 컴포넌트를 다른 여러 컴포넌트로 감싸고 또 감싸는 등 이상하고 복잡해짐
 1. Hooks 를 사용함으로써 더 나은 방법으로 stateful logic 을 공유할 수 있음.
 
 ## 기존의 React 문제점 3
@@ -46,9 +46,9 @@ const incrementFive = () => {
 };
 ```
 
-## useState with object and with Array
+## useState with Object and with Array
 
-Hooks 의 `useState` 에서 Object 를 사용하면, class based Component 에서의 `this.setState` 와 달리 객체의 어떤 속성을 업데이트 할 때 자동으로 그 업데이트된 속성과 나머지 속성을 merge 해서 update 해주지 않는다. 즉, 알아서 spread operator 를 이용해서 객체를 합체 완성시켜 줘야 한다(즉 hook 의 setState 는 update 가 아니라 replace 가 발생한다.). Array 일 때도 마찬가지..
+Hooks 의 `useState` 에서 Object 를 사용하면, class based Component 에서의 `this.setState` 와 달리 객체의 어떤 속성을 업데이트 할 때 자동으로 그 업데이트된 속성과 나머지 속성을 merge 해서 update 해주지 않는다. 즉, 알아서 spread operator 를 이용해서 객체를 합체 완성시켜 줘야 한다(즉 hook 의 setState 는 update 가 아니라 replace 가 발생한다.). Array 일 때도 마찬가지.. (리덕스의 리듀서를 생각하면 된다.)
 
 # useEffect
 
@@ -281,6 +281,10 @@ export default DataFetchingTwo;
 
 
 
+> `useCallback` 어디까지나 callback 함수에 관련된 것이다. 즉, 자식 컴포넌트에게 넘겨주는 콜백함수와 연관있을 뿐, 컴포넌트 자체의 `state` 나 `context` 와 관련된 상황에선 당연히 rerender 된다. 또한, `React.memo` 와 같이 애초에 최적화를 노린 컴포넌트에만 사용하도록 하자. 
+
+
+
 ## What is useCallback?
 
 `useCallback` is a hook that will return a memoized version of the callback function that only changes if one of the dependencies has changed.
@@ -298,3 +302,21 @@ It is useful when passing callbacks to optimized(React.memo) child components th
 # useMemo
 
 캐싱할 `return` 값을 반환하는 함수를 첫번째 인자로 가진다. 두 번째 인자로는, 언제 다시 계산할 지, 즉 어떤 값이 변했을 때 다시 계산할지를 결정하는 **dependency** 를 배열 안에 넣는다. 그리고 이런 인자를 가진 `useMemo` 전체를 어떤 변수에 할당한다. 그러면 그 변수는 `useMemo` 가 캐싱했거나, 때에 따라 새로 계산한 값을 가지게 된다. 즉, 원래 **함수** 여서 JSX 상에서 `()` 로 호출하며 결과값을 얻었던 것이, `useMemo` 를 사용함으로써 함수가 아닌 변수가 된다는 점에 유의하자.
+
+
+
+## useCallback vs useMemo
+
+`useCallback` 은 콜백 함수 자체를 (함수 instance 라고 하는 게 더 옳은 표현이다.)  캐싱한다면, `useMemo` 는 어쨋거나 함수는 invoke 시키고, 그 계산 **결과값만**을 캐싱한다. 
+
+
+
+# useRef
+
+useRef 는 그냥 그 html 요소를 가리키기 위해서도 쓰이지만, 재렌더링 없이 어떤 특성을 변형할 때도 쓰인다. 특히나 `useEffect` 와 함께 쓰이는데, `componentDidMount` 시점에 `ref.current` 에 어떤 속성을 부여하고, 이후 어떤 이벤트 발생시 그 속성에 변화, 제거 등을 할 수 있다. 대표적인 사례는 `clearInterval` 이다.  즉, 굳이 `ref` 키워드를 html 요소에 붙이지 않은 상태(`null` 초기값만을 가진 상태) 에서도, `useRef` 는 아주 쓸만한 훅이다. `ref.current` 에 원하는 특성을 넣어두고, 특정 이벤트 때 그것을 변형시킬 수 있다.
+
+
+
+# Custom Hooks
+
+Share logic 이 주 목적이며, HOC 와 Render Props 의 대체재라고 할 수 있다.

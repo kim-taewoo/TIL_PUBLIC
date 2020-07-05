@@ -1,4 +1,4 @@
-import React, { useEffect, Fragment } from 'react';
+import React, { useEffect } from 'react';
 import SearchBar from './components/layout/SearchBar';
 import Logs from './components/logs/Logs';
 import AddBtn from './components/layout/AddBtn';
@@ -17,7 +17,7 @@ const App = () => {
     M.AutoInit();
   }, []);
   return (
-    <Fragment>
+    <>
       <SearchBar />
       <div className='container'>
         <AddBtn />
@@ -27,7 +27,7 @@ const App = () => {
         <TechListModal />
         <Logs />
       </div>
-    </Fragment>
+    </>
   );
 };
 
