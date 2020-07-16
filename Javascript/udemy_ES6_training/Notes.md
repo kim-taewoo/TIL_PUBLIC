@@ -922,7 +922,7 @@ let proto = {
 Reflect.setPrototypeOf(person, proto); // Reflect API 를 이용하는 방법.
 Reflect.apply(person.greet, null, []); // prototype 의 메서드 호출됨. // "Hello"
 
-console.log(Reflect.getPrototypeOf(person) == Person.prototype); // true
+console.log(Reflect.getPrototypeOf(person) == Person.prototype); // false
 ```
 
 ## Accessing Properties with Reflect
@@ -975,7 +975,7 @@ person.hobbies = ['Nothing']; // writable 옵션이 true 이면 수정되고, fa
 ```
 
 ### Deleting with Reflect.deleteProperty(obj, prop)
-기존에도 그냥 `delete obj.age` 같이 `delte` 키워드로 property 삭제가 가능했다. Reflect API 에서는 `.deleteProperty(obj, prop)` 으로 삭제할 수 있다.
+기존에도 그냥 `delete obj.age` 같이 `delete` 키워드로 property 삭제가 가능했다. Reflect API 에서는 `.deleteProperty(obj, prop)` 으로 삭제할 수 있다.
 
 ## Preventing Object extensions & Wrap up
 Reflect API 메서드로 어떤 객체의 property 추가를 막는(Lock) 설정을 하거나, 그 막는 설정이 되어있는지 확인할 수 있다.  
@@ -1073,3 +1073,4 @@ console.log(proxy.name); // 'Josh'
 revoke();
 console.log(proxy.name); // error 발생
 ```
+
