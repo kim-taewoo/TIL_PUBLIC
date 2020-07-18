@@ -1,3 +1,17 @@
+const debounceRender = function (instance) {
+
+  // if there's a pending render, cancel it
+  if (instance.debounce) {
+    window.cancelAnimationFrame(instance.debounce);
+  }
+
+  // setup the new render to run at the next animation frame
+  instance.debounce = window.requestAnimationFrame(() => {
+    instance.render();
+  })
+}
+
+
 const handler = function (instance) {
   return {
     get(target, prop, receiver) {
@@ -12,7 +26,8 @@ const handler = function (instance) {
     set(target, prop, value) {
       console.log('set it');
       Reflect.set(target, prop, value);
-      instance.render();
+      debounceRender(instance)
+      // instance.render();
       return true;
     },
     deleteProperty(target, prop) {
@@ -24,12 +39,14 @@ const handler = function (instance) {
   }
 }
 
+
 class Component {
   constructor(options) {
     const _this = this;
     const _data = new Proxy(options.data, handler(this))
     this.elem =document.querySelector(options.selector)
     this.template = options.template;
+    this.debounce = null;
 
     Object.defineProperty(this, 'data', {
       get() {
@@ -37,7 +54,7 @@ class Component {
       },
       set(data) {
         _data = new Proxy(data, handler(_this));
-        _this.render();
+        debounce(_this);
         return true;
       }
     })
