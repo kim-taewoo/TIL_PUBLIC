@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.workspace {
+  max-width: 800px;
+  height: 800px;
+  margin: 0 auto;
+  background-color: bisque;
+}
+
+.container {
+  width: 95%;
+  height: 60%;
+  justify-content: center;
+  align-content: center;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  background-color: #333;
+  /* padding: 1rem; */
+  margin: 3rem auto;
+}
+
+.drag-container {
+  padding: 1rem;
+  color: white;
+  /* border: 1px solid #ccc; */
+  box-shadow: 0 0 0 2px #ccc;;
+  position: relative;
+}
+
+.draggable {
+  /* padding: 1rem; */
+  background-color: white;
+  color: black;
+  cursor: move;
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  width : 200%;
+  height: 300%;
+}
+
+.draggable.dragging {
+  border: 1px solid yellow;
+  /* opacity: .5; */
+}
