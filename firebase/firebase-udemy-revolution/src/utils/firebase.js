@@ -13,6 +13,9 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-export const db = firebase.firestore();
+const db = firebase.firestore();
+export const firebaseTimestamp = firebase.firestore.FieldValue.serverTimestamp;
+export const carsCollection = db.collection('cars');
+export const employeesRef = db.collection('site').doc('employees').collection('admins');
 
 export default firebase;

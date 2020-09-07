@@ -16,6 +16,7 @@ const Routes = () => (
         <Route exact path='/cars' component={Cars} />
       </Switch>
     </main>
+    <Footer />
   </BrowserRouter>
 );
 
