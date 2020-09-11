@@ -27,5 +27,5 @@ def solution(s):
     return len(s) - max_shorten
 
 
-s = "abcabcabcabcdededededede"
+s = "aabbaccc"
 print(solution(s))
