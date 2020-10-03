@@ -504,3 +504,112 @@ function() {}
 코드를 캡슐화할 때는 항상 이름없는 랩퍼(Anonymous Wrapper)로 네임스페이스를 만들어 사용할 것을 추천한다. 이 래퍼(Wrapper)는 이름이 중복되는 것을 막아 주고 더 쉽게 모듈화할 수 있도록 해준다.
 
 그리고 전역 변수를 사용하는 것은 좋지 못한 습관이다. 이유야 어쨌든 에러 나기 쉽고 관리하기도 어렵다.
+
+# 타입
+
+## 타입 캐스팅
+
+1. 스트링으로 변환하기  
+`'' + 10 === '10'; // true`  
+숫자를 빈 스트링과 더하면 쉽게 스트링으로 변환할 수 있다.
+
+2. 숫자로 변환하기
+`+'10' === 10; // true`  
++ 연산자만 앞에 붙여주면 스트링을 쉽게 숫자로 변환할 수 있다.
+
+3. Boolean으로 변환하기
+'!' 연산자를 두 번 사용하면 쉽게 Boolean으로 변환할 수 있다.
+
+```js
+!!'foo';   // true
+!!'';      // false
+!!'0';     // true
+!!'1';     // true
+!!'-1'     // true
+!!{};      // true
+!!true;    // true
+```
+
+# undefined
+
+**undefined도 변수**  
+undefined는 undefined라는 값을 가지는 데이터 형식이다.
+
+undefined는 상수도 아니고 JavaScript의 키워드도 아니다. 그냥 undefined라는 이름의 Global 변수이고 이 변수에는 undefined라고 할당돼 있다. 그래서 이 Global 변수의 값을 쉽게 바꿀 수 있다.
+
+> ES5 Note: ECMAScript 5의 strict 모드에서는 undefined를 더는 바꿀 수 없도록 했다. 하지만 undefined라는 함수를 만들면 여전히 할당할 수 있다.
+
+undefined 값이 반환될 때:
+
+1. `global` 변수 `undefined`에 접근할 때.
+1. 선언은 했지만 아직 초기화하지 않은 변수에 접근할 때.
+1. `return` 구문이 없는 함수는 암묵적으로 undefined를 반환함.
+1. `return` 구문으로 아무것도 반환하지 않을 때.
+1. 없는 프로퍼티를 찾을 때.
+1. 함수 인자가 생략될 때.
+1. `undefined`가 할당된 모든 것.
+1. `void(expression)` 형식으로 된 표현
+
+
+# setTimeout과 setInterval
+JavaScript는 setTimeout과 setInterval함수를 이용해 비동기로 함수를 실행시킬수있다.
+
+```js
+function foo() {}
+var id = setTimeout(foo, 1000); // 0보다 큰 수를 반환한다.
+```
+setTimeout을 호출하면 타이머의 ID를 반환하고 대략 1,000밀리 초 후에 foo를 실행시킨다. foo는 딱 한 번만 실행한다.
+
+JS엔진은 타이머에 설정한 시간(timer resolution)에 따라서 코드를 실행하지만 단일 쓰레드이기 때문에 특정 코드는 실행이 지연 될수도 있다. 따라서 setTimeout으로 코드가 실행돼야 할 시간을 정해줘도 정확하게 그 시간에 실행되지 않을수도 있다..
+
+첫 번째 인자로 넘긴 함수는 전역 객체가 실행시킨다. 따라서 인자로 넘겨진 함수 내부의 `this`는 전역 객체를 가리키게 된다.
+
+```js
+function Foo() {
+    this.value = 42;
+    this.method = function() {
+        // this는 전역 객체를 가리키기 때문에 
+        console.log(this.value); // undefined를 출력한다.
+    };
+    setTimeout(this.method, 500);
+}
+new Foo();
+```
+
+## 함수 호출을 쌓는(Stacking) setInterval함수.
+setTimeout은 딱 한 번 함수를 호출하지만 setInterval은 이름처럼 지정한 시간마다 함수를 실행시켜준다. 하지만 이 함수의 사용은 좀 생각해봐야한다.
+
+setInterval은 실행하는 코드가 일정시간 동안 블럭되도 계속해서 함수를 호출하기 때문에 주기가 짧은 경우 함수 호출이 쉽게 쌓여버린다.
+
+```js
+function foo(){
+    // 1초 동안 블럭함.
+}
+setInterval(foo, 100);
+```
+
+위 코드에서 foo함수는 호출될 때마다 1초씩 실행을 지연시킨다.
+
+하지만 foo함수가 블럭되더라도 setInterval함수는 계속해서 함수 호출을 쌓기 때문에 foo함수 호출이 끝나면 10번 이상의 함수 호출이 쌓여서 대기하고 있을수도 있다. (역주: **따라서 함수 호출이 쌓이게 되면 원래 기대했던 실행 주기를 보장받지 못한다.**)
+
+블럭되는 코드 해결법
+앞에 문제를 해결하는 가장 쉽고 일반적인 방법은 setTimeout 함수에서 자기 자신을 다시 호출하는 방법이다.
+
+```js
+function foo(){
+    // something that blocks for 1 second
+    setTimeout(foo, 100);
+}
+foo();
+```
+
+이 방법은 함수 호출이 쌓이지도 않을 뿐만 아니라 setTimeout 호출을 해당 함수 안에서 관리하기 때문에 foo 함수에서 계속 실행할지 말지도 조절할 수 있다.
+
+## 타이머 없애기
+
+`clearTimeout`과 `clearInterval` 함수로 `setTimeout`과 `setInterval`로 등록한 timeout과 interval을 삭제할 수 있다. set 함수들이 반환한 id를 저장했다가 clear 함수를 호출해서 삭제한다.
+```js
+var id = setTimeout(foo, 1000);
+clearTimeout(id);
+```
+
