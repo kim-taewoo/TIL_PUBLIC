@@ -38,6 +38,25 @@
 
 위 예시처럼 Image CDN 서버에 원본 이미지 소스 이외에 원하는 사이즈 옵션을 달아서 요청하면 원하는 이미지를 얻을 수 있다.
 
-Image CDN 을 자체구축하거나 `imgix` 같은 서비스를 이용하자.
+Image CDN 을 자체구축하거나 `imgix` 같은 서비스를 이용하자. 혹은 `splash` 같은 이미지 제공 사이트에서 이미지를 가져온다면 자체 제공하는 이미지 전처리 기능이 있다.
+
+### Minify JavaScript
+
+이 항목은 production 으로 빌드하면 알아서 해주니 신경 안 써도 된다.
+
+## Javascript 코드 최적화를 위한 Performance 탭
+
+lighthouse 에서도 자바스크립트 코드와 관련해서 최적화가 필요하다고 알려주지만, 정확히 어떤 코드가 문제인지 파악하려면 Performace 탭에서 검사를 다시 해보자.
+
+1. 어떤 작업이 얼마나 시간이 걸렸는지 확인할 수 있다. 
+2. 어느 시점에 처음으로 화면이 그려졌는지 표시해준다.
+3. React 앱의 경우 `Timing` 이란 작은 탭에서는 어떤 컴포넌트가 로드됐는지까지 확인 가능하다!
+
+![](./performance.jpg)
+
+강의에서 제공한 lecture1 프로젝트의 경우, `Article` 컴포넌트의 `removeSpecialCharacter` 라는 항목이 엄청난 시간을 잡아 먹는 것을 확인할 수 있다. Performance 탭에서는 `removeSpecialCharacter` 가 좀 끊겨서 나타나지만, 사실 여러번 진행된 것은 아니고, 너무 많은 메모리를 차지해서 중간중간에 `Minor GC` 라고 적혀있는 가비지 컬렉터가 분할해서 실행하고 있었음을 확인할 수 있다.
+
+dnl
+
 
 
