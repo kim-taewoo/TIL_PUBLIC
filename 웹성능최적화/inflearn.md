@@ -60,7 +60,7 @@ lighthouse 에서도 자바스크립트 코드와 관련해서 최적화가 필�
 
 ## Webpack bundle analyzer
 
-웹팩 번들링의 결과인 `chunk~.js` 파일에서 어떤 코드가 어느정도의 크기를 차지하는지 시각화해서 보여주는 bundle analyzer 을 사용해보자. 아쉽게도 CRA(Create React App) 으로 생성한 프로젝트는 직접적으로 웹팩을 세팅할 수 없게 되어있다. eject 같은 걸 해야 하는데, 다행히 `cra-bundle-analyzer` 라는 CRA 프로젝트를 위한 라이브러리가 있으니 다운해서 사용하도록 하자.
+웹팩 번들링의 결과인 `chunk~.js` 파일에서 어떤 코드가 어느정도의 크기를 차지하는지 시각화해서 보여주는 bundle analyzer 을 사용해보자. 아쉽게도 CRA(Create React App) 으로 생성한 프로젝트는 직접적으로 웹팩을 세팅할 수 없게 되어있다. eject 같은 걸 해야 하는데, 다행히 `cra-bundle-analyzer` 라는 CRA 프로젝트를 위한 라이브러리가 있으니 다운해서 사용하도록 하자. 라이브러리를 다운 받은 후 `npx cra-bundle-analyzer` 명령어로 `report.html` 파일을 만들어낼 수 있다.
 
 결과를 보면 `node_modules` 내의 코드 중에서도 `refractor` 라는 라이브러리가 큰 공간을 차지하는 걸 알 수 있다. 그런데 이 라이브러리는 마크다운의 syntax highlight 을 위한 것이므로, 메인 페이지에서 불러올 이유가 없다. 따라서 메인 페이지 로딩 속도 개선을 위해서, 따로 **Code splitting & Lazy Loading** 해줄 필요가 있다.
 
@@ -77,3 +77,11 @@ lighthouse 에서도 자바스크립트 코드와 관련해서 최적화가 필�
 const ListPage = lazy(()=> import('./pages/ListPage/index'))
 const ViewPage = lazy(() => import('./pages/ViewPage/index'));
 ```
+
+### 텍스트 압축 적용
+
+2kb 이상의 텍스트는 gzip 으로 압축해주는 게 성능상 도움된다.
+
+> gzip 은 deflate 라는 압축 알고리즘(LZ77, 허프먼 코드? 등을 사용한 인기있는 압축 알고리즘)에 추가적인 기법(블럭화, 휴리스틱 필터링, 헤드와 체크섬 등)을 더한 것으로, 성능이 우수해 웹 환경에서 자주 쓰인다.
+
+파일을 압축해서 서빙하는 것은 서버의 역할이므로, 서버에서 텍스트 압축을 하는지 체크해야 한다. 서버를 여러개 운영한다면, 그 서버들이 모이는 곳인 라우터 서버 같은 곳에서 처리하는 것도 좋다.
