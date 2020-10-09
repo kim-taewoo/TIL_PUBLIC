@@ -103,3 +103,68 @@ const ViewPage = lazy(() => import('./pages/ViewPage/index'));
 
 위 전체적인 과정을 Critical Rendering Path Pixel Pipeline 이라고 한다. 
 
+## Reflow
+
+`width`, `height` 같은 layout 속성을 변경하는 경우에는, 화면 전체를 다시 계산해야 하므로 위 다섯 과정을 처음부터 다시 하게 된다. 즉, 완전히 새로 모든 것을 하는 걸 Reflow 라고 한다.
+
+## Repaint
+
+`color`, `background-color` 같이 색이 변경될 뿐 크기나 위치가 변하지 않으면 **Layout 단계를 생략** 할 수 있다. 이렇게 Layout 과정을 건너띄게 되는 상황을 **Repaint** 라고 한다. 
+
+## GPU 도움을 받아 Reflow 와 Repaint 피하기
+
+`transform`, `opacity` 같은 속성은 Render Tree 를 그리는 2단계까지는 동일하지만 , Layout, Paint 두 단계를 GPU 가 대신해서 처리해서 layer 를 만들어서 Composite 단계로 넘겨준다. 즉, 가장 빠르다.
+
+## 컴포넌트 Preloading
+
+Lazy loading 처리를 하면 첫 로딩 시간과 크기는 줄일 수 있지만, 결국 나눠진 파일이 필요해졌을 때 다시 그걸 불러오고 해석할 시간이 필요하다. 
+
+그래서 Preloading 기능으로, 미리 로딩하도록 할 수 있다. 마우스 오버이벤트 같은 이벤트에 기능을 달 수도 있고, 최초 페이지 마운트가 끝났을 때 추가적으로 진행할 수도 있다. 
+
+```js
+// 마우스 엔터 이벤트에 걸었을 때 이벤트 처리.
+// 딱히 변수를 딴 데서 사용하지 않아도 된다. 
+const handleMouseEnter = () => {
+    const component = import('./components/ImageModal')
+}
+```
+
+```js
+// 마운트 후 추가로 프리로딩 할 때.
+useEffect(() => {
+  const component = import('./components/ImageModal');
+}, []);
+```
+
+```js
+// 팩토리 패턴을 사용해 preload 기능을 탑재한 컴포넌트를 만들어 활용할 수도 있다.
+function lazyWithPreload(importFunction) {
+    const Component = lazy(importFunction)
+    Component.preload = importFunction
+    return Component
+}
+
+const LazyImageModal = lazyWithPreload(() => import('./components/ImageModal'));
+
+//...
+  useEffect(() => {
+    LazyImageModal.preload()
+  }, []);
+```
+
+## 이미지 프리로딩
+
+모달을 프리로딩 해와도, 모달 안의 이미지는 또 따로 프리로딩 해야 한다. 이미지는 기본적으로 화면에 노출되었을 때 그려지기 시작하기 때문이다.
+
+이미지 객체를 미리 생성한 후, 그 안에 `.src` 주소를 넣는 순간 이미지가 가져와진다는 점을 활용할 수 있다. 
+
+```js
+  useEffect(() => {
+    LazyImageModal.preload();
+
+    const img = new Image()
+    img.src =
+      'https://stillmed.olympic.org/media/Photos/2016/08/20/part-1/20-08-2016-Football-Men-01.jpg?interpolation=lanczos-none&resize=*:800'; // 이 시점에 이미지가 네트워크로 가져와지고, 캐싱되어 모달을 띄웠을 때 빠르게 뜨게 된다. 중요한 첫 이미지만 프리로딩하도록 하자.
+  }, []);
+  ```
+
