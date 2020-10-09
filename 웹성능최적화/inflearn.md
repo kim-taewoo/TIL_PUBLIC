@@ -85,3 +85,21 @@ const ViewPage = lazy(() => import('./pages/ViewPage/index'));
 > gzip 은 deflate 라는 압축 알고리즘(LZ77, 허프먼 코드? 등을 사용한 인기있는 압축 알고리즘)에 추가적인 기법(블럭화, 휴리스틱 필터링, 헤드와 체크섬 등)을 더한 것으로, 성능이 우수해 웹 환경에서 자주 쓰인다.
 
 파일을 압축해서 서빙하는 것은 서버의 역할이므로, 서버에서 텍스트 압축을 하는지 체크해야 한다. 서버를 여러개 운영한다면, 그 서버들이 모이는 곳인 라우터 서버 같은 곳에서 처리하는 것도 좋다.
+
+
+# Lecture 2 (통계 사이트)
+
+## 브라우저 렌더링 과정
+
+1. HTML, CSS, JS 파일 같은 정적 파일들을 가져와서 `DOM` 트리와 `CSS Object Model` 으로 변환시킨다. 
+
+2. 위의 변환된 내용을 Render Tree 로 만든다. Render Tree 는 두 개를 조합한 것으로 보면 된다.
+
+3. 브라우저가 Layout 으로 만든다. **위치와 크기를 계산한다.**
+
+4. Paint 한다. 레이아웃 위에 색을 칠하면서 그려나간다. 
+
+5. Composite 한다. Composite 는 각 layer 를 합치는 과정이다. 합쳐서 최종 화면을 만든다. 
+
+위 전체적인 과정을 Critical Rendering Path Pixel Pipeline 이라고 한다. 
+
