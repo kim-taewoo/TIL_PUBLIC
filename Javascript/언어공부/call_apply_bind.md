@@ -9,7 +9,7 @@ call function takes two arguments:
 1. Context
 2. Function arguments
 
-A context is an object that replaces **this** keyword inside the function. Later arguments are passed as function arguments.
+A **context is an object** that replaces **this** keyword inside the function. Later arguments are passed as function arguments.
 
 For Ex:
 
@@ -44,7 +44,7 @@ var newVolume = cylinder.volume.bind({pi: 3.14159}); // This is not instant call
 newVolume(2,6); // Now pi is 3.14159
 ```
 
-What is the use of Bind? It allows us to inject a context into a function which returns a new function with updated context. It means this variable will be user supplied variable. This is very useful while working with JavaScript events.
+What is the use of Bind? It allows us to inject a context into a function which returns a new function with updated context. It means this variable will be user supplied variable. This is very useful while working with JavaScript **events**.
 
 
 ## Scope
@@ -52,7 +52,7 @@ What is the use of Bind? It allows us to inject a context into a function which 
 There are three kinds of scopes:  
 1. Global scope
 1. Local Scope/Function scope
-1. Block scope(Introduced in ES6)
+1. Block scope(Introduced in ES6) // 즉, ES6 이전에는 없던 개념이다.
 
 ### Block Scope 예시
 
