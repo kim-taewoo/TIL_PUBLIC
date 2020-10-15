@@ -4,6 +4,8 @@
 
 CORS 는 Cross Origin Resource Sharing 의 줄임말. 도메인 주소가 다른 서버에 http request 를 전송하는 것을 이야기 하는데, 예를 들어 naver.com 에서 api.google.com 으로 http request 를 보내면 CORS 다. top level domain 이 다르면 무조건 CORS 로 간주하기 때문에, naver.com 에서 api.naver.com 으로 보내도 CORS 며, 심지어 PORT 만 달라도 CORS 로 간주된다. 
 
+또한 CORS 외에도 CORB(cross origin read blocking) 현상도 있습니다. CORS를 허용했더라도 POST, PUT, DELETE 요청에서 json을 전송하는 경우 요청이 차단됩니다. 이럴 때는 json 대신 www-form-urlencoded 형식으로 데이터를 보내면 됩니다.
+
 ## 동시성(Concurrency) 과 병렬성 (Parallelism)
 
 ### 동시성 or 병행성(Concurrency)
