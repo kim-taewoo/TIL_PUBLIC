@@ -11,7 +11,9 @@ string solution(vector<string> participant, vector<string> completion) {
     for(auto& i:completion) d[i]--;
     for(auto& i:d) {
         if (i.second != 0) {
-            return i.first;
+            answer = i.first;
+            break;
         }
     }
+    return answer;
 }
