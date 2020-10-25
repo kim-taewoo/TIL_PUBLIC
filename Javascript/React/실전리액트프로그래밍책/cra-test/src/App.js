@@ -1,16 +1,21 @@
-import Box from "./Box4";
-import TodoList from "./TodoList";
+import React, { useEffect } from 'react'
 
-function App() {
-  console.log(`REACT_APP_DATA_API = ${process.env.REACT_APP_DATA_API}`);
-  console.log(`REACT_APP_LOGIN_API = ${process.env.REACT_APP_LOGIN_API}`);
+export default function App() {
+  useEffect(() => {
+    window.onpopstate = function(e) {
+      console.log(`location: ${document.location}, state: ${e.state.name}`);
+    }
+  }, []);
+
   return (
-    <div className="App">
-      <TodoList />
-      <Box /*size="big"*/ />
-    </div>
+    <>
+      <button onClick={() => window.history.pushState({name:'v1'}, '', '/page1')}>
+        page1
+      </button>
+      <button onClick={() => window.history.pushState('v2', '', '/page2')}>
+        page2
+      </button>
+    </>
   );
 }
-
-export default App;
 
