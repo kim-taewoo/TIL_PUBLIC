@@ -2,6 +2,7 @@
 - [] Apollo 의 graphQL 캐싱을 위한 Normalize 정책 알아보기 [링크](https://www.apollographql.com/blog/the-concepts-of-graphql-bc68bd819be3/)
 - [] Core concepts 의 맨 밑 **Learn More** 파트 링크 3개 공부 [링크](https://www.howtographql.com/basics/2-core-concepts/)
 - [] GraphQL 이 어떤 순서로 resolvers 들을 실행해서 합치는지 작동원리 [링크](https://www.apollographql.com/blog/graphql-explained-5844742f195e/)
+- [] GraphQL 은 어떻게 서버사이드 캐싱을 하려고 하는가 [링크](https://graphql.org/learn/caching/)
 
 # 알아둬야 할 것
 - DataLoader 를 이용해서 중복되는 쿼리를 최적화할 수 있다. [링크](https://www.howtographql.com/advanced/1-server/) 아래부분 참고.
