@@ -341,7 +341,7 @@ Context Object 에 데이터를 집어넣는(in) 방법은 크게 2가지, Conte
 
 
 
-### 꺼낼 때
+### 집어넣을 때
 
 1. Default Value
 2. Parent Component 에서 `Provider` 컴포넌트 사용

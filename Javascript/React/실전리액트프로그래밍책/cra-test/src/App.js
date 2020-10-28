@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
-import { BrowserRouter, Link, Route } from 'react-router-dom'
+import React, { useState } from 'react';
+import { BrowserRouter, Link, Route } from 'react-router-dom';
 import useWindowWidth from './customHooks/useWindowWidth';
 import Rooms from './Rooms';
 import Title from './Title';
+import Timer from './Timer';
 
 export default function App() {
   return (
@@ -18,44 +19,41 @@ export default function App() {
         <br />
         <Link to='/resize'>Resize Event</Link>
         <br />
-        Route
+        <Link to='/timer'>Timer</Link>
       </div>
       <Route exact path='/' component={Home} />
       <Route path='/photo' component={Photo} />
       <Route path='/rooms' component={Rooms} />
       <Route path='/rmemo' component={Rmemo} />
       <Route path='/resize' component={Resize} />
+      <Route path='/timer' component={Timer} />
     </BrowserRouter>
   );
 }
 
-function Home({match}) {
-  return <h2>홈페이지</h2>
+function Home({ match }) {
+  return <h2>홈페이지</h2>;
 }
 
-function Photo({match}) {
-  return <h2>사진 감상페이지</h2>
+function Photo({ match }) {
+  return <h2>사진 감상페이지</h2>;
 }
 
-function Rmemo({match}) {
-  const [count, setCount] = useState(0)
+function Rmemo({ match }) {
+  const [count, setCount] = useState(0);
   function onClick() {
-    setCount(count+1);
+    setCount(count + 1);
   }
   return (
     <div>
       <Title title={`현재 카운트: ${count}`} />
       <button onClick={onClick}>Increase</button>
     </div>
-  )
+  );
 }
 
 function Resize() {
   const width = useWindowWidth();
 
-  return (
-    <div>
-      {`width is ${width}`}
-    </div>
-  )
+  return <div>{`width is ${width}`}</div>;
 }

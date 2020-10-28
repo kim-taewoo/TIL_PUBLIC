@@ -92,16 +92,15 @@ function* g2_third() {
 // next 메서드를 호출하는 쪽에서 제너레이터 함수로 데이터를 전달할 수 있다. 
 // 다음과 같이 next 메서드의 데이터를 전달할 수 있다. (기본값 덮어씌우는 느낌)
 function* f1() {
-  const data1 = yield; // 아예 안 써도 됨.
-  // const data1 = yield 3;
+  const data1 = yield;
   console.log(data1);
-  const data2 = yield 5;
+  const data2 = yield 5; // 외부 함수에 이 기본값을 우선 돌려준 뒤에 next 로 받은 값을 그 다음 next 에 대입한다. 
   console.log(data2);
 }
 const gen = f1();
-gen.next(); // 단순히 제너레이터 함수의 실행이 시작하도록 하는 역할만 수행 (yield 까지니까?)
-gen.next(10);
-gen.next(20);
+console.log('chk', gen.next().value); // 단순히 제너레이터 함수의 실행이 시작하도록 하는 역할만 수행 (yield 까지니까?)
+console.log('chk', gen.next(10).value);
+console.log('chk', gen.next(20).value);
 
 // 협업 멀티태스킹
 // 멀티태스킹은 여러 개의 태스크를 실행할 때 하나의 태스크가 종료되기 전에 멈추고 다른 태스크가 실행되는 것을 말함.
