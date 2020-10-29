@@ -1,0 +1,7 @@
+{
+  "extends": "../../common/.babelrc",
+  "plugins": [
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-template-literals" // extends 해온 애 설정을 덮어씌운다.
+  ]
+}
