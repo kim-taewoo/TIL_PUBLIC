@@ -1,3 +1,11 @@
+# Babel 을 실행하는 여러 가지 방법
+1. @babel/cli 로 실행
+1. 웹팩에서 babel-loader 로 실행
+1. @babel/core 를 직접 실행
+1. @babel/register 로 실행. 
+
+이 중에서 마지막 @babel/register 을 이용하는 것은 리액트와 사용하는 경우가 많지 않음으로 생략한다.
+
 # Plugin, Preset
 필요한 Plugin 들을 모아 놓은 것이 Preset.
 
