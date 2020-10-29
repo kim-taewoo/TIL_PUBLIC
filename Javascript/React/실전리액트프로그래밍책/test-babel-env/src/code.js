@@ -1,5 +1,3 @@
-import 'core-js';
-
 const p = Promise.resolve(10);
 const obj = {
   a: 10,
