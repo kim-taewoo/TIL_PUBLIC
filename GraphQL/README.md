@@ -1,4 +1,5 @@
 # TODO
+- [] GraphQL Server Basics: GraphQL Schemas, TypeDefs & Resolvers Explained [링크](https://www.prisma.io/blog/graphql-server-basics-the-schema-ac5e2950214e)
 - [] Apollo 의 graphQL 캐싱을 위한 Normalize 정책 알아보기 [링크](https://www.apollographql.com/blog/the-concepts-of-graphql-bc68bd819be3/)
 - [] Core concepts 의 맨 밑 **Learn More** 파트 링크 3개 공부 [링크](https://www.howtographql.com/basics/2-core-concepts/)
 - [] GraphQL 이 어떤 순서로 resolvers 들을 실행해서 합치는지 작동원리 [링크](https://www.apollographql.com/blog/graphql-explained-5844742f195e/)
