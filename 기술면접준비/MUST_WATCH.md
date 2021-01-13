@@ -1,5 +1,8 @@
 [프론트엔드 면접 질문 모음](https://realmojo.tistory.com/300?fbclid=IwAR2QHO9BeoWCFB4SGYoD_7Qxx_6MLB7qNPjcVuTPXJm9Xm0Qh3wwH85wkiw)
 
+아래 링크에 그 아래 영상들 내용의 개괄을 포함하는 글이 있음.
+[how-javascript-works-in-browser-and-node](https://medium.com/jspoint/how-javascript-works-in-browser-and-node-ab7d0d09ac2f)
+
 [What the heck is the event loop anyway? | Philip Roberts | JSConf EU](https://www.youtube.com/watch?v=8aGhZQkoFbQ&feature=emb_title)
 
 [Jake Archibald: In The Loop - JSConf.Asia](https://www.youtube.com/watch?v=cCOL7MC4Pl0&t=3s)
