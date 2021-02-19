@@ -1,0 +1,2 @@
+- `npx tailwindcss init --full` 로 기본설정값을 모두 볼 수 있는 `tailwind.config.js` 파일을 만들 수 있다.
+- `--full` 없이 만들면, 보기 편하게 custom 값들을 작성할 수 있다. 
