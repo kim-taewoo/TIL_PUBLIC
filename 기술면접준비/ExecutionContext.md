@@ -1,0 +1,1 @@
+[MUST READ](https://medium.com/@happymishra66/execution-context-in-javascript-319dd72e8e2c)
