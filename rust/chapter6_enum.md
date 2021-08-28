@@ -62,6 +62,10 @@ let m = Message::Write(String::from("hello"));
 m.call();
 ```
 
+# Option<T>
+
+- Rust 에는 null 타입이 없다. null 을 개발한 사람조차 null 은 10억달러짜리 실수라며 후회했듯, rust 는 null 을 사용함으로써 생길 수 있는 에러들을 막고자 한다. 대신 Option<T>라는 Some<T>, None 두 개의 variants 를 가지는 enum 으로 None 이 될 수 있는 상황을 나타낸다. None 이 될 수 있는 상황을 타입으로 명시함으로써, 반드시 그 상황을 커버하도록 한다. 이렇듯 enum 의 값을 추출해서 확인해야 하는 상황이 많기에 아래의 match, if let 등을 사용해서 enum 내의 값을 추출해 사용한다.
+
 # `match` control flow operator
 
 - 어떤 값을 패턴들에 대입해보고 매칭되면 그에 맞는 코드를 실행시킨다.
